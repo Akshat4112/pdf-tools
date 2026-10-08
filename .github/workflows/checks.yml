@@ -1,0 +1,105 @@
+name: checks
+
+# PT-FND-008: automated checks for every push/PR to main.
+# Stages: install (npm ci, locked) -> lint -> unit tests (vitest, node) ->
+# build (tsc + vite) -> corpus validation (dual-reader, python) -> audit gate.
+# No document-bearing artifacts are ever uploaded (PT-PD-003 §10).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: app checks (lint, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - name: Install (locked)
+        run: npm ci
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      - name: Unit tests (vitest)
+        run: npm test
+
+      - name: Typecheck tests config
+        run: npx tsc -p tsconfig.test.json --noEmit
+
+      - name: Build (tsc -b && vite build)
+        run: npm run build
+
+      - name: Production dependency audit gate
+        run: npm audit --omit=dev --audit-level=high
+
+      # Build output sanity: assets must resolve under /pdf-tools/ (PT-PD-004 §5)
+      - name: Verify base path in dist
+        run: |
+          grep -q '/pdf-tools/assets/' dist/index.html || {
+            echo "::error::dist/index.html does not reference /pdf-tools/assets/ (base path broken)"; exit 1; }
+
+  corpus:
+    name: fixture corpus validation (two readers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install reader dependencies
+        run: pip install pymupdf==1.28.0
+
+      - name: Install qpdf
+        run: sudo apt-get update && sudo apt-get install -y qpdf
+
+      - name: Validate corpus (PyMuPDF + qpdf, per PT-PD-005 §4)
+        run: python3 scripts/validate_corpus.py
+
+      # Structural reproducibility: regenerated fixtures must match the committed
+      # corpus structurally (same byte sizes, page counts, markers, fields).
+      # Byte-identical output is NOT expected — PDF creation IDs/timestamps vary.
+      # The committed corpus remains the canonical reference (sha256-pinned).
+      - name: Corpus structural reproducibility check
+        run: |
+          python3 scripts/generate_fixtures.py
+          python3 scripts/validate_corpus.py
+          python3 - <<'PY'
+          import json, subprocess, sys
+          committed = json.loads(subprocess.run(
+              ["git", "show", "HEAD:fixtures/manifest.json"], capture_output=True, text=True, check=True).stdout)
+          regenerated = json.load(open("fixtures/manifest.json"))
+          def structural(entry):
+              return {
+                  "id": entry["id"], "bytes": entry["bytes"],
+                  "pages": entry["expected"].get("pages"),
+                  "fields": entry["expected"].get("form_fields"),
+                  "rotations": entry["expected"].get("rotations"),
+              }
+          a = [structural(e) for e in committed["fixtures"]]
+          b = [structural(e) for e in regenerated["fixtures"]]
+          if a != b:
+              sys.exit("::error::Regenerated corpus differs structurally from committed manifest")
+          print("Structural reproducibility: OK")
+          PY
