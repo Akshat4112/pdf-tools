@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-08T21:05:55.734Z",
+  "results": [
+    {
+      "label": "pdf-lib (full)",
+      "rawKiB": 500,
+      "gzipKiB": 189.6
+    },
+    {
+      "label": "pdfjs-dist legacy (full)",
+      "rawKiB": 479,
+      "gzipKiB": 146.7
+    },
+    {
+      "label": "pdfjs worker (own file)",
+      "rawKiB": 2361.6,
+      "gzipKiB": 504.8
+    },
+    {
+      "label": "pdfjs standard_fonts (self-host total)",
+      "rawKiB": 779.3,
+      "gzipKiB": null
+    },
+    {
+      "label": "@zip.js/zip.js",
+      "rawKiB": 215.2,
+      "gzipKiB": 91.9
+    },
+    {
+      "label": "fflate",
+      "rawKiB": 31.4,
+      "gzipKiB": 12.1
+    }
+  ]
+}
