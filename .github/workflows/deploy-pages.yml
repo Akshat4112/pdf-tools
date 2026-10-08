@@ -1,0 +1,92 @@
+name: deploy-pages
+
+# PT-FND-009: GitHub Pages deployment via GitHub Actions (PT-PD-004 §5).
+# Source: Actions (not branch deploy) — build step required for Vite.
+# Deploys main only, after ALL checks jobs pass. No preview-per-PR deploys.
+# Rollback: re-run this workflow from any older main commit (documented in PT-REL-002).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  # gate: reuse the checks workflow's jobs by re-running them here
+  checks-app:
+    name: app checks (lint, test, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npx tsc -p tsconfig.test.json --noEmit
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Verify base path
+        run: grep -q '/pdf-tools/assets/' dist/index.html
+
+  build-site:
+    name: build site artifact
+    runs-on: ubuntu-latest
+    needs: [checks-app]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Build
+        working-directory: app
+        run: |
+          npm ci
+          npm run build
+
+      # PT-SP-001 §2.1: pdf.js needs its worker + standard fonts self-hosted
+      # under /pdf-tools/assets/. Copy them from the pinned package into dist.
+      - name: Bundle pdf.js worker + standard fonts
+        working-directory: app
+        run: |
+          mkdir -p dist/assets/standard_fonts
+          cp node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs dist/assets/pdf.worker.min.mjs
+          cp node_modules/pdfjs-dist/standard_fonts/*.pfb dist/assets/standard_fonts/
+
+      - name: Asset path sanity (worker + fonts resolve under /pdf-tools/)
+        working-directory: app
+        run: |
+          test -f dist/assets/pdf.worker.min.mjs
+          ls dist/assets/standard_fonts/*.pfb | wc -l | grep -v '^0$'
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+
+  deploy:
+    name: deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [build-site]
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
