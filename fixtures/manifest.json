@@ -1,0 +1,271 @@
+{
+  "generator": "pymupdf 1.28.0",
+  "fixtures": [
+    {
+      "id": "F-001",
+      "file": "fixtures/pdf/F-001-plain-text-3p.pdf",
+      "sha256": "326571cc5a7d24ccd35f3324bfbf9414c220765d96d95d642dddecae0b457404",
+      "bytes": 2698,
+      "purpose": "baseline merge/extract/text operations",
+      "expected": {
+        "pages": 3,
+        "text_markers": [
+          "PACKING-BOX-0001",
+          "PACKING-BOX-0002",
+          "PACKING-BOX-0003"
+        ],
+        "extractable_text": true,
+        "page_size_pt": [
+          595,
+          842
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-002",
+      "file": "fixtures/pdf/F-002-plain-text-30p.pdf",
+      "sha256": "d372268e02c3dc709b216229e94835e911d7dccf258c99014f6b28f322582618",
+      "bytes": 22039,
+      "purpose": "split/organize stress, two-column page 10, 30-page corpus core",
+      "expected": {
+        "pages": 30,
+        "text_markers": [
+          "PACKING-BOX-0001",
+          "PACKING-BOX-0009",
+          "PACKING-BOX-0010",
+          "PACKING-BOX-0030"
+        ],
+        "extractable_text": true,
+        "two_column_page": 10
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-003",
+      "file": "fixtures/pdf/F-003-mixed-sizes.pdf",
+      "sha256": "540fc6488fc4f5ab036dfae1c8f2167c09b978cd5e8509832c006d8c4e7e9cf7",
+      "bytes": 2125,
+      "purpose": "mixed page geometry: A4p, A4l, US Letter, A5",
+      "expected": {
+        "pages": 4,
+        "page_sizes_pt": [
+          [
+            595,
+            842
+          ],
+          [
+            842,
+            595
+          ],
+          [
+            612,
+            792
+          ],
+          [
+            420,
+            595
+          ]
+        ],
+        "text_markers": [
+          "MIXED-SIZE-PAGE-1",
+          "MIXED-SIZE-PAGE-4"
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-004",
+      "file": "fixtures/pdf/F-004-rotated-pages.pdf",
+      "sha256": "0999d988d09cd4c413a157f4ee43661b598a069795dadf241e111484765070de",
+      "bytes": 2085,
+      "purpose": "page /Rotate attribute composition test (0/90/180/270)",
+      "expected": {
+        "pages": 4,
+        "rotations": [
+          0,
+          90,
+          180,
+          270
+        ],
+        "text_markers": [
+          "ROTATE-FIXTURE-PAGE-1",
+          "ROTATE-FIXTURE-PAGE-4"
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-005",
+      "file": "fixtures/pdf/F-005-form-acroform.pdf",
+      "sha256": "4ff343f21830efa7b0f3452a0d8c851147ae712ab6acfaa6e509ab62f9940c84",
+      "bytes": 2178,
+      "purpose": "interactive AcroForm (text field + checkbox) preservation/blocking decision tests",
+      "expected": {
+        "pages": 1,
+        "form_fields": [
+          "fullname",
+          "subscribe"
+        ],
+        "acroform": true
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-006",
+      "file": "fixtures/pdf/F-006-annotations.pdf",
+      "sha256": "713f7598e596ee32fa20dea8208babd9ed1c76536eef88e4f74b07b7006c1d3a",
+      "bytes": 2280,
+      "purpose": "annotation preservation on merge/organize; link self-target",
+      "expected": {
+        "pages": 1,
+        "annotation_types": [
+          "Highlight",
+          "Text"
+        ],
+        "links": 1
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-007",
+      "file": "fixtures/pdf/F-007-image-page.pdf",
+      "sha256": "49ca1e64be9abd3ccf3ca4a6b283b4517db1ff9d36b588b88778562babbb8c17",
+      "bytes": 4773,
+      "purpose": "embedded image rendering fidelity (PDF\u2192JPG/PNG) and rotate",
+      "expected": {
+        "pages": 1,
+        "embedded_images": 1,
+        "text_markers": [
+          "IMAGE-PAGE-001"
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-007-img",
+      "file": "fixtures/images/F-007-photo.jpg",
+      "sha256": "06fb397a6d4823b778b5394d25da5bf44e2bb51f36ceeacc453e0b5ceee40755",
+      "bytes": 755,
+      "purpose": "JPEG input for JPG\u2192PDF conversion tests",
+      "expected": {
+        "format": "JPEG",
+        "dimensions_px": [
+          120,
+          160
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-008",
+      "file": "fixtures/pdf/F-008-scan-like.pdf",
+      "sha256": "064b44d73d1f8c8b879c986eb2b48f422e3b04ba4ed1e64a72bca346aa531c31",
+      "bytes": 1506633,
+      "purpose": "image-only page: reader search notice, TXT export 'no text layer' notice, OCR gap evidence",
+      "expected": {
+        "pages": 1,
+        "extractable_text": false,
+        "note": "no text layer by construction"
+      },
+      "notes": "expects E-class behavior: reader shows 'no searchable text', TXT export explains OCR pending"
+    },
+    {
+      "id": "F-009",
+      "file": "fixtures/pdf/F-009-signed-marker.pdf",
+      "sha256": "f7e85ed7ff4ae07ce03bb366eb8fac1249b7f695978c4156fb83e4cad57e1956",
+      "bytes": 1386,
+      "purpose": "signature-indicator language test: modifying tools must warn that output invalidates signatures",
+      "expected": {
+        "pages": 1,
+        "text_markers": [
+          "SIGNED-MARKER-PAGE"
+        ]
+      },
+      "notes": "visual marker only \u2014 document-info must not claim a cryptographic signature exists"
+    },
+    {
+      "id": "F-010",
+      "file": "fixtures/pdf/F-010-encrypted-aes256.pdf",
+      "sha256": "821758ee4de060cd9d3902834f8e7d4a8f0a8cc627036a233e3c8840e16f6572",
+      "bytes": 1721,
+      "purpose": "early encrypted-input rejection (E-INPUT-02) for all R1 tools",
+      "expected": {
+        "pages": 1,
+        "encrypted": true,
+        "algorithm": "AES-256",
+        "opens_with_password": "synthetic-password-2026"
+      },
+      "notes": "password recorded here is synthetic and public within the corpus"
+    },
+    {
+      "id": "F-011",
+      "file": "fixtures/pdf/F-011-malformed-truncated.pdf",
+      "sha256": "2d1f384f9f8cadfd8eb7ce79d3c1ad329e3b9e308d2fdb43204ac19e6e4505b1",
+      "bytes": 1214,
+      "purpose": "unparsable-input handling (E-INPUT-03): recoverable error, no crash",
+      "expected": {
+        "valid_pdf": false
+      },
+      "notes": "truncated copy of F-001 \u2014 must trigger E-INPUT-03 in every tool"
+    },
+    {
+      "id": "F-012",
+      "file": "fixtures/pdf/F-012-empty.pdf",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "purpose": "zero-byte input handling (E-INPUT-03 variant)",
+      "expected": {
+        "valid_pdf": false,
+        "bytes": 0
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-013-img",
+      "file": "fixtures/images/F-013-diagram.png",
+      "sha256": "fa8e91a99d730a2b18843b11ee785691a64e332e6a8a8df4cc92cf44cf0f3e67",
+      "bytes": 655,
+      "purpose": "PNG input for images\u2192PDF conversion and PNG output comparison",
+      "expected": {
+        "format": "PNG",
+        "dimensions_px": [
+          300,
+          200
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-014",
+      "file": "fixtures/pdf/F-014-outline.pdf",
+      "sha256": "79977b55697908235ed364a85a33786414c677cae76ae483d9a582ea6dcbeb74",
+      "bytes": 3411,
+      "purpose": "bookmark/outline preservation question on merge/split (disclose or block)",
+      "expected": {
+        "pages": 6,
+        "outline_entries": 5,
+        "text_markers": [
+          "OUTLINE-PAGE-01",
+          "OUTLINE-PAGE-06"
+        ]
+      },
+      "notes": ""
+    },
+    {
+      "id": "F-015",
+      "file": "fixtures/pdf/F-015-pages-60p.pdf",
+      "sha256": "a07a91ada6c54036647ce512ece72a52c9c99ba7c99db61db685dac8410f5e7d",
+      "bytes": 42553,
+      "purpose": "larger corpus member for split-every-N, memory and quota boundary tests",
+      "expected": {
+        "pages": 60,
+        "text_markers": [
+          "PACKING-BOX-0001",
+          "PACKING-BOX-0060"
+        ]
+      },
+      "notes": ""
+    }
+  ]
+}
