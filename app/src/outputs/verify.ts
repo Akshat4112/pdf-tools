@@ -46,10 +46,11 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
       bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46
     const tail = bytes.subarray(Math.max(0, bytes.byteLength - 2048))
     let hasEof = false
-    for (let i = 0; i + 5 <= tail.byteLength; i++) {
+    // PDF trailer marker is '%%EOF' — 0x25 0x25 0x45 0x4f 0x46 (double percent).
+    for (let i = 0; i + 4 <= tail.byteLength; i++) {
       if (
-        tail[i] === 0x25 && tail[i + 1] === 0x45 && tail[i + 2] === 0x4f &&
-        tail[i + 3] === 0x46
+        tail[i] === 0x25 && tail[i + 1] === 0x25 && tail[i + 2] === 0x45 &&
+        tail[i + 3] === 0x4f && tail[i + 4] === 0x46
       ) {
         hasEof = true
         break
