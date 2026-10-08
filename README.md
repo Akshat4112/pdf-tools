@@ -12,6 +12,8 @@ The planned site is https://akshat4112.github.io/pdf-tools/. The application has
 
 [PT-PD-003 — Local data lifecycle](docs/product/PT-PD-003-data-lifecycle.md) specifies the memory-only data model, forbidden storage locations, reset semantics, and the network/storage audit contract.
 
+[PT-PD-004 — Repository and Pages eligibility](docs/platform/PT-PD-004-pages-eligibility.md) verifies the hosting plan, deployment source (GitHub Actions), published limits, and the conditions that keep the site eligible.
+
 The specification is the scope baseline after its PR is reviewed and merged. It is not a claim that listed tools already work.
 
 ## Project tracker
