@@ -16,6 +16,8 @@ The planned site is https://akshat4112.github.io/pdf-tools/. The application has
 
 [Test corpus](docs/testing/PT-PD-005-benchmark-corpus.md): 16 synthetic, license-free fixtures (text, forms, annotations, rotations, scan-like, encrypted, malformed) with a manifest of expected properties, validated by two independent readers (`scripts/validate_corpus.py`).
 
+[Dependency decisions](docs/architecture/PT-PD-006-dependency-decisions.md): approved core stack (pdfjs-dist, pdf-lib, @zip.js/zip.js, fflate) with live-verified versions and licenses, permissive-only license allowlist, and rejected candidates (AGPL mupdf, immature qpdf-wasm).
+
 The specification is the scope baseline after its PR is reviewed and merged. It is not a claim that listed tools already work.
 
 ## Project tracker
