@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { ToolCatalog } from './components/ToolCatalog'
 import { TOOLS } from './registry'
 
 const SITE = '/pdf-tools/'
 
 function App() {
-  const searchRef = useRef<HTMLInputElement | null>(null)
 
   // "/" focuses search (keyboard-first catalog, PT-PD-002 §6 target)
   useEffect(() => {
@@ -21,7 +20,6 @@ function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
-  void searchRef
 
   const live = TOOLS.filter((t) => t.implemented).length
 
