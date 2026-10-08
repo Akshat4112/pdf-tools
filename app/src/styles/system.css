@@ -1,0 +1,323 @@
+/* PT-UX-001 — Original visual system for PDF Tools.
+   Own palette/typography; no UI framework; system fonts only (no external
+   font CDN — PT-PD-001 §5). Light/dark via prefers-color-scheme. */
+
+:root {
+  /* palette — "ink & paper" scheme, original to this project */
+  --ink-900: #14121a;
+  --ink-700: #37323f;
+  --ink-500: #5f5968;
+  --ink-300: #a49fae;
+  --paper: #fdfdfb;
+  --paper-2: #f6f4ef;
+  --paper-3: #eeecf4;
+  --line: #ded9e3;
+  --accent: #6d4aff;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(109, 74, 255, 0.12);
+  --ok: #1a7f4e;
+  --ok-soft: rgba(26, 127, 78, 0.12);
+  --warn: #8a6d1a;
+  --warn-soft: rgba(138, 109, 26, 0.12);
+
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --mono: ui-monospace, 'SF Mono', Consolas, 'Roboto Mono', monospace;
+
+  --radius-s: 6px;
+  --radius-m: 12px;
+  --radius-l: 18px;
+  --shadow-1: 0 1px 2px rgba(20, 18, 26, 0.06), 0 2px 8px rgba(20, 18, 26, 0.04);
+  --shadow-2: 0 4px 12px rgba(20, 18, 26, 0.08), 0 12px 32px rgba(20, 18, 26, 0.08);
+  --focus: 0 0 0 3px var(--accent-soft), 0 0 0 1.5px var(--accent);
+
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink-700);
+  background: var(--paper);
+  color-scheme: light dark;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink-900: #f2f0f6;
+    --ink-700: #d4cfdc;
+    --ink-500: #a89fb2;
+    --ink-300: #6b6375;
+    --paper: #171520;
+    --paper-2: #1e1b29;
+    --paper-3: #262233;
+    --line: #332e42;
+    --accent: #9d86ff;
+    --accent-ink: #171520;
+    --accent-soft: rgba(157, 134, 255, 0.16);
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 400px at 80% -10%, var(--paper-3), transparent 60%),
+    var(--paper);
+  min-height: 100vh;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 0 12px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  color: var(--ink-900);
+  text-decoration: none;
+}
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-s);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  letter-spacing: -0.5px;
+}
+.brand-name {
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+}
+
+.privacy-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-500);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 12px;
+  background: var(--paper-2);
+}
+.privacy-pill strong { color: var(--ok); font-weight: 600; }
+
+/* ---------------------------------------------------------------- hero */
+
+.hero { padding: 40px 0 8px; }
+.hero h1 {
+  font-size: clamp(28px, 4.5vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+  color: var(--ink-900);
+  margin: 0 0 10px;
+  max-width: 21ch;
+}
+.hero p {
+  font-size: 17px;
+  max-width: 52ch;
+  margin: 0;
+  color: var(--ink-500);
+}
+.hero .local-note {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14.5px;
+  color: var(--ink-700);
+  background: var(--ok-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-m);
+  padding: 12px 14px;
+  max-width: 62ch;
+}
+.hero .local-note svg { flex: none; color: var(--ok); margin-top: 2px; }
+
+/* ---------------------------------------------------------------- search */
+
+.search-row { padding: 28px 0 6px; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--paper-2);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-m);
+  padding: 12px 14px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-box:focus-within { border-color: var(--accent); box-shadow: var(--focus); }
+.search-box svg { color: var(--ink-300); flex: none; }
+.search-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  outline: none;
+  min-width: 0;
+}
+.search-box input::placeholder { color: var(--ink-300); }
+.search-box kbd {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-300);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 2px 6px;
+  background: var(--paper);
+}
+
+/* ---------------------------------------------------------------- categories */
+
+.category-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 14px 0 4px;
+}
+.cat-chip {
+  font: inherit;
+  font-size: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--paper-2);
+  color: var(--ink-700);
+  border-radius: 999px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.cat-chip:hover { border-color: var(--accent); color: var(--ink-900); }
+.cat-chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+.cat-chip:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* ---------------------------------------------------------------- tool catalog */
+
+.catalog { padding: 14px 0 40px; }
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tool-card {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-m);
+  background: var(--paper-2);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 128px;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+a.tool-card { text-decoration: none; color: inherit; }
+a.tool-card:hover, a.tool-card:focus-visible {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-1);
+  transform: translateY(-1px);
+}
+a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
+
+.tool-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-s);
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.tool-title { font-weight: 650; font-size: 16px; color: var(--ink-900); margin: 0; }
+.tool-desc { font-size: 13.5px; color: var(--ink-500); margin: 0; flex: 1; }
+
+.tool-card.is-disabled { opacity: 0.62; }
+.tool-card.is-disabled .tool-icon { background: var(--paper-3); color: var(--ink-300); }
+.tool-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-300);
+}
+.badge {
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+.badge-soon { background: var(--paper-3); color: var(--ink-500); border: 1px solid var(--line); }
+.badge-live { background: var(--ok-soft); color: var(--ok); border: 1px solid transparent; }
+
+/* ---------------------------------------------------------------- empty state */
+
+.empty-state {
+  border: 1.5px dashed var(--line);
+  border-radius: var(--radius-m);
+  padding: 32px;
+  text-align: center;
+  color: var(--ink-500);
+  font-size: 15px;
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 20px 0 36px;
+  margin-top: 20px;
+  font-size: 13.5px;
+  color: var(--ink-300);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+}
+.site-footer a { color: var(--ink-500); }
+
+/* ---------------------------------------------------------------- responsive */
+
+@media (max-width: 640px) {
+  .shell { padding: 0 16px; }
+  .site-header { flex-wrap: wrap; }
+  .hero { padding-top: 24px; }
+  .privacy-pill { font-size: 12px; padding: 5px 10px; }
+}
+
+/* 200% zoom / large-text friendliness (PT-PD-002 §6) */
+@media (min-resolution: 1.5dppx) and (max-width: 900px) {
+  .tool-grid { grid-template-columns: 1fr; }
+}
