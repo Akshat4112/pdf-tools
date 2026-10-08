@@ -14,6 +14,8 @@ The planned site is https://akshat4112.github.io/pdf-tools/. The application has
 
 [PT-PD-004 — Repository and Pages eligibility](docs/platform/PT-PD-004-pages-eligibility.md) verifies the hosting plan, deployment source (GitHub Actions), published limits, and the conditions that keep the site eligible.
 
+[Test corpus](docs/testing/PT-PD-005-benchmark-corpus.md): 16 synthetic, license-free fixtures (text, forms, annotations, rotations, scan-like, encrypted, malformed) with a manifest of expected properties, validated by two independent readers (`scripts/validate_corpus.py`).
+
 The specification is the scope baseline after its PR is reviewed and merged. It is not a claim that listed tools already work.
 
 ## Project tracker
