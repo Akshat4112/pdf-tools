@@ -16,12 +16,14 @@
 import { QUOTAS, toolError } from '../registry'
 
 export type InputKind = 'pdf' | 'image'
+/** per-file kinds from the registry (what a tool accepts) */
+export type FileKind = 'pdf' | 'jpeg' | 'png'
 
 export interface ValidatedFileMeta {
   /** sanitized, DOM-safe display name */
   displayName: string
   /** resolved kind after sniffing, never trusting the extension alone */
-  kind: 'pdf' | 'jpeg' | 'png'
+  kind: FileKind
   byteLength: number
   /** PDF only: true when the encryption dictionary was found (never decrypted) */
   encrypted: boolean
