@@ -10,6 +10,8 @@ The planned site is https://akshat4112.github.io/pdf-tools/. The application has
 
 [PT-PD-002 — User journeys and success criteria](docs/product/PT-PD-002-user-journeys.md) defines the shared workspace state machine, per-tool journeys, the failure taxonomy and measurable success criteria for all 14 R1 tools.
 
+[PT-PD-003 — Local data lifecycle](docs/product/PT-PD-003-data-lifecycle.md) specifies the memory-only data model, forbidden storage locations, reset semantics, and the network/storage audit contract.
+
 The specification is the scope baseline after its PR is reviewed and merged. It is not a claim that listed tools already work.
 
 ## Project tracker
