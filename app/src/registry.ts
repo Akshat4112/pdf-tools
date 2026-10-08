@@ -56,6 +56,16 @@ export const QUOTAS = {
   jobTimeoutMs: 30_000,
 } as const
 
+export type ToolCategory = 'organize' | 'convert-to-pdf' | 'convert-from-pdf' | 'view' | 'markup'
+
+export const CATEGORIES: ReadonlyArray<{ id: ToolCategory; title: string; description: string }> = [
+  { id: 'organize', title: 'Organize', description: 'Combine, split, reorder and trim pages' },
+  { id: 'convert-to-pdf', title: 'Convert to PDF', description: 'Turn images into PDF documents' },
+  { id: 'convert-from-pdf', title: 'Convert from PDF', description: 'Export pages and text from PDFs' },
+  { id: 'view', title: 'View & inspect', description: 'Read and examine documents' },
+  { id: 'markup', title: 'Markup', description: 'Number and stamp your pages' },
+]
+
 export interface ToolDefinition {
   id: ToolId
   /** feature ID from the tracker/spec (PT-FT-xxx) */
@@ -70,6 +80,13 @@ export interface ToolDefinition {
   readOnly: boolean
   /** route slug under /pdf-tools/ (PT-UX-004) */
   route: string
+  /** catalog grouping (PT-UX-001) */
+  category: ToolCategory
+  /**
+   * PT-PD-001 §2 / PT-UX-001 acceptance: only working tools have active entry
+   * points. Flipped to true by each PT-CORE ship task when engine + UI pass.
+   */
+  implemented: boolean
 }
 
 export const TOOLS: readonly ToolDefinition[] = [
@@ -78,84 +95,112 @@ export const TOOLS: readonly ToolDefinition[] = [
     description: 'Combine PDFs in your chosen order into one document.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/merge',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'split', featureId: 'PT-FT-002', title: 'Split PDF',
     description: 'Split by page ranges, every N pages, or one file per page.',
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdflib', 'zip'],
     readOnly: false, route: '/split',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'rotate', featureId: 'PT-FT-003', title: 'Rotate PDF',
     description: 'Rotate selected or all pages in 90° steps.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/rotate',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'delete-pages', featureId: 'PT-FT-004', title: 'Delete pages',
     description: 'Remove selected pages into a new copy.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/delete-pages',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'extract-pages', featureId: 'PT-FT-005', title: 'Extract pages',
     description: 'Pull selected pages into a new PDF, in the order you choose.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/extract-pages',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'organize', featureId: 'PT-FT-006', title: 'Organize PDF',
     description: 'Reorder, rotate, duplicate and delete pages with undo.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/organize',
+    category: 'organize',
+    implemented: false,
   },
   {
     id: 'images-to-pdf', featureId: 'PT-FT-007', title: 'JPG/PNG to PDF',
     description: 'Turn JPG or PNG images into one PDF with size and margin options.',
     acceptedInputs: ['jpeg', 'png'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/images-to-pdf',
+    category: 'convert-to-pdf',
+    implemented: false,
   },
   {
     id: 'pdf-to-jpg', featureId: 'PT-FT-008', title: 'PDF to JPG',
     description: 'Render pages to JPG images at a chosen DPI.',
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdfjs', 'zip'],
     readOnly: false, route: '/pdf-to-jpg',
+    category: 'convert-from-pdf',
+    implemented: false,
   },
   {
     id: 'pdf-to-png', featureId: 'PT-FT-009', title: 'PDF to PNG',
     description: 'Render pages to PNG images with an explicit background choice.',
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdfjs', 'zip'],
     readOnly: false, route: '/pdf-to-png',
+    category: 'convert-from-pdf',
+    implemented: false,
   },
   {
     id: 'reader', featureId: 'PT-FT-010', title: 'PDF reader',
     description: 'Read, search, copy and print — entirely locally.',
     acceptedInputs: ['pdf'], outputKind: 'view', engines: ['pdfjs'],
     readOnly: true, route: '/reader',
+    category: 'view',
+    implemented: false,
   },
   {
     id: 'page-numbers', featureId: 'PT-FT-011', title: 'Page numbers',
     description: 'Add page numbers with start, position and page selection.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/page-numbers',
+    category: 'markup',
+    implemented: false,
   },
   {
     id: 'watermark', featureId: 'PT-FT-012', title: 'Text watermark',
     description: 'Stamp a text watermark with position, opacity and page selection.',
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/watermark',
+    category: 'markup',
+    implemented: false,
   },
   {
     id: 'pdf-to-text', featureId: 'PT-FT-013', title: 'PDF to text',
     description: 'Export the text layer of a PDF as a UTF-8 .txt file.',
     acceptedInputs: ['pdf'], outputKind: 'txt', engines: ['pdfjs'],
     readOnly: true, route: '/pdf-to-text',
+    category: 'convert-from-pdf',
+    implemented: false,
   },
   {
     id: 'doc-info', featureId: 'PT-FT-014', title: 'Document information',
     description: 'Inspect page count, dimensions, metadata and indicators.',
     acceptedInputs: ['pdf'], outputKind: 'view', engines: ['pdfjs'],
     readOnly: true, route: '/doc-info',
+    category: 'view',
+    implemented: false,
   },
 ] as const
 

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  CATEGORIES,
   QUOTAS,
   TOOLS,
   enginesFor,
@@ -69,6 +70,26 @@ describe('tool registry (PT-FND-002)', () => {
     expect(QUOTAS.defaultDpi).toBe(150)
     expect(QUOTAS.maxHeldBitmaps).toBe(10)
     expect(QUOTAS.maxThumbnails).toBe(60)
+  })
+
+  it('every tool has a category and an implemented flag; nothing ships enabled until its PT-CORE task lands', () => {
+    const validCats = new Set(['organize', 'convert-to-pdf', 'convert-from-pdf', 'view', 'markup'])
+    for (const t of TOOLS) {
+      expect(validCats.has(t.category)).toBe(true)
+      expect(typeof t.implemented).toBe('boolean')
+    }
+    // PT-UX-001 acceptance: before any PT-CORE ship task merges, NO tool is enabled
+    expect(TOOLS.filter((t) => t.implemented)).toHaveLength(0)
+  })
+
+  it('categories cover all tools with no orphans', () => {
+    const catIds = new Set(CATEGORIES.map((c) => c.id))
+    for (const t of TOOLS) {
+      expect(catIds.has(t.category)).toBe(true)
+    }
+    for (const c of CATEGORIES) {
+      expect(TOOLS.some((t) => t.category === c.id)).toBe(true)
+    }
   })
 
   it('toolError produces taxonomy-coded errors with recovery hints', () => {
