@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>PT-SP-002 memory probe</title></head>
+<body>
+<script type="module">
+// PT-SP-002 in-browser memory probe.
+// Renders corpus pages at candidate DPIs via the real browser path
+// (pdf.js worker + canvas), measures JS heap + peak allocation, reports JSON.
+// The harness page (measure-browser.mjs) drives this via window.postMessage.
+
+import * as pdfjsLib from "/spike/pt-sp-002/node_modules/pdfjs-dist/legacy/build/pdf.mjs";
+
+const params = new URLSearchParams(location.search);
+const workerSrc = new URL("/spike/pt-sp-002/node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs", location.origin).href;
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+
+const FONT_URL = "/spike/pt-sp-002/node_modules/pdfjs-dist/standard_fonts/";
+
+function gc() {
+  return new Promise((resolve) => {
+    const obs = new PerformanceObserver(() => { obs.disconnect(); resolve(); });
+    obs.observe({ entryTypes: ["gc"] });
+    if (typeof window.gc === "function") { window.gc(); }
+    setTimeout(resolve, 600); // fallthrough if gc observer silent
+  });
+}
+
+async function measureFile(file, dpis) {
+  const resp = await fetch(new URL(file, "http://localhost:8931/"));
+  const data = new Uint8Array(await resp.arrayBuffer());
+  const out = { file, pages: 0, points: [] };
+  const task = pdfjsLib.getDocument({
+    data: data.slice(0), // offset-0 copy per PT-SP-001 rule
+    standardFontDataUrl: FONT_URL,
+    isEvalSupported: false,
+  });
+  const doc = await task.promise;
+  out.pages = doc.numPages;
+  for (const dpi of dpis) {
+    performance.measure(`render-${dpi}`, { start: performance.now() });
+    await gc();
+    const heap0 = performance.memory ? performance.memory.usedJSHeapSize : null;
+    const t0 = performance.now();
+    // render ALL pages at this dpi (hold no bitmaps — render then drop)
+    let rendered = 0, maxDim = 0;
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const scale = dpi / 72;
+      const vp = page.getViewport({ scale });
+      const canvas = new OffscreenCanvas(Math.ceil(vp.width), Math.ceil(vp.height));
+      const ctx = canvas.getContext("2d");
+      await page.render({ canvasContext: ctx, viewport: vp, canvas }).promise;
+      // force a readback to ensure the render actually happened
+      const blob = await canvas.convertToBlob({ type: "image/png" });
+      maxDim = Math.max(maxDim, vp.width);
+      rendered += blob.size;
+      page.cleanup();
+    }
+    const t1 = performance.now();
+    await gc();
+    const heap1 = performance.memory ? performance.memory.usedJSHeapSize : null;
+    out.points.push({
+      dpi,
+      ms: +(t1 - t0).toFixed(0),
+      pngBytesTotal: rendered,
+      heapDeltaMB: heap0 != null && heap1 != null ? +(((heap1 - heap0) / 1048576).toFixed(1)) : null,
+      heapAfterMB: heap1 != null ? +(heap1 / 1048576).toFixed(1) : null,
+    });
+  }
+  await task.destroy();
+  return out;
+}
+
+window.__run = async () => {
+  const files = JSON.parse(params.get("files") || "[]");
+  const dpis = JSON.parse(params.get("dpis") || "[96,150]");
+  const results = [];
+  for (const f of files) {
+    try { results.push(await measureFile(f, dpis)); }
+    catch (e) { results.push({ file: f, error: String(e) }); }
+  }
+  return results;
+};
+</script>
+</body>
+</html>

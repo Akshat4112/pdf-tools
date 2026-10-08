@@ -1,0 +1,82 @@
+[
+  {
+    "file": "fixtures/pdf/F-001-plain-text-3p.pdf",
+    "pages": 3,
+    "points": [
+      {
+        "dpi": 96,
+        "ms": 68,
+        "pngBytesTotal": 162392,
+        "heapDeltaMB": 0.2,
+        "heapAfterMB": 2.7
+      },
+      {
+        "dpi": 150,
+        "ms": 35,
+        "pngBytesTotal": 311926,
+        "heapDeltaMB": 0,
+        "heapAfterMB": 2.7
+      }
+    ]
+  },
+  {
+    "file": "fixtures/pdf/F-002-plain-text-30p.pdf",
+    "pages": 30,
+    "points": [
+      {
+        "dpi": 96,
+        "ms": 519,
+        "pngBytesTotal": 1633268,
+        "heapDeltaMB": 0.1,
+        "heapAfterMB": 2.8
+      },
+      {
+        "dpi": 150,
+        "ms": 477,
+        "pngBytesTotal": 3147677,
+        "heapDeltaMB": 0,
+        "heapAfterMB": 2.8
+      }
+    ]
+  },
+  {
+    "file": "fixtures/pdf/F-008-scan-like.pdf",
+    "pages": 1,
+    "points": [
+      {
+        "dpi": 96,
+        "ms": 14,
+        "pngBytesTotal": 24941,
+        "heapDeltaMB": 0,
+        "heapAfterMB": 4.2
+      },
+      {
+        "dpi": 150,
+        "ms": 11,
+        "pngBytesTotal": 50382,
+        "heapDeltaMB": 0,
+        "heapAfterMB": 4.2
+      }
+    ]
+  },
+  {
+    "file": "fixtures/pdf/F-015-pages-60p.pdf",
+    "pages": 60,
+    "points": [
+      {
+        "dpi": 96,
+        "ms": 1017,
+        "pngBytesTotal": 3269775,
+        "heapDeltaMB": -1.4,
+        "heapAfterMB": 2.9
+      },
+      {
+        "dpi": 150,
+        "ms": 978,
+        "pngBytesTotal": 6306229,
+        "heapDeltaMB": 0,
+        "heapAfterMB": 2.9
+      }
+    ]
+  }
+]
