@@ -67,13 +67,14 @@ jobs:
         run: |
           mkdir -p dist/assets/standard_fonts
           cp node_modules/pdfjs-dist/legacy/build/pdf.worker.min.mjs dist/assets/pdf.worker.min.mjs
-          cp node_modules/pdfjs-dist/standard_fonts/*.pfb dist/assets/standard_fonts/
+          # ALL font files incl. Liberation .ttf + license notices (compliance)
+          cp node_modules/pdfjs-dist/standard_fonts/* dist/assets/standard_fonts/
 
       - name: Asset path sanity (worker + fonts resolve under /pdf-tools/)
         working-directory: app
         run: |
           test -f dist/assets/pdf.worker.min.mjs
-          ls dist/assets/standard_fonts/*.pfb | wc -l | grep -v '^0$'
+          test $(ls dist/assets/standard_fonts | wc -l) -ge 10
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
