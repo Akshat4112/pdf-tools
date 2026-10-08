@@ -19,7 +19,8 @@ import pymupdf
 ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = ROOT / "fixtures"
 MANIFEST = FIXTURES / "manifest.json"
-QPDF = "/opt/homebrew/bin/qpdf"
+import shutil as _shutil
+QPDF = _shutil.which("qpdf") or "/opt/homebrew/bin/qpdf"
 
 failures: list[str] = []
 
