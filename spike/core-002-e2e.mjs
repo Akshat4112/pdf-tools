@@ -28,7 +28,7 @@ async function runViewport(name, width, height, touch) {
     "--disable-gpu", "--no-first-run", "--no-default-browser-check",
     `--window-size=${width},${height}`,
     ...(touch ? ["--touch-events=enabled", "--force-device-scale-factor=1"] : []),
-    `--user-data-dir=/tmp/core002-${name}`,
+    `--user-data-dir=/tmp/core002-${name}-${Date.now()}`,
     SITE,
   ], { stdio: ["ignore", "pipe", "pipe"] });
 
