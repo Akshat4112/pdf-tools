@@ -96,7 +96,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/merge',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'split', featureId: 'PT-FT-002', title: 'Split PDF',
