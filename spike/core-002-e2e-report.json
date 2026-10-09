@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-09T08:52:34.916Z",
+  "desktop": [
+    {
+      "label": "catalog shows Merge as active <a> entry",
+      "ok": true
+    },
+    {
+      "label": "merge screen renders",
+      "ok": true
+    },
+    {
+      "label": "two PDFs injected via DataTransfer",
+      "ok": true
+    },
+    {
+      "label": "both files listed by name",
+      "ok": true
+    },
+    {
+      "label": "merge button enabled",
+      "ok": true
+    },
+    {
+      "label": "order preview shown",
+      "ok": true
+    },
+    {
+      "label": "result panel with Download appears",
+      "ok": true
+    },
+    {
+      "label": "output name derived (merged)",
+      "ok": true
+    },
+    {
+      "label": "download produces a real file",
+      "ok": true
+    },
+    {
+      "label": "reset clears file names from the DOM",
+      "ok": true
+    }
+  ],
+  "mobile": [
+    {
+      "label": "catalog shows Merge as active <a> entry",
+      "ok": true
+    },
+    {
+      "label": "merge screen renders",
+      "ok": true
+    },
+    {
+      "label": "two PDFs injected via DataTransfer",
+      "ok": true
+    },
+    {
+      "label": "both files listed by name",
+      "ok": true
+    },
+    {
+      "label": "merge button enabled",
+      "ok": true
+    },
+    {
+      "label": "order preview shown",
+      "ok": true
+    },
+    {
+      "label": "result panel with Download appears",
+      "ok": true
+    },
+    {
+      "label": "output name derived (merged)",
+      "ok": true
+    },
+    {
+      "label": "download produces a real file",
+      "ok": true
+    },
+    {
+      "label": "reset clears file names from the DOM",
+      "ok": true
+    }
+  ]
+}
