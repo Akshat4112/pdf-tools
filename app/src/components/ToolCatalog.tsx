@@ -140,7 +140,7 @@ function ToolCard({ tool, base }: { tool: ToolDefinition; base: string }) {
   if (!tool.implemented) classes.push('is-disabled')
   if (tool.implemented) {
     return (
-      <a className={classes.join(' ')} href={`${base}#${tool.route.slice(1)}`}>
+      <a className={classes.join(' ')} href={`${base}#${tool.route.slice(1)}`} aria-label={`Open ${tool.title}`}>
         <span className="tool-icon">
           <ToolIcon tool={tool} />
         </span>

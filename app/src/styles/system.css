@@ -539,3 +539,15 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   .panel { padding: 16px; }
   .panel-title { font-size: 17px; }
 }
+
+/* ---------------------------------------------------------------- tool screens (PT-CORE-002) */
+
+.tool-screen { max-width: 760px; margin: 0 auto; }
+.tool-header { padding: 12px 0 4px; }
+.tool-heading {
+  font-size: clamp(24px, 3.5vw, 32px);
+  letter-spacing: -0.4px;
+  color: var(--ink-900);
+  margin: 0 0 6px;
+}
+.tool-subtitle { color: var(--ink-500); margin: 0 0 8px; font-size: 15.5px; }

@@ -72,14 +72,16 @@ describe('tool registry (PT-FND-002)', () => {
     expect(QUOTAS.maxThumbnails).toBe(60)
   })
 
-  it('every tool has a category and an implemented flag; nothing ships enabled until its PT-CORE task lands', () => {
+  it('every tool has a category and an implemented flag; only shipped tools are enabled', () => {
     const validCats = new Set(['organize', 'convert-to-pdf', 'convert-from-pdf', 'view', 'markup'])
     for (const t of TOOLS) {
       expect(validCats.has(t.category)).toBe(true)
       expect(typeof t.implemented).toBe('boolean')
     }
-    // PT-UX-001 acceptance: before any PT-CORE ship task merges, NO tool is enabled
-    expect(TOOLS.filter((t) => t.implemented)).toHaveLength(0)
+    // PT-PD-001 §2: the enabled set must exactly match shipped tools.
+    // PT-CORE-002 shipped merge — extend this list as tools go live.
+    const SHIPPED: Array<(typeof TOOLS)[number]['id']> = ['merge']
+    expect(TOOLS.filter((t) => t.implemented).map((t) => t.id)).toEqual(SHIPPED)
   })
 
   it('categories cover all tools with no orphans', () => {
