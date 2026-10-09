@@ -256,46 +256,5 @@ export function renderedPageSize(pageWidthPt: number, pageHeightPt: number, dpi:
   return { width: Math.round(w * scale), height: Math.round(h * scale) }
 }
 
-// ---------------------------------------------------------------- page ranges (shared with PT-CORE-003)
-
-export interface ParsedRange {
-  /** 1-based page numbers, deduped, in the order given */
-  pages: number[]
-}
-
-/**
- * Parse a range expression like "1-5, 8, 12-30" against a page count.
- * Empty input -> E-INPUT-05; any out-of-bounds reference -> E-CONFIG-01.
- */
-export function parsePageRanges(expr: string, pageCount: number): ParsedRange {
-  const trimmed = expr.trim()
-  if (!trimmed) {
-    throw toolError('E-INPUT-05', 'Select at least one page to continue.', 'focus-picker')
-  }
-  const pages: number[] = []
-  for (const partRaw of trimmed.split(',')) {
-    const part = partRaw.trim()
-    if (!part) continue
-    const m = /^(\d+)(?:\s*-\s*(\d+))?$/.exec(part)
-    if (!m) {
-      throw toolError('E-CONFIG-01', `'${part}' is not a valid page or range.`, 'fix-field')
-    }
-    const start = parseInt(m[1], 10)
-    const end = m[2] ? parseInt(m[2], 10) : start
-    if (start < 1 || end < 1 || start > pageCount || end > pageCount) {
-      throw toolError(
-        'E-CONFIG-01',
-        `Range '${part}' is not valid for a ${pageCount}-page document.`,
-        'fix-field',
-      )
-    }
-    if (start > end) {
-      throw toolError('E-CONFIG-01', `Range '${part}' runs backwards.`, 'fix-field')
-    }
-    for (let i = start; i <= end; i++) pages.push(i)
-  }
-  if (pages.length === 0) {
-    throw toolError('E-INPUT-05', 'Select at least one page to continue.', 'focus-picker')
-  }
-  return { pages: [...new Set(pages)] }
-}
+// Page ranges moved to lib/pageRanges.ts (PT-CORE-003); re-exported for compatibility.
+export { parsePageRanges, type ParsedRange } from '../lib/pageRanges'
