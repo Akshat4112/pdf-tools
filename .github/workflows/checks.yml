@@ -85,7 +85,8 @@ jobs:
         run: |
           python3 scripts/generate_fixtures.py
           python3 scripts/validate_corpus.py
-          python3 - <<'PY'
+          python3 scripts/check_reproducibility.py
+
           import json, subprocess, sys
           committed = json.loads(subprocess.run(
               ["git", "show", "HEAD:fixtures/manifest.json"], capture_output=True, text=True, check=True).stdout)
