@@ -85,21 +85,4 @@ jobs:
         run: |
           python3 scripts/generate_fixtures.py
           python3 scripts/validate_corpus.py
-          python3 - <<'PY'
-          import json, subprocess, sys
-          committed = json.loads(subprocess.run(
-              ["git", "show", "HEAD:fixtures/manifest.json"], capture_output=True, text=True, check=True).stdout)
-          regenerated = json.load(open("fixtures/manifest.json"))
-          def structural(entry):
-              return {
-                  "id": entry["id"], "bytes": entry["bytes"],
-                  "pages": entry["expected"].get("pages"),
-                  "fields": entry["expected"].get("form_fields"),
-                  "rotations": entry["expected"].get("rotations"),
-              }
-          a = [structural(e) for e in committed["fixtures"]]
-          b = [structural(e) for e in regenerated["fixtures"]]
-          if a != b:
-              sys.exit("::error::Regenerated corpus differs structurally from committed manifest")
-          print("Structural reproducibility: OK")
-          PY
+          python3 scripts/check_reproducibility.py
