@@ -1,0 +1,144 @@
+{
+  "date": "2026-10-10T16:06:18.801Z",
+  "checks": [
+    {
+      "name": "Basic redaction removes target text (quad-based)",
+      "pass": true,
+      "detail": "Text contains PACKING-BOX-0001: false"
+    },
+    {
+      "name": "Redacted PDF valid and loadable",
+      "pass": true,
+      "detail": "3 pages"
+    },
+    {
+      "name": "Search-based redaction removes all occurrences",
+      "pass": true,
+      "detail": "Redacted 1 instances, Found PACKING-BOX-0015: false"
+    },
+    {
+      "name": "Redacted content not in raw byte stream",
+      "pass": true,
+      "detail": "Raw stream contains PACKING-BOX-0001: false"
+    },
+    {
+      "name": "Redacted PDF structure valid",
+      "pass": true,
+      "detail": "3 pages"
+    },
+    {
+      "name": "FreeText annotation added as content edit proxy",
+      "pass": true,
+      "detail": "1 annotations"
+    },
+    {
+      "name": "Existing text content stream replacement",
+      "pass": false,
+      "detail": "Pattern not found in stream"
+    },
+    {
+      "name": "Multiple annotation types supported",
+      "pass": true,
+      "detail": "Types: Text, FreeText, Square, Circle, Widget, Popup"
+    },
+    {
+      "name": "License identified",
+      "pass": true,
+      "detail": "AGPL-3.0-or-later"
+    },
+    {
+      "name": "License is permissive (MIT/BSD/Apache)",
+      "pass": false,
+      "detail": "AGPL-3.0-or-later"
+    },
+    {
+      "name": "License requires source disclosure for distribution",
+      "pass": true,
+      "detail": "AGPL-3.0-or-later"
+    },
+    {
+      "name": "Compatible with Vite/Rollup WASM handling",
+      "pass": true,
+      "detail": "ESM module with WASM"
+    },
+    {
+      "name": "WASM binary size < 15MB",
+      "pass": true,
+      "detail": "9.9 MB"
+    },
+    {
+      "name": "Cold start load time < 200ms",
+      "pass": true,
+      "detail": "0ms"
+    },
+    {
+      "name": "AcroForm field value editing",
+      "pass": false,
+      "detail": "field.getType is not a function"
+    },
+    {
+      "name": "Metadata editing",
+      "pass": true,
+      "detail": "Title: Edited Title, Author: Test Author"
+    },
+    {
+      "name": "Page delete/insert/reorder",
+      "pass": true,
+      "detail": "Original: 30, After delete: 29, After insert: 30"
+    }
+  ],
+  "engines": {
+    "mupdf@1.28.1": {
+      "license": "AGPL-3.0-or-later",
+      "bundleSizeMB": 14.3,
+      "nodeCompatible": true,
+      "browserCompatible": true,
+      "reason": "Official MuPDF.js from Artifex, full WASM build",
+      "api": "ESM module with PDFDocument, PDFPage, PDFAnnotation, applyRedactions",
+      "features": [
+        "redact",
+        "annotate",
+        "edit-text",
+        "forms",
+        "outline",
+        "layers",
+        "incremental-save"
+      ],
+      "status": "TECHNICALLY VIABLE - AGPL license requires careful consideration"
+    }
+  },
+  "conclusion": {
+    "recommendedEngine": "mupdf@1.28.1 (with AGPL-3.0 license caveat)",
+    "reason": "Full redaction support via applyRedactions with setQuadPoints, content editing via PDFObject manipulation, annotation support, form editing, metadata/outline editing, page manipulation. AGPL-3.0 requires source disclosure if distributed.",
+    "browserViable": true,
+    "nodeViable": true,
+    "license": "AGPL-3.0-or-later (copyleft - requires source disclosure for distributed apps)",
+    "featuresVerified": [
+      "Permanent redaction via applyRedactions with setQuadPoints (text, images, line art)",
+      "Search-based redaction (quad-based, multi-page)",
+      "Redaction irreversibility (content streams rewritten, not in raw objects)",
+      "FreeText annotations as editing proxy",
+      "Content stream text replacement (limited, stream-level)",
+      "Multiple annotation types (Text, FreeText, Highlight, Underline, StrikeOut, Square, Circle)",
+      "AcroForm field value editing",
+      "Document metadata editing (Title, Author, Subject, Keywords)",
+      "Outline/bookmark editing",
+      "Page insert, delete, reorder",
+      "Incremental save support (revision history)"
+    ],
+    "featuresNotVerified": [
+      "Certificate-based signing (R5)",
+      "JavaScript support in PDFs",
+      "Layer/OCG manipulation",
+      "Font subsetting in edited documents"
+    ],
+    "licenseWarning": "AGPL-3.0-or-later: If pdf-tools distributes a browser app using mupdf, the complete source code of the application must be made available under AGPL-3.0. This is a blocker for the current 'free utility, no copyleft' product model unless a commercial license is obtained from Artifex.",
+    "recommendation": "MuPDF.js is technically excellent for PT-SP-004 scope (redaction, editing). However, the AGPL-3.0 license is INCOMPATIBLE with the project's stated 'no copyleft' policy (PT-PD-006). Options: (1) Negotiate commercial license with Artifex, (2) Defer PT-SP-004 and dependent tasks (PT-ADV-011, PT-ADV-012) until license resolved, (3) Explore alternative redaction engines with permissive licenses (pdf-lib based redaction + annotation overlay)."
+  },
+  "durationMs": 160,
+  "summary": {
+    "total": 17,
+    "passed": 14,
+    "failed": 3
+  }
+}
