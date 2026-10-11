@@ -104,7 +104,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdflib', 'zip'],
     readOnly: false, route: '/split',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'rotate', featureId: 'PT-FT-003', title: 'Rotate PDF',

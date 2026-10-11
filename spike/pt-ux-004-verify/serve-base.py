@@ -35,4 +35,5 @@ class BasePathHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     print(f"serving {DIST} at http://127.0.0.1:{PORT}/pdf-tools/")
-    http.server.ThreadingHTTPServer(("127.0.0.1", PORT), BasePathHandler).serve_forever()
+    handler = lambda *args, **kw: BasePathHandler(*args, directory=DIST, **kw)
+    http.server.ThreadingHTTPServer(("127.0.0.1", PORT), handler).serve_forever()

@@ -15,6 +15,7 @@
 import type { ToolDefinition } from '../registry'
 import { SITE_BASE } from '../lib/seo'
 import { MergeTool } from './MergeTool'
+import { SplitTool } from './SplitTool'
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -46,6 +47,8 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
     switch (tool.id) {
       case 'merge':
         return <MergeTool onExit={onExit} />
+      case 'split':
+        return <SplitTool onExit={onExit} />
       default:
         return <ToolWorkInProgress tool={tool} />
     }

@@ -79,8 +79,8 @@ describe('tool registry (PT-FND-002)', () => {
       expect(typeof t.implemented).toBe('boolean')
     }
     // PT-PD-001 §2: the enabled set must exactly match shipped tools.
-    // PT-CORE-002 shipped merge — extend this list as tools go live.
-    const SHIPPED: Array<(typeof TOOLS)[number]['id']> = ['merge']
+    // PT-CORE-002 shipped merge; PT-CORE-005 shipped split.
+    const SHIPPED: Array<(typeof TOOLS)[number]['id']> = ['merge', 'split']
     expect(TOOLS.filter((t) => t.implemented).map((t) => t.id)).toEqual(SHIPPED)
   })
 
