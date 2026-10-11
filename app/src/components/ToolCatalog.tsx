@@ -12,6 +12,7 @@
 
 import { useMemo, useState } from 'react'
 import { CATEGORIES, TOOLS, type ToolCategory, type ToolDefinition } from '../registry'
+import { href } from '../router'
 
 /** Original inline icons — stroke style, no icon-font dependency (self-hosted rule). */
 function ToolIcon({ tool }: { tool: ToolDefinition }) {
@@ -135,12 +136,12 @@ function ToolIcon({ tool }: { tool: ToolDefinition }) {
   }
 }
 
-function ToolCard({ tool, base }: { tool: ToolDefinition; base: string }) {
+function ToolCard({ tool }: { tool: ToolDefinition }) {
   const classes = ['tool-card']
   if (!tool.implemented) classes.push('is-disabled')
   if (tool.implemented) {
     return (
-      <a className={classes.join(' ')} href={`${base}#${tool.route.slice(1)}`} aria-label={`Open ${tool.title}`}>
+      <a className={classes.join(' ')} href={href(tool.route)} aria-label={`Open ${tool.title}`}>
         <span className="tool-icon">
           <ToolIcon tool={tool} />
         </span>
@@ -168,7 +169,7 @@ function ToolCard({ tool, base }: { tool: ToolDefinition; base: string }) {
   )
 }
 
-export function ToolCatalog({ base = '/pdf-tools/' }: { base?: string }) {
+export function ToolCatalog() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ToolCategory | 'all'>('all')
 
@@ -237,7 +238,7 @@ export function ToolCatalog({ base = '/pdf-tools/' }: { base?: string }) {
         <ul className="tool-grid">
           {filtered.map((t) => (
             <li key={t.id}>
-              <ToolCard tool={t} base={base} />
+              <ToolCard tool={t} />
             </li>
           ))}
         </ul>
