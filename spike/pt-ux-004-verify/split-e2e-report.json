@@ -1,0 +1,55 @@
+{
+  "date": "2026-10-11T21:11:21.328Z",
+  "results": [
+    {
+      "name": "split deep link mounts workspace",
+      "pass": true,
+      "detail": "h1=\"Split PDF\""
+    },
+    {
+      "name": "file input found",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mode picker renders three modes after file selection",
+      "pass": true,
+      "detail": "3 modes"
+    },
+    {
+      "name": "ranges input present",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ranges typed into field",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "live preview shows part count",
+      "pass": true,
+      "detail": "summary=\"3 files from a 30-page document, zipped into one download.\""
+    },
+    {
+      "name": "split button clicked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "result panel offers the ZIP download",
+      "pass": true,
+      "detail": "\"Done — your files are readyOne file was generated and verified.F-002-plain-text-30p-split.zip4.5 KBDownloadRun again wit\""
+    },
+    {
+      "name": "no failure panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "catalog: split card is an active link (implemented flip)",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

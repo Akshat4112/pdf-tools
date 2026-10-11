@@ -16,3 +16,15 @@
 .nf-title { font-family: var(--font-serif, Georgia, serif); font-size: 1.75rem; margin: 8px 0 12px; }
 .nf-text { color: var(--ink-500, #57503f); margin: 0 0 24px; }
 .not-found .btn-primary { display: inline-block; padding: 10px 22px; border-radius: 10px; text-decoration: none; }
+
+/* PT-CORE-005: split configuration (mode picker + fields) */
+.split-modes { display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 14px; }
+.split-mode { display: flex; flex-direction: column; gap: 2px; border: 1px solid var(--line, #d8d2c4); border-radius: 10px; padding: 10px 12px; cursor: pointer; min-width: 150px; flex: 1; }
+.split-mode.is-active { border-color: var(--accent, #863bff); box-shadow: 0 0 0 1px var(--accent, #863bff); }
+.split-mode input { position: absolute; opacity: 0; }
+.split-mode span { font-weight: 600; }
+.split-mode small { color: var(--ink-500, #57503f); }
+.split-field { margin: 10px 0 0; }
+.split-field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.split-field input { width: 100%; max-width: 340px; padding: 9px 12px; border: 1px solid var(--line, #d8d2c4); border-radius: 8px; font: inherit; background: transparent; color: inherit; }
+.split-field input[aria-invalid='true'] { border-color: var(--warn, #b3261e); }
