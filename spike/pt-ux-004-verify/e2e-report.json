@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-11T20:25:19.711Z",
+  "results": [
+    {
+      "name": "deep link /merge/ boots SPA with merge screen",
+      "pass": true,
+      "detail": "h1=\"Merge PDF\""
+    },
+    {
+      "name": "deep link title accurate",
+      "pass": true,
+      "detail": "title=\"Merge PDF — PDF Tools\""
+    },
+    {
+      "name": "deep link canonical accurate",
+      "pass": true,
+      "detail": "canonical=https://akshat4112.github.io/pdf-tools/merge/"
+    },
+    {
+      "name": "SPA nav executes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "SPA nav to catalog updates title",
+      "pass": true,
+      "detail": "title=\"PDF Tools — free local PDF tools in your browser\""
+    },
+    {
+      "name": "catalog renders 14 tool cards",
+      "pass": true,
+      "detail": "14 cards"
+    },
+    {
+      "name": "catalog hero copy present",
+      "pass": true,
+      "detail": "Everyday document tools, running entirely in your "
+    },
+    {
+      "name": "catalog canonical after SPA nav",
+      "pass": true,
+      "detail": "canonical=https://akshat4112.github.io/pdf-tools/"
+    },
+    {
+      "name": "404.html served with not-found metadata",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "SPA 404 screen renders on unknown path",
+      "pass": true,
+      "detail": "code=\"404\""
+    },
+    {
+      "name": "SPA 404 title updates",
+      "pass": true,
+      "detail": "title=\"Page not found — PDF Tools\""
+    },
+    {
+      "name": "not-yet tool route title",
+      "pass": true,
+      "detail": "title=\"Split PDF — PDF Tools\""
+    },
+    {
+      "name": "not-yet tool shows honest entry (no picker)",
+      "pass": true,
+      "detail": "panel=\"In progress — not available yet\""
+    },
+    {
+      "name": "sitemap.xml served with 15 locs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "robots.txt served",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

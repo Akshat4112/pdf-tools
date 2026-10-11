@@ -1,13 +1,13 @@
 import { useEffect } from 'react'
 import { ToolCatalog } from './components/ToolCatalog'
-import { MergeTool } from './components/MergeTool'
-import { useHashRoute } from './router'
-import { TOOLS } from './registry'
-
-const SITE = '/pdf-tools/'
+import { ToolEntry } from './components/ToolEntry'
+import { NotFound } from './components/NotFound'
+import { usePathRoute } from './router'
+import { TOOLS, toolByRoute } from './registry'
+import { SITE_BASE } from './lib/seo'
 
 function App() {
-  const [route, navigate] = useHashRoute()
+  const [route, navigate] = usePathRoute()
 
   // "/" focuses search (keyboard-first catalog, PT-PD-002 §6 target)
   useEffect(() => {
@@ -24,13 +24,23 @@ function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  const activeTool = route.name !== 'catalog' && route.name !== 'not-found' ? toolByRoute(route.path) : undefined
   const live = TOOLS.filter((t) => t.implemented).length
 
-  // Tool screen: hash route -> mounted tool component (PT-CORE-002 mounts MergeTool)
-  if (route.name === 'merge') {
+  // Tool screen: path route -> generated entry page (PT-UX-004; merge mounts
+  // its workspace via ToolEntry, others show the honest in-progress entry)
+  if (activeTool) {
     return (
       <div className="shell">
-        <MergeTool onExit={() => navigate('#/')} />
+        <ToolEntry tool={activeTool} onExit={() => navigate('/')} />
+      </div>
+    )
+  }
+
+  if (route.name === 'not-found') {
+    return (
+      <div className="shell">
+        <NotFound />
       </div>
     )
   }
@@ -38,7 +48,7 @@ function App() {
   return (
     <div className="shell">
       <header className="site-header">
-        <a className="brand" href={SITE}>
+        <a className="brand" href={SITE_BASE}>
           <span className="brand-mark" aria-hidden="true">PD</span>
           <span className="brand-name">PDF Tools</span>
         </a>
@@ -71,7 +81,7 @@ function App() {
         </p>
       </section>
 
-      <ToolCatalog base={SITE} />
+      <ToolCatalog />
 
       <footer className="site-footer">
         <span>Free and open source, MIT license.</span>
