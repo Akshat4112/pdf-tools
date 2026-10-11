@@ -79,7 +79,9 @@ function prerenderRoutes(): Plugin {
       const ORIGIN = 'https://akshat4112.github.io/pdf-tools/'
 
       const metaFor = (dir: string, title: string, description: string): string => {
-        const canonical = dir === '.' ? ORIGIN : `${ORIGIN}${dir}/`
+        // 404.html is a file (not a clean URL route) — canonical must match
+        // NOT_FOUND_META in src/lib/seo.ts (asserted in unit tests)
+        const canonical = dir === '.' ? ORIGIN : dir === '404' ? `${ORIGIN}404.html` : `${ORIGIN}${dir}/`
         // strip any tags the base index.html already carries so each page has
         // exactly one canonical/description/OG set (no duplicates)
         let html = indexHtml
