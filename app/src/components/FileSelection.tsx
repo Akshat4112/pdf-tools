@@ -171,6 +171,8 @@ export function FileSelection({
           ref={inputRef}
           type="file"
           className="visually-hidden"
+          tabIndex={-1}
+          aria-hidden="true"
           multiple={multiple}
           // accept built from expected kind (registry contract)
           accept={expected === 'pdf' ? 'application/pdf,.pdf' : 'image/jpeg,image/png,.jpg,.jpeg,.png'}

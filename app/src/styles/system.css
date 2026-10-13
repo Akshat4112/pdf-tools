@@ -60,6 +60,13 @@
 
 * { box-sizing: border-box; }
 
+/* Shared by every FileSelection, including Merge and Split. Keep the native
+   input available to the custom button without a second visible picker. */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
 body {
   margin: 0;
   background:
@@ -357,7 +364,8 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   min-height: 44px; /* touch target (PT-UX-005) */
   transition: filter 0.15s;
 }
-.btn-primary:hover { filter: brightness(1.06); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-primary:disabled, .btn-ghost:disabled { opacity: 0.45; cursor: not-allowed; }
 .btn-primary:focus-visible { outline: none; box-shadow: var(--focus); }
 
 .btn-ghost {
@@ -369,7 +377,7 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   border-radius: var(--radius-s);
   padding: 8px 14px;
   cursor: pointer;
-  min-height: 40px;
+  min-height: 44px;
   margin-top: 10px;
 }
 .btn-ghost:hover { color: var(--ink-900); border-color: var(--ink-300); }
@@ -395,11 +403,11 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 
 .limits-line {
   font-size: 13px;
-  color: var(--ink-300);
+  color: var(--ink-500);
   margin: 10px 2px 0;
 }
 
-.workspace-empty { color: var(--ink-300); font-size: 14.5px; margin: 14px 2px; }
+.workspace-empty { color: var(--ink-500); font-size: 14.5px; margin: 14px 2px; }
 .workspace-count { font-size: 14px; color: var(--ink-500); margin: 14px 2px 6px; }
 
 .file-list {
@@ -438,6 +446,7 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1 1 12ch;
+  min-width: 0;
 }
 .file-size {
   font-family: var(--mono);
@@ -483,9 +492,10 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   padding-left: 20px;
   color: var(--ink-500);
   font-size: 14px;
+  overflow-wrap: anywhere;
 }
 .panel-details li { margin: 4px 0; }
-.panel-hint { color: var(--ink-300); font-size: 13.5px; margin: 10px 0 0; }
+.panel-hint { color: var(--ink-500); font-size: 13.5px; margin: 10px 0 0; }
 .panel-hint code {
   font-family: var(--mono);
   font-size: 12.5px;
@@ -498,7 +508,9 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   gap: 10px;
   flex-wrap: wrap;
   margin-top: 6px;
+  align-items: center;
 }
+.panel-actions .btn-ghost { margin-top: 0; }
 
 .progress-track {
   height: 10px;
@@ -542,8 +554,8 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 
 /* ---------------------------------------------------------------- tool screens (PT-CORE-002) */
 
-.tool-screen { max-width: 760px; margin: 0 auto; }
-.tool-header { padding: 12px 0 4px; }
+.tool-screen { max-width: 760px; margin: 0 auto; padding: 24px 0 64px; }
+.tool-header { margin-bottom: 20px; }
 .tool-heading {
   font-size: clamp(24px, 3.5vw, 32px);
   letter-spacing: -0.4px;

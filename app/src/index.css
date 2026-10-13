@@ -2,14 +2,6 @@
    system.css (PT-UX-001, PR #19) is the canonical visual system; keep it first. */
 @import './styles/system.css';
 
-/* PT-CORE-002 additions: tool-screen layout pieces used by MergeTool and the
-   shared tool screens (selection rows, preview/processing/result panels). */
-.tool-screen { max-width: 760px; margin: 0 auto; padding: 24px 0 64px; }
-
-.tool-header { margin-bottom: 20px; }
-.tool-heading { font-family: var(--font-serif, Georgia, serif); font-size: 1.75rem; margin: 0 0 4px; }
-.tool-subtitle { color: var(--ink-soft, #57503f); margin: 0 0 20px; }
-
 /* PT-UX-004: client 404 screen (NotFound.tsx + static 404.html) */
 .not-found { max-width: 760px; margin: 0 auto; padding: 72px 0 96px; text-align: center; }
 .nf-code { font-size: 4.5rem; font-weight: 700; letter-spacing: 0.06em; margin: 0; color: var(--ink-300, #a9a08c); font-family: var(--font-serif, Georgia, serif); }
