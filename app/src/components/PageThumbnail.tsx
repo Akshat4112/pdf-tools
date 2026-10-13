@@ -2,12 +2,17 @@ import { useEffect, useRef, useState } from 'react'
 import type { PdfjsDocument, PdfjsPage } from '../engines/pdfjs'
 
 /** Only the current eight-page group is mounted, bounding retained canvases. */
-export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle }: {
+export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, rotation, label, caption, detail }: {
   doc: PdfjsDocument
   pageNumber: number
   selected: boolean
   deleting: boolean
   onToggle(): void
+  /** Absolute final rotation: the preview uses the same angle as the export plan. */
+  rotation?: number
+  label?: string
+  caption?: string
+  detail?: string
 }) {
   const canvas = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading')
@@ -21,8 +26,8 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle }:
       try {
         page = await doc.getPage(pageNumber)
         if (disposed || !target) return
-        const original = page.getViewport({ scale: 1 })
-        const viewport = page.getViewport({ scale: Math.min(280 / original.width, 360 / original.height) })
+        const original = page.getViewport({ scale: 1, rotation })
+        const viewport = page.getViewport({ scale: Math.min(280 / original.width, 360 / original.height), rotation })
         target.width = Math.ceil(viewport.width)
         target.height = Math.ceil(viewport.height)
         const context = target.getContext('2d')
@@ -41,16 +46,16 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle }:
       task?.cancel?.()
       if (target) { target.width = 0; target.height = 0 }
     }
-  }, [doc, pageNumber])
+  }, [doc, pageNumber, rotation])
 
   return (
     <button type="button" className={`page-pick${selected ? ' is-selected' : ''}${selected && deleting ? ' is-removal' : ''}`}
-      aria-label={`Page ${pageNumber}`} aria-pressed={selected} onClick={onToggle}>
+      aria-label={label ?? `Page ${pageNumber}`} aria-pressed={selected} onClick={onToggle}>
       <span className="page-image">
         <canvas ref={canvas} aria-hidden="true" />
         {status !== 'ready' ? <span className="page-placeholder">{status === 'loading' ? 'Loading preview…' : 'Preview unavailable'}</span> : null}
       </span>
-      <span className="page-pick-label">Page {pageNumber}<span>{selected ? (deleting ? 'Remove' : 'Selected') : 'Select'}</span></span>
+      <span className="page-pick-label">{caption ?? `Page ${pageNumber}`}<span>{detail ?? (selected ? (deleting ? 'Remove' : 'Selected') : 'Select')}</span></span>
     </button>
   )
 }

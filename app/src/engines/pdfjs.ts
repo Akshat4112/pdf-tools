@@ -24,7 +24,7 @@ export interface PdfjsDocument {
 }
 
 export interface PdfjsPage {
-  getViewport(opts: { scale: number }): { width: number; height: number }
+  getViewport(opts: { scale: number; rotation?: number }): { width: number; height: number }
   render(opts: Record<string, unknown>): { promise: Promise<void> }
   getTextContent(): Promise<{ items: Array<{ str: string }> }>
   cleanup(): void

@@ -112,7 +112,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/rotate',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'delete-pages', featureId: 'PT-FT-004', title: 'Delete pages',
@@ -136,7 +136,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/organize',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'images-to-pdf', featureId: 'PT-FT-007', title: 'JPG/PNG to PDF',
