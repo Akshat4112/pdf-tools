@@ -551,3 +551,40 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   margin: 0 0 6px;
 }
 .tool-subtitle { color: var(--ink-500); margin: 0 0 8px; font-size: 15.5px; }
+
+/* Page selection (PT-CORE-007): bounded thumbnails and explicit removal review. */
+.page-range-field { margin: 16px 0; }
+.page-selection-tool .visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.page-range-field label { display: block; font-weight: 600; margin-bottom: 6px; }
+.page-range-field input {
+  width: 100%; box-sizing: border-box; min-height: 44px; padding: 10px 12px;
+  font: inherit; color: var(--ink-900); background: var(--paper);
+  border: 1.5px solid var(--line); border-radius: var(--radius-s);
+}
+.page-range-field input:focus-visible { outline: none; box-shadow: var(--focus); }
+.page-range-field input[aria-invalid="true"] { border-color: var(--warn); }
+.page-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 18px 0; }
+.page-pick {
+  min-width: 0; padding: 8px; font: inherit; text-align: left; cursor: pointer;
+  border: 2px solid var(--line); border-radius: var(--radius-s); background: var(--paper);
+  color: var(--ink-900);
+}
+.page-pick.is-selected { border-color: var(--accent); background: var(--accent-soft); }
+.page-pick.is-removal { border-color: var(--warn); background: var(--warn-soft); }
+.page-pick:focus-visible { outline: none; box-shadow: var(--focus); }
+.page-image { position: relative; height: 160px; display: flex; align-items: center; justify-content: center; }
+.page-image canvas { max-width: 100%; max-height: 100%; object-fit: contain; }
+.page-placeholder { position: absolute; font-size: 12px; text-align: center; background: var(--paper); padding: 6px; }
+.page-pick-label { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; font-size: 13px; margin-top: 8px; }
+.page-pick-label span { font-size: 12px; }
+.page-pagination { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 13px; }
+.page-pagination .btn-ghost { margin-top: 0; }
+.page-selection-status { font-size: 14px; margin-bottom: 0; overflow-wrap: anywhere; }
+.page-selection-tool .panel-details { overflow-wrap: anywhere; }
+.page-selection-tool button:disabled { opacity: 0.45; cursor: not-allowed; }
+.page-delete-confirmation { display: flex; align-items: flex-start; gap: 10px; padding: 16px; font-size: 14px; border: 1px solid var(--line); border-radius: var(--radius-s); }
+.page-delete-confirmation input { flex-shrink: 0; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
+@media (max-width: 420px) { .page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
