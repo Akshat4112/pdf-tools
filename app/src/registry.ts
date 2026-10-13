@@ -120,7 +120,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/delete-pages',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'extract-pages', featureId: 'PT-FT-005', title: 'Extract pages',
@@ -128,7 +128,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/extract-pages',
     category: 'organize',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'organize', featureId: 'PT-FT-006', title: 'Organize PDF',

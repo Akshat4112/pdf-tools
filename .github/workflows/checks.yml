@@ -49,6 +49,12 @@ jobs:
       - name: Build (tsc -b && vite build)
         run: npm run build
 
+      - name: Install Chromium for page-tool interface checks
+        run: npx playwright install --with-deps chromium
+
+      - name: Extract and Delete Pages browser regression checks
+        run: npm run test:pages-ui
+
       - name: Production dependency audit gate
         run: npm audit --omit=dev --audit-level=high
 

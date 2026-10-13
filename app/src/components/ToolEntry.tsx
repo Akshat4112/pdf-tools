@@ -16,6 +16,7 @@ import type { ToolDefinition } from '../registry'
 import { SITE_BASE } from '../lib/seo'
 import { MergeTool } from './MergeTool'
 import { SplitTool } from './SplitTool'
+import { PageSelectionTool } from './PageSelectionTool'
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -49,6 +50,9 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         return <MergeTool onExit={onExit} />
       case 'split':
         return <SplitTool onExit={onExit} />
+      case 'extract-pages':
+      case 'delete-pages':
+        return <PageSelectionTool key={tool.id} mode={tool.id} onExit={onExit} />
       default:
         return <ToolWorkInProgress tool={tool} />
     }

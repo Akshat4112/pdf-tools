@@ -1,8 +1,10 @@
 # PDF Tools
 
-A planned collection of free PDF utilities that process documents in the browser.
+A collection of free PDF utilities being developed to process documents in the browser.
 
-The planned site is https://akshat4112.github.io/pdf-tools/. The application has not been implemented or deployed by this specification change.
+Project site: https://akshat4112.github.io/pdf-tools/. The application is an early preview; tools become available as their engine and interface tasks pass verification and merge.
+
+[PT-CORE-007 — Extract and Delete Pages interfaces](docs/tools/PT-CORE-007-page-selection.md) describes thumbnail/range selection, output-order previews, deletion review and browser regression checks.
 
 ## Product scope
 
