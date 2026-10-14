@@ -168,7 +168,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'view', engines: ['pdfjs'],
     readOnly: true, route: '/reader',
     category: 'view',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'page-numbers', featureId: 'PT-FT-011', title: 'Page numbers',

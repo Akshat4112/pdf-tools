@@ -40,6 +40,25 @@
   text-rendering: optimizeLegibility;
 }
 
+/* PDF.js owns the inner page/text layout; the surrounding controls use our system. */
+.reader-toolbar, .reader-search { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; margin-bottom: 12px; }
+.reader-toolbar form { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.reader-toolbar input { width: 64px; }
+.reader-toolbar label, .reader-search label, .reader-print > label { display: grid; gap: 6px; font-size: 14px; }
+.reader-search > label:first-child { flex: 1 1 220px; }
+.reader-search .reader-case { display: flex; align-items: center; min-height: 44px; }
+.reader-workspace input:not([type=checkbox]), .reader-workspace select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); min-width: 0; max-width: 100%; }
+.reader-viewport-shell { position: relative; height: min(72vh, 800px); min-height: 360px; margin: 16px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--paper-3); }
+.reader-viewport { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain; }
+.reader-viewport .pdfViewer { min-width: 100%; }
+.reader-print > label { max-width: 360px; }
+.reader-print-frame { position: fixed; left: -10000px; top: 0; width: 800px; height: 600px; border: 0; }
+@media (max-width: 600px) {
+  .reader-toolbar { gap: 8px; }
+  .reader-search > button { flex: 1; }
+  .reader-viewport-shell { height: 60vh; min-height: 320px; }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --ink-900: #f2f0f6;

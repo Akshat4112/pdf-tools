@@ -20,6 +20,7 @@ import { PageSelectionTool } from './PageSelectionTool'
 import { OrganizeTool } from './OrganizeTool'
 import { ImagesToPdfTool } from './ImagesToPdfTool'
 import { PdfToImagesTool } from './PdfToImagesTool'
+import { PdfReaderTool } from './PdfReaderTool'
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -49,6 +50,8 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
   if (tool.implemented) {
     // mounted workspaces per tool id — one case per shipped PT-CORE interface
     switch (tool.id) {
+      case 'reader':
+        return <PdfReaderTool onExit={onExit} />
       case 'merge':
         return <MergeTool onExit={onExit} />
       case 'split':
