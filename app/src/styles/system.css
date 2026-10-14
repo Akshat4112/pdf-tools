@@ -680,3 +680,6 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 .pdf-image-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 12px 0 0; }
 .pdf-images-results .image-preview-card .btn-ghost { margin-top: 12px; }
 .pdf-to-images-tool button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.text-export-preview { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px; border-radius: 8px; background: var(--paper-3); font: 13px/1.6 var(--mono); }
+.text-missing-pages { max-height: 160px; overflow: auto; overflow-wrap: anywhere; }

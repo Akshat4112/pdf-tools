@@ -80,7 +80,7 @@ describe('tool registry (PT-FND-002)', () => {
     }
     // PT-PD-001 §2: the enabled set must exactly match shipped tools.
     // PT-CORE-002/005/007 mount the four verified tool interfaces.
-    const SHIPPED: Array<(typeof TOOLS)[number]['id']> = ['merge', 'split', 'rotate', 'delete-pages', 'extract-pages', 'organize', 'images-to-pdf', 'pdf-to-jpg', 'pdf-to-png', 'reader']
+    const SHIPPED: Array<(typeof TOOLS)[number]['id']> = ['merge', 'split', 'rotate', 'delete-pages', 'extract-pages', 'organize', 'images-to-pdf', 'pdf-to-jpg', 'pdf-to-png', 'reader', 'pdf-to-text']
     expect(TOOLS.filter((t) => t.implemented).map((t) => t.id)).toEqual(SHIPPED)
   })
 

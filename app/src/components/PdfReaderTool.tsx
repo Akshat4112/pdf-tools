@@ -7,6 +7,19 @@ import { openDocument, type PdfjsDocument } from '../engines/pdfjs'
 import { toolError, type ToolError } from '../registry'
 import { clearPrintFrame, prepareReaderPrint } from '../tools/readerPrint'
 
+interface ReaderSearchMatch { pageIndex: number; matchIndex: number; ordinal: number }
+/** Version-pinned bridge: PDF.js has no public arbitrary-match navigation API. */
+function navigateReaderMatch(viewer: PDFViewer, bus: EventBus, item: ReaderSearchMatch): void {
+  const controller = viewer.findController
+  if (!controller?.selected) return
+  const navigation = controller as PDFFindController & { _offset: { pageIdx: number; matchIdx: number | null; wrapped: boolean }; _scrollMatches: boolean }
+  Object.assign(controller.selected, { pageIdx: item.pageIndex, matchIdx: item.matchIndex })
+  Object.assign(navigation._offset, { pageIdx: item.pageIndex, matchIdx: item.matchIndex, wrapped: false })
+  navigation._scrollMatches = true
+  viewer.currentPageNumber = item.pageIndex + 1
+  bus.dispatch('updatetextlayermatches', { source: controller, pageIndex: -1 })
+}
+
 export function PdfReaderTool({ onExit }: { onExit(): void }) {
   const [files, setFiles] = useState<WorkspaceFile[]>([])
   const selected = files.find(file => !file.error)
@@ -27,6 +40,7 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
   const [zoom, setZoom] = useState('page-width'), [query, setQuery] = useState(''), [caseSensitive, setCaseSensitive] = useState(false)
   const [matches, setMatches] = useState({ current: 0, total: 0 }), [findState, setFindState] = useState(0)
   const [resultStart, setResultStart] = useState(0)
+  const [matchPageCounts, setMatchPageCounts] = useState<number[]>([])
   const [textStatus, setTextStatus] = useState(''), [pageError, setPageError] = useState('')
   const [printRange, setPrintRange] = useState(''), [printStatus, setPrintStatus] = useState(''), [printing, setPrinting] = useState(false), [printReady, setPrintReady] = useState(false)
   const stopPrint = useCallback(() => {
@@ -58,8 +72,12 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
         eventBus.on('pagesinit', () => { if (!disposed) { instance!.currentScaleValue = 'page-width'; setReady(true) } })
         eventBus.on('pagechanging', ({ pageNumber }: { pageNumber: number }) => { if (!disposed) { setPage(pageNumber); setPageText(String(pageNumber)); setPageError('') } })
         eventBus.on('pagerendered', ({ error }: { error?: unknown }) => { if (!disposed) setPageError(error ? 'This page could not be rendered. Try another page or PDF.' : '') })
-        eventBus.on('updatefindmatchescount', ({ matchesCount }: { matchesCount: { current: number; total: number } }) => { if (!disposed) setMatches(matchesCount) })
-        eventBus.on('updatefindcontrolstate', ({ state, matchesCount }: { state: number; matchesCount: { current: number; total: number } }) => { if (!disposed) { setFindState(state); setMatches(matchesCount) } })
+        const updateMatchCounts = (matchesCount: { current: number; total: number }) => {
+          if (disposed) return
+          setMatches(matchesCount); setMatchPageCounts((instance?.findController?.pageMatches ?? []).map(matches => matches?.length ?? 0))
+        }
+        eventBus.on('updatefindmatchescount', ({ matchesCount }: { matchesCount: { current: number; total: number } }) => updateMatchCounts(matchesCount))
+        eventBus.on('updatefindcontrolstate', ({ state, matchesCount }: { state: number; matchesCount: { current: number; total: number } }) => { if (!disposed) { setFindState(state); updateMatchCounts(matchesCount) } })
         const native = loaded as unknown as PDFDocumentProxy
         linkService.setDocument(native); instance.setDocument(native)
         viewer.current = instance; bus.current = eventBus; documentRef.current = loaded
@@ -102,25 +120,17 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
   }
   const changeZoom = (value: string) => { setZoom(value); if (viewer.current) viewer.current.currentScaleValue = value }
   const findAgain = (previous: boolean) => bus.current?.dispatch('find', { source: null, type: 'again', query, caseSensitive, entireWord: false, highlightAll: true, findPrevious: previous, matchDiacritics: false })
-  const resultItems: { pageIndex: number; matchIndex: number; ordinal: number }[] = []
+  const resultItems: ReaderSearchMatch[] = []
   let ordinal = 0
-  if (query && findState !== 3) for (const [pageIndex, pageMatches] of (viewer.current?.findController?.pageMatches ?? []).entries()) {
-    for (let matchIndex = 0; matchIndex < (pageMatches?.length ?? 0); matchIndex++) {
+  if (query && findState !== 3) for (const [pageIndex, pageMatches] of matchPageCounts.entries()) {
+    for (let matchIndex = 0; matchIndex < (pageMatches ?? 0); matchIndex++) {
       if (ordinal >= resultStart && resultItems.length < 20) resultItems.push({ pageIndex, matchIndex, ordinal: ordinal + 1 })
       ordinal++
     }
   }
   const jumpMatch = (item: typeof resultItems[number]) => {
-    const controller = viewer.current?.findController
-    if (!controller?.selected || !viewer.current) return
-    // Pinned PDF.js 6.4.299 has no public arbitrary-match navigation API.
-    // Synchronize its selection and traversal offset before updating text layers.
-    const navigation = controller as PDFFindController & { _offset: { pageIdx: number; matchIdx: number | null; wrapped: boolean }; _scrollMatches: boolean }
-    Object.assign(controller.selected, { pageIdx: item.pageIndex, matchIdx: item.matchIndex })
-    Object.assign(navigation._offset, { pageIdx: item.pageIndex, matchIdx: item.matchIndex, wrapped: false })
-    navigation._scrollMatches = true
-    viewer.current.currentPageNumber = item.pageIndex + 1
-    bus.current?.dispatch('updatetextlayermatches', { source: controller, pageIndex: -1 })
+    if (!viewer.current || !bus.current) return
+    navigateReaderMatch(viewer.current, bus.current, item)
     setMatches({ current: item.ordinal, total: matches.total }); setFindState(0)
   }
   const preparePrint = async () => {
