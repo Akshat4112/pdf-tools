@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:pages-ui": "tsc -p tsconfig.e2e.json --noEmit && playwright test"
+    "test:pages-ui": "tsc -p tsconfig.e2e.json --noEmit && playwright test",
+    "test:images-engine": "tsc -p tsconfig.e2e.json --noEmit && playwright test --config playwright.images.config.ts"
   },
   "dependencies": {
     "@zip.js/zip.js": "2.23.0",

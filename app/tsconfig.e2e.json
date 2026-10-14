@@ -1,4 +1,9 @@
 {
   "extends": "./tsconfig.test.json",
-  "include": ["playwright.config.ts", "e2e"]
+  "include": [
+    "playwright.config.ts",
+    "e2e",
+    "playwright.images.config.ts",
+    "vite.images.config.ts"
+  ]
 }
