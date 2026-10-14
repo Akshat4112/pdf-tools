@@ -43,7 +43,11 @@ describe('working tool entry points', () => {
     expect(html).toContain('disabled=""')
     expect(html).not.toContain('Nothing to try here yet')
   })
-  it('keeps Organize PDF unavailable until its own ship task', () => {
-    expect(getTool('organize').implemented).toBe(false)
+  it.each(['organize', 'rotate'] as const)('mounts the working %s workspace', (id) => {
+    const tool = getTool(id)
+    expect(tool.implemented).toBe(true)
+    const html = renderToStaticMarkup(createElement(ToolEntry, { tool, onExit: () => {} }))
+    expect(html).toContain(id === 'organize' ? 'Create organized copy' : 'Create rotated copy')
+    expect(html).not.toContain('not available yet')
   })
 })

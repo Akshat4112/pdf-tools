@@ -6,6 +6,8 @@ Project site: https://akshat4112.github.io/pdf-tools/. The application is an ear
 
 [PT-CORE-007 — Extract and Delete Pages interfaces](docs/tools/PT-CORE-007-page-selection.md) describes thumbnail/range selection, output-order previews, deletion review and browser regression checks.
 
+[PT-CORE-009 — Organize and Rotate workspace](docs/tools/PT-CORE-009-organize-workspace.md) describes page reordering, independent duplicates, composed rotations, deletion review, undo and export fidelity checks.
+
 ## Product scope
 
 [PT-PD-001 — Product scope and first release](docs/product/PT-PD-001-product-scope.md) defines the first 14 capabilities, accepted formats, privacy and hosting boundaries, later releases and their prototype gates.

@@ -600,3 +600,23 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 .page-delete-confirmation { display: flex; align-items: flex-start; gap: 10px; padding: 16px; font-size: 14px; border: 1px solid var(--line); border-radius: var(--radius-s); }
 .page-delete-confirmation input { flex-shrink: 0; width: 20px; height: 20px; margin: 0; accent-color: var(--accent); }
 @media (max-width: 420px) { .page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Organize/Rotate (PT-CORE-009): at most eight canvases, accessible touch controls. */
+.organize-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 20px 0; }
+.organize-card { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius-m); background: var(--paper); }
+.organize-card .page-pick { width: 100%; }
+.organize-card.is-drop-target { border-color: var(--accent); box-shadow: var(--focus); }
+.organize-card-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.organize-card-actions .btn-ghost { margin-top: 0; padding: 8px 10px; color: var(--ink-700); }
+.organize-drag { display: inline-flex; align-items: center; cursor: grab; user-select: none; touch-action: none; }
+.organize-drag:active { cursor: grabbing; }
+.organize-tool button:disabled { opacity: 0.45; cursor: not-allowed; }
+.organize-tool button { touch-action: manipulation; }
+.organize-move-field { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.organize-move-field label { width: 100%; font-size: 14px; font-weight: 600; }
+.organize-move-field input { width: 100px; min-height: 44px; font: inherit; padding: 8px; color: var(--ink-900); background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-s); }
+.organize-move-field input:focus-visible { outline: none; box-shadow: var(--focus); }
+.organize-move-field input[aria-invalid="true"] { border-color: var(--warn); }
+.organize-move-field .btn-ghost { margin-top: 0; }
+.organize-tool .panel-details { overflow-wrap: anywhere; }
+@media (max-width: 540px) { .organize-grid { grid-template-columns: minmax(0, 1fr); } }
