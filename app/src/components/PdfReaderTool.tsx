@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { PDFViewer, EventBus } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs'
+import type { PDFViewer, EventBus, PDFFindController } from 'pdfjs-dist/legacy/web/pdf_viewer.mjs'
 import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import 'pdfjs-dist/legacy/web/pdf_viewer.css'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
@@ -26,6 +26,7 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
   const [page, setPage] = useState(1), [pageText, setPageText] = useState('1'), [count, setCount] = useState(0)
   const [zoom, setZoom] = useState('page-width'), [query, setQuery] = useState(''), [caseSensitive, setCaseSensitive] = useState(false)
   const [matches, setMatches] = useState({ current: 0, total: 0 }), [findState, setFindState] = useState(0)
+  const [resultStart, setResultStart] = useState(0)
   const [textStatus, setTextStatus] = useState(''), [pageError, setPageError] = useState('')
   const [printRange, setPrintRange] = useState(''), [printStatus, setPrintStatus] = useState(''), [printing, setPrinting] = useState(false), [printReady, setPrintReady] = useState(false)
   const stopPrint = useCallback(() => {
@@ -101,6 +102,27 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
   }
   const changeZoom = (value: string) => { setZoom(value); if (viewer.current) viewer.current.currentScaleValue = value }
   const findAgain = (previous: boolean) => bus.current?.dispatch('find', { source: null, type: 'again', query, caseSensitive, entireWord: false, highlightAll: true, findPrevious: previous, matchDiacritics: false })
+  const resultItems: { pageIndex: number; matchIndex: number; ordinal: number }[] = []
+  let ordinal = 0
+  if (query && findState !== 3) for (const [pageIndex, pageMatches] of (viewer.current?.findController?.pageMatches ?? []).entries()) {
+    for (let matchIndex = 0; matchIndex < (pageMatches?.length ?? 0); matchIndex++) {
+      if (ordinal >= resultStart && resultItems.length < 20) resultItems.push({ pageIndex, matchIndex, ordinal: ordinal + 1 })
+      ordinal++
+    }
+  }
+  const jumpMatch = (item: typeof resultItems[number]) => {
+    const controller = viewer.current?.findController
+    if (!controller?.selected || !viewer.current) return
+    // Pinned PDF.js 6.4.299 has no public arbitrary-match navigation API.
+    // Synchronize its selection and traversal offset before updating text layers.
+    const navigation = controller as PDFFindController & { _offset: { pageIdx: number; matchIdx: number | null; wrapped: boolean }; _scrollMatches: boolean }
+    Object.assign(controller.selected, { pageIdx: item.pageIndex, matchIdx: item.matchIndex })
+    Object.assign(navigation._offset, { pageIdx: item.pageIndex, matchIdx: item.matchIndex, wrapped: false })
+    navigation._scrollMatches = true
+    viewer.current.currentPageNumber = item.pageIndex + 1
+    bus.current?.dispatch('updatetextlayermatches', { source: controller, pageIndex: -1 })
+    setMatches({ current: item.ordinal, total: matches.total }); setFindState(0)
+  }
   const preparePrint = async () => {
     const doc = documentRef.current
     if (!doc) return
@@ -136,8 +158,9 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
         <button className="btn-ghost" disabled={!ready || page >= count} onClick={() => navigate(page + 1)}>Next page</button>
         <label htmlFor="reader-zoom">Zoom<select id="reader-zoom" disabled={!ready} value={zoom} onChange={event => changeZoom(event.target.value)}><option value="page-width">Fit width</option><option value="page-fit">Fit page</option>{[0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4].map(scale => <option key={scale} value={scale}>{scale * 100}%</option>)}</select></label>
       </div>
-      <div className="reader-search"><label htmlFor="reader-search">Search this PDF<input id="reader-search" type="search" value={query} maxLength={256} disabled={!ready} onChange={event => setQuery(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); findAgain(event.shiftKey) } }} /></label><label className="reader-case"><input type="checkbox" checked={caseSensitive} disabled={!ready} onChange={event => setCaseSensitive(event.target.checked)} />Match case</label><button className="btn-ghost" disabled={!ready || !query || !matches.total} onClick={() => findAgain(true)}>Previous match</button><button className="btn-ghost" disabled={!ready || !query || !matches.total} onClick={() => findAgain(false)}>Next match</button></div>
+      <div className="reader-search"><label htmlFor="reader-search">Search this PDF<input id="reader-search" type="search" value={query} maxLength={256} disabled={!ready} onChange={event => { setResultStart(0); setQuery(event.target.value) }} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); findAgain(event.shiftKey) } }} /></label><label className="reader-case"><input type="checkbox" checked={caseSensitive} disabled={!ready} onChange={event => { setResultStart(0); setCaseSensitive(event.target.checked) }} />Match case</label><button className="btn-ghost" disabled={!ready || !query || !matches.total} onClick={() => findAgain(true)}>Previous match</button><button className="btn-ghost" disabled={!ready || !query || !matches.total} onClick={() => findAgain(false)}>Next match</button></div>
       <p className="panel-hint" role="status" aria-label="Search results">{!ready ? 'Opening PDF…' : !query ? 'Search text across all pages. Scans need OCR; text in images is not searchable.' : findState === 3 ? 'Searching…' : matches.total ? `${matches.current} of ${matches.total} matches${findState === 2 ? ' · Wrapped around' : ''}` : 'No matches. Scanned pages need OCR to become searchable.'}</p>
+      {resultItems.length ? <div role="group" aria-label="Search match list"><ol start={resultStart + 1} className="reader-match-list">{resultItems.map(item => <li key={item.ordinal}><button className="btn-ghost" onClick={() => jumpMatch(item)} aria-current={matches.current === item.ordinal ? 'true' : undefined}>Page {item.pageIndex + 1}, match {item.matchIndex + 1}: {query}</button></li>)}</ol><div className="panel-actions"><button className="btn-ghost" disabled={resultStart === 0} onClick={() => setResultStart(start => Math.max(0, start - 20))}>Previous results</button><span>Results {resultStart + 1}–{resultStart + resultItems.length} of {matches.total}</span><button className="btn-ghost" disabled={resultStart + 20 >= matches.total} onClick={() => setResultStart(start => start + 20)}>Next results</button></div></div> : null}
       <p className="panel-hint" role="status" aria-label="Page text status">{textStatus}</p>
       {pageError ? <p role="alert">{pageError}</p> : null}
     </>}
