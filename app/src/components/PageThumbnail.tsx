@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { PdfjsDocument, PdfjsPage } from '../engines/pdfjs'
 
 /** Only the current eight-page group is mounted, bounding retained canvases. */
-export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, rotation, label, caption, detail }: {
+export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, rotation, label, caption, detail, background = 'white' }: {
   doc: PdfjsDocument
   pageNumber: number
   selected: boolean
@@ -13,6 +13,7 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, r
   label?: string
   caption?: string
   detail?: string
+  background?: 'white' | 'transparent'
 }) {
   const canvas = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading')
@@ -32,7 +33,7 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, r
         target.height = Math.ceil(viewport.height)
         const context = target.getContext('2d')
         if (!context) throw new Error('Canvas unavailable')
-        task = page.render({ canvas: target, canvasContext: context, viewport, background: '#ffffff' })
+        task = page.render({ canvas: target, canvasContext: context, viewport, background: background === 'white' ? '#ffffff' : 'rgba(0,0,0,0)' })
         await task.promise
         if (!disposed) setStatus('ready')
       } catch {
@@ -46,12 +47,12 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, r
       task?.cancel?.()
       if (target) { target.width = 0; target.height = 0 }
     }
-  }, [doc, pageNumber, rotation])
+  }, [doc, pageNumber, rotation, background])
 
   return (
     <button type="button" className={`page-pick${selected ? ' is-selected' : ''}${selected && deleting ? ' is-removal' : ''}`}
       aria-label={label ?? `Page ${pageNumber}`} aria-pressed={selected} onClick={onToggle}>
-      <span className="page-image">
+      <span className={`page-image${background === 'transparent' ? ' is-transparent' : ''}`}>
         <canvas ref={canvas} aria-hidden="true" />
         {status !== 'ready' ? <span className="page-placeholder">{status === 'loading' ? 'Loading preview…' : 'Preview unavailable'}</span> : null}
       </span>
