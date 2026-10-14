@@ -75,6 +75,9 @@ jobs:
         run: |
           test -f dist/assets/pdf.worker.min.mjs
           test $(ls dist/assets/standard_fonts | wc -l) -ge 10
+          test -f dist/assets/wasm/openjpeg.wasm
+          test -f dist/assets/cmaps/78-EUC-H.bcmap
+          test -f dist/assets/iccs/CGATS001Compat-v2-micro.icc
 
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
