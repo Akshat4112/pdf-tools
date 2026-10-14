@@ -643,3 +643,17 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   .image-settings-grid, .image-preview-grid { grid-template-columns: minmax(0, 1fr); }
   .image-preview-paper { height: 240px; }
 }
+
+/* PDF to Images (PT-CORE-013): explicit transparency, bounded previews and downloads. */
+.page-image.is-transparent canvas { background-color: #fff; background-image: conic-gradient(#e0e0e0 25%, #fff 0 50%, #e0e0e0 0 75%, #fff 0); background-size: 16px 16px; box-shadow: 0 1px 5px #0003; }
+.pdf-image-ranges { margin-top: 18px; }
+.pdf-image-dimensions { margin-top: 14px; }
+.pdf-image-dimensions summary { cursor: pointer; padding: 8px 0; font-weight: 600; }
+.pdf-image-dimensions .panel-details { max-height: 240px; overflow-y: auto; }
+.pdf-to-images-tool .panel-details { overflow-wrap: anywhere; }
+.pdf-images-zip { display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 14px; background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius-s); }
+.pdf-images-zip span { display: flex; flex-direction: column; min-width: 0; gap: 5px; overflow-wrap: anywhere; }
+.pdf-images-zip small { color: var(--ink-500); }
+.pdf-image-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin: 12px 0 0; }
+.pdf-images-results .image-preview-card .btn-ghost { margin-top: 12px; }
+.pdf-to-images-tool button:disabled { opacity: 0.45; cursor: not-allowed; }

@@ -152,7 +152,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdfjs', 'zip'],
     readOnly: false, route: '/pdf-to-jpg',
     category: 'convert-from-pdf',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'pdf-to-png', featureId: 'PT-FT-009', title: 'PDF to PNG',
@@ -160,7 +160,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'zip', engines: ['pdfjs', 'zip'],
     readOnly: false, route: '/pdf-to-png',
     category: 'convert-from-pdf',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'reader', featureId: 'PT-FT-010', title: 'PDF reader',
