@@ -144,7 +144,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['jpeg', 'png'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/images-to-pdf',
     category: 'convert-to-pdf',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'pdf-to-jpg', featureId: 'PT-FT-008', title: 'PDF to JPG',

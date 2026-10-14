@@ -11,11 +11,12 @@
  * - Clear files wired to the session reset (PT-PD-003 §5)
  */
 
-import { useCallback, useMemo, useRef, useState, type DragEvent } from 'react'
-import { QUOTAS, type InputKind } from '../registry'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type DragEvent } from 'react'
+import { QUOTAS, toolError, type InputKind } from '../registry'
 import { formatBytes } from './format'
 import { validateSelection, type InputKind as ValidateKind } from '../validation/validate'
 import type { ToolError } from '../registry'
+import { sanitizeFileName } from '../session/fileSession'
 
 /** registry per-file kind -> validator expectation */
 function toValidateKind(kind: InputKind): ValidateKind {
@@ -39,6 +40,8 @@ interface FileSelectionProps {
   onChange(files: WorkspaceFile[]): void
   /** i18n hook point (PT-UX-005); defaults en */
   labels?: Partial<FileSelectionLabels>
+  maxFiles?: number
+  maxTotalBytes?: number
 }
 
 export interface FileSelectionLabels {
@@ -73,15 +76,24 @@ export function FileSelection({
   files,
   onChange,
   labels: labelOverrides,
+  maxFiles,
+  maxTotalBytes,
 }: FileSelectionProps) {
   const labels = { ...DEFAULT_LABELS, ...labelOverrides }
   const [dragActive, setDragActive] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const generation = useRef(0)
+  const mounted = useRef(true)
+  const [selectionError, setSelectionError] = useState<ToolError | null>(null)
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false } }, [])
+  const previousFiles = useRef(files)
+  useLayoutEffect(() => { if (previousFiles.current !== files) { generation.current++; previousFiles.current = files } }, [files])
+  const change = (next: WorkspaceFile[]) => { generation.current++; setSelectionError(null); onChange(next) }
 
   const limitsLine = useMemo(() => formatLimit(QUOTAS.maxInputBytes), [])
 
   const ingest = useCallback(
-    async (incoming: Array<{ name: string; bytes: Uint8Array }>) => {
+    (incoming: Array<{ name: string; bytes: Uint8Array; error?: ToolError; size?: number }>) => {
       if (incoming.length === 0) return
       const outcomes = validateSelection(incoming, toValidateKind(expected))
       const accepted: WorkspaceFile[] = []
@@ -89,10 +101,10 @@ export function FileSelection({
         const src = incoming[o.index]
         accepted.push({
           id: nextWspId++,
-          displayName: o.ok ? o.meta!.displayName : src.name.replace(/[<>]/g, ''),
+          displayName: o.ok ? o.meta!.displayName : sanitizeFileName(src.name),
           bytes: src.bytes,
-          sizeLabel: formatBytes(src.bytes.byteLength),
-          error: o.ok ? undefined : o.error,
+          sizeLabel: formatBytes(src.size ?? src.bytes.byteLength),
+          error: src.error ?? (o.ok ? undefined : o.error),
         })
       }
       // multiple=false keeps only the newest valid file (single-file tools)
@@ -102,42 +114,50 @@ export function FileSelection({
     [expected, files, multiple, onChange],
   )
 
-  const onInputChange = useCallback(
-    async (e: { target: { files: FileList | null } }) => {
-      const list = e.target.files
-      if (!list) return
-      const incoming: Array<{ name: string; bytes: Uint8Array }> = []
-      for (const f of Array.from(list)) {
-        incoming.push({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })
+  const readFiles = async (list: File[]) => {
+    const token = ++generation.current
+    setSelectionError(null)
+    if (maxFiles && list.length + files.length > maxFiles) {
+      setSelectionError(toolError('E-INPUT-04', `Choose at most ${maxFiles} files. Remove files or choose a smaller batch.`, 'show-limits'))
+      return
+    }
+    const readable = list.filter(f => f.size <= QUOTAS.maxInputBytes)
+    if (maxTotalBytes && readable.reduce((sum,f) => sum + f.size, files.reduce((sum,f) => sum + f.bytes.length, 0)) > maxTotalBytes) {
+      setSelectionError(toolError('E-INPUT-04', 'The selection exceeds 50 MB in total. Choose fewer or smaller images.', 'show-limits'))
+      return
+    }
+    const incoming: Array<{ name: string; bytes: Uint8Array; error?: ToolError; size?: number }> = []
+    for (const file of list) {
+      if (!mounted.current || token !== generation.current) return
+      if (file.size > QUOTAS.maxInputBytes) {
+        incoming.push({ name: file.name, size: file.size, bytes: new Uint8Array(), error: toolError('E-INPUT-04', 'This file exceeds 50 MB. Choose a smaller file.', 'show-limits') })
+        continue
       }
-      await ingest(incoming)
-      if (inputRef.current) inputRef.current.value = '' // allow re-selecting the same file
-    },
-    [ingest],
-  )
+      try { incoming.push({ name: file.name, bytes: new Uint8Array(await file.arrayBuffer()) }) }
+      catch { incoming.push({ name: file.name, size: file.size, bytes: new Uint8Array(), error: toolError('E-INPUT-03', 'This file could not be read. Choose it again.', 'retry-file') }) }
+    }
+    if (!mounted.current || token !== generation.current) return
+    ingest(incoming)
+  }
 
-  const onDrop = useCallback(
-    async (e: DragEvent) => {
-      e.preventDefault()
-      setDragActive(false)
-      const dropped = Array.from(e.dataTransfer.files)
-      const incoming: Array<{ name: string; bytes: Uint8Array }> = []
-      for (const f of dropped) {
-        incoming.push({ name: f.name, bytes: new Uint8Array(await f.arrayBuffer()) })
-      }
-      await ingest(incoming)
-    },
-    [ingest],
-  )
-
-  const remove = (id: number) => onChange(files.filter((f) => f.id !== id))
+  const onInputChange = async (e: { target: { files: FileList | null } }) => {
+    const list = e.target.files
+    if (list) await readFiles(Array.from(list))
+    if (mounted.current && inputRef.current) inputRef.current.value = ''
+  }
+  const onDrop = async (e: DragEvent) => {
+    e.preventDefault()
+    setDragActive(false)
+    await readFiles(Array.from(e.dataTransfer.files))
+  }
+  const remove = (id: number) => change(files.filter((f) => f.id !== id))
   const move = (index: number, delta: -1 | 1) => {
     const target = index + delta
     if (target < 0 || target >= files.length) return
     const next = [...files]
     const [moved] = next.splice(index, 1)
     next.splice(target, 0, moved)
-    onChange(next)
+    change(next)
   }
 
   const validCount = files.filter((f) => !f.error).length
@@ -181,7 +201,8 @@ export function FileSelection({
         />
       </div>
 
-      <p className="limits-line">{limitsLine}</p>
+      <p className="limits-line">{labelOverrides?.limits ?? limitsLine}</p>
+      {selectionError ? <p className="file-error" role="alert">{selectionError.message}</p> : null}
 
       {files.length === 0 ? (
         <p className="workspace-empty" role="status">{labels.emptyHint}</p>
@@ -237,7 +258,7 @@ export function FileSelection({
               </li>
             ))}
           </ul>
-          <button type="button" className="btn-ghost" onClick={() => onChange([])}>
+          <button type="button" className="btn-ghost" onClick={() => change([])}>
             {labels.clear}
           </button>
         </>
