@@ -194,7 +194,7 @@ export function ResultPanel({
 }
 
 /** Cancelled state — S5 exit without partial results (PT-PD-003 §5). */
-export function CancelledPanel({ onReset }: { onReset(): void }) {
+export function CancelledPanel({ onReset, onAdjust }: { onReset(): void; onAdjust?(): void }) {
   return (
     <section className="panel" aria-label="Cancelled" role="status">
       <h2 className="panel-title">Cancelled</h2>
@@ -202,7 +202,8 @@ export function CancelledPanel({ onReset }: { onReset(): void }) {
         The job was stopped and no partial files were kept.
       </p>
       <div className="panel-actions">
-        <button type="button" className="btn-primary" onClick={onReset}>
+        {onAdjust ? <button type="button" className="btn-primary" onClick={onAdjust}>Adjust settings</button> : null}
+        <button type="button" className={onAdjust ? "btn-ghost" : "btn-primary"} onClick={onReset}>
           Start over
         </button>
       </div>

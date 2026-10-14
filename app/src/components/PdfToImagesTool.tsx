@@ -154,6 +154,6 @@ export function PdfToImagesTool({ mode, onExit }: { mode: 'pdf-to-jpg' | 'pdf-to
     {phase === 'processing' ? <ProcessingPanel label="Creating your images" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
     {phase === 'result' && result ? <PdfImagesResults outcome={result} onDownload={download} onAdjust={resetJob} onReset={reset} onExit={onExit} /> : null}
     {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
-    {phase === 'cancelled' ? <CancelledPanel onReset={reset} /> : null}
+    {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
   </div>
 }
