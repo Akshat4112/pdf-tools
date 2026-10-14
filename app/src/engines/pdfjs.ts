@@ -14,6 +14,7 @@
  */
 
 import type { ToolError } from '../registry'
+import { CancelledError } from '../jobs/orchestrator'
 import { QUOTAS, toolError } from '../registry'
 
 export interface PdfjsDocument {
@@ -25,7 +26,7 @@ export interface PdfjsDocument {
 
 export interface PdfjsPage {
   getViewport(opts: { scale: number; rotation?: number }): { width: number; height: number }
-  render(opts: Record<string, unknown>): { promise: Promise<void> }
+  render(opts: Record<string, unknown>): { promise: Promise<void>; cancel?: () => void }
   getTextContent(): Promise<{ items: Array<{ str: string }> }>
   cleanup(): void
   rotate: number
@@ -100,7 +101,7 @@ export function assertPixelBudget(widthPx: number, heightPx: number, heldBitmaps
 
 export async function openDocument(
   data: Uint8Array | ArrayBuffer,
-  opts: { maxPages?: number; maxBytes?: number } = {},
+  opts: { maxPages?: number; maxBytes?: number; strict?: boolean; maxCanvasBytes?: number } = {},
 ): Promise<PdfjsDocument> {
   const { getDocument } = await getPdfjs()
   const input = data instanceof Uint8Array ? data : new Uint8Array(data)
@@ -119,18 +120,25 @@ export async function openDocument(
   // private copy so the caller's original stays valid for reuse/verification.
   const bytes = new Uint8Array(input.byteLength)
   bytes.set(input)
-  let task: { promise: Promise<PdfjsDocument>; destroy(): Promise<void> }
+  let task: { promise: Promise<PdfjsDocument>; destroy(): Promise<void> } | undefined
+  let destroyed = false
   try {
     task = getDocument({
       data: bytes, // private copy — pdf.js detaches what it receives
       standardFontDataUrl: FONT_URL,
+      cMapUrl: `${import.meta.env.BASE_URL}assets/cmaps/`, cMapPacked: true,
+      wasmUrl: `${import.meta.env.BASE_URL}assets/wasm/`,
+      iccUrl: `${import.meta.env.BASE_URL}assets/iccs/`,
+      stopAtErrors: opts.strict === true,
+      canvasMaxAreaInBytes: opts.maxCanvasBytes ?? -1,
       isEvalSupported: false,
       // Node test path has no network fonts; browser self-hosts under BASE_URL
-    } as never) as never
+    } as never) as unknown as { promise: Promise<PdfjsDocument>; destroy(): Promise<void> }
     const doc = await task.promise
     const maxPages = opts.maxPages ?? QUOTAS.maxPages
     if (doc.numPages > maxPages) {
       await task.destroy()
+      destroyed = true
       throw toolError(
         'E-INPUT-04',
         `This document has ${doc.numPages} pages; the current limit is ${maxPages}.`,
@@ -138,8 +146,10 @@ export async function openDocument(
       )
     }
     // pdf.js 6.x: teardown lives on the loadingTask — expose it on the doc handle
-    return Object.assign(doc, { destroy: () => task.destroy() }) as PdfjsDocument
+    const loadedTask = task
+    return Object.assign(doc, { destroy: () => loadedTask.destroy() }) as PdfjsDocument
   } catch (err) {
+    if (task && !destroyed) await task.destroy().catch(() => {})
     const e = err as ToolError & { name?: string }
     // taxonomy errors only: pdf.js PasswordException carries a NUMERIC code (1),
     // so check for our string codes explicitly — never re-throw raw exceptions.
@@ -258,3 +268,24 @@ export function renderedPageSize(pageWidthPt: number, pageHeightPt: number, dpi:
 
 // Page ranges moved to lib/pageRanges.ts (PT-CORE-003); re-exported for compatibility.
 export { parsePageRanges, type ParsedRange } from '../lib/pageRanges'
+
+/** Reject image resources PDF.js failed to decode instead of claiming a blank substitute is success. */
+export async function assertRenderedImages(page: PdfjsPage, isCancelled: () => boolean): Promise<void> {
+  const { OPS } = await getPdfjs()
+  const native = page as unknown as import('pdfjs-dist/legacy/build/pdf.mjs').PDFPageProxy
+  const operations = await native.getOperatorList()
+  for (let i = 0; i < operations.fnArray.length; i++) {
+    if (![OPS.paintImageXObject, OPS.paintImageXObjectRepeat].includes(operations.fnArray[i])) continue
+    const id = operations.argsArray[i][0] as string
+    const objects = id.startsWith('g_') ? native.commonObjs : native.objs
+    let timer: ReturnType<typeof setInterval> | undefined
+    let data: unknown
+    try {
+      data = await new Promise((resolve, reject) => {
+        timer = setInterval(() => { if (isCancelled()) reject(new CancelledError()) }, 20)
+        objects.get(id, resolve)
+      })
+    } finally { if (timer) clearInterval(timer) }
+    if (!data) throw toolError('E-INPUT-03', 'A PDF image could not be decoded. Try a different PDF.', 'retry-file')
+  }
+}
