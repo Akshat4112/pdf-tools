@@ -18,6 +18,7 @@ import { MergeTool } from './MergeTool'
 import { SplitTool } from './SplitTool'
 import { PageSelectionTool } from './PageSelectionTool'
 import { OrganizeTool } from './OrganizeTool'
+import { ImagesToPdfTool } from './ImagesToPdfTool'
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -54,6 +55,8 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       case 'extract-pages':
       case 'delete-pages':
         return <PageSelectionTool key={tool.id} mode={tool.id} onExit={onExit} />
+      case 'images-to-pdf':
+        return <ImagesToPdfTool onExit={onExit} />
       case 'organize':
       case 'rotate':
         return <OrganizeTool key={tool.id} mode={tool.id} onExit={onExit} />
