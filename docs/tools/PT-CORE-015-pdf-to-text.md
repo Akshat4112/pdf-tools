@@ -15,7 +15,7 @@
 
 ## Lifecycle
 
-Cancellation checks run around page/text requests and verification. A cancellation monitor destroys the loading task while a worker request is pending. Cancellation, failure and replacement cannot expose partial text or an older job's result. Adjust/retry retains the selected PDF; full reset removes it. Source changes, reset and exit cancel work and revoke download URLs. Repeated downloads reuse their one tracked output URL. PDF.js loading tasks are destroyed exactly once per job; page cleanup and cancellation-monitor cleanup run on all paths.
+Cancellation checks run around page/text requests and verification. A cancellation monitor is installed before document loading. Signal-bearing loads own their PDF.js worker and terminate it immediately on abort, including while setup/parsing is pending; abort races settle loading/text waits without waiting for an acknowledgement from a terminated worker. The adapter invokes loading-task teardown once, and ordinary successful/error teardown remains awaited. Cancellation, failure and replacement cannot expose partial text or an older job's result. Adjust/retry retains the selected PDF; full reset removes it. Source changes, reset and exit cancel work and revoke download URLs. Repeated downloads reuse their one tracked output URL. PDF.js loading tasks are destroyed exactly once per job; page cleanup and cancellation-monitor cleanup run on all paths.
 
 The reader's search-match state is also stored in React state rather than read from mutable refs during rendering. Its version-pinned arbitrary-match bridge is isolated outside the component. Existing click-to-jump/pagination/next-match regressions remain required.
 
@@ -23,7 +23,7 @@ The reader's search-match state is also stored in React state rather than read f
 
 - Unit checks cover actual corpus text and page boundaries, Unicode/line hints, unchanged source bytes, deterministic names, scan-only outcomes, mixed empty positions, invalid/encrypted/over-page-limit input, cancellation/retry, bounded preview, output limit and document teardown. Shared verification tests reject malformed UTF-8.
 - Desktop/mobile browser checks use a real PDF with a ToUnicode map containing German, Greek, Chinese and an emoji, two stored-order columns, a blank page and a scanned page. The downloaded bytes are decoded strictly and compared with the report. PDF text resembling script markup remains inert.
-- Further browser checks verify scan-only messaging without a download, encrypted/malformed recovery, full text behind a bounded preview, repeated download URL reuse/revocation, and a deliberately held PDF.js worker text request followed by cancel/retry and discarded late text.
+- Further browser checks verify scan-only messaging without a download, encrypted/malformed recovery, full text behind a bounded preview, repeated download URL reuse/revocation, and deliberately held PDF.js loading and text requests, asserted worker termination, then cancel/retry and discarded late text.
 - All browser requests stay on the local origin/data/blob schemes; uncaught page errors fail tests. Desktop/mobile screenshots are opt-in temporary QA evidence and never uploaded by CI.
 - Required gates: unit tests, TypeScript (app/tests/e2e), lint, production build, complete interface/image-engine browser suites, dependency audit and fixture-corpus CI.
 

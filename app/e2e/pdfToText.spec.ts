@@ -90,22 +90,25 @@ test('download URLs are reused, revoked on retry/reset/exit and long text previe
   await page.getByRole('button', { name: 'Continue to another tool', exact: true }).click(); expect(await count()).toBe(0)
 })
 
-test('cancelling a pending worker text request keeps the source and discards late text', async ({ page }) => {
-  await page.addInitScript(() => {
+for (const action of ['GetDocRequest', 'GetTextContent']) test(`cancelling pending ${action} terminates loading/text work and discards late output`, async ({ page }) => {
+  await page.addInitScript(action => {
     const send = Worker.prototype.postMessage
-    const gate = { hold: false, pending: [] as (() => void)[] }
+    const gate = { hold: false, pending: [] as (() => void)[], terminated: 0 }
+    const terminate = Worker.prototype.terminate
+    Worker.prototype.terminate = function() { gate.terminated++; terminate.call(this) }
     Object.assign(window, { textWorkerGate: gate })
     Worker.prototype.postMessage = function(message: unknown, transfer?: Transferable[] | StructuredSerializeOptions) {
       const forward = () => { Reflect.apply(send, this, [message, transfer]) }
-      if (gate.hold && (message as { action?: string })?.action === 'GetTextContent') gate.pending.push(forward)
+      if (gate.hold && (message as { action?: string })?.action === action) gate.pending.push(forward)
       else forward()
     }
-  })
+  }, action)
   await page.goto('pdf-to-text/'); await choose(page)
   await page.evaluate(() => { (window as unknown as { textWorkerGate: { hold: boolean } }).textWorkerGate.hold = true })
   await page.getByRole('button', { name: 'Export text', exact: true }).click()
   await expect.poll(() => page.evaluate(() => (window as unknown as { textWorkerGate: { pending: unknown[] } }).textWorkerGate.pending.length)).toBeGreaterThan(0)
   await page.getByRole('button', { name: 'Cancel', exact: true }).click()
+  await expect.poll(() => page.evaluate(() => (window as unknown as { textWorkerGate: { terminated: number } }).textWorkerGate.terminated)).toBeGreaterThan(0)
   await page.getByRole('button', { name: 'Adjust settings', exact: true }).click()
   await expect(page.locator('.file-row .file-name')).toHaveText('paper.pdf')
   await page.evaluate(() => { const gate = (window as unknown as { textWorkerGate: { hold: boolean; pending: (() => void)[] } }).textWorkerGate; gate.hold = false; gate.pending.splice(0).forEach(send => send()) })

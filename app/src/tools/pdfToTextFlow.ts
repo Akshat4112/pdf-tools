@@ -1,4 +1,4 @@
-import { openDocument } from '../engines/pdfjs'
+import { openDocument, type PdfjsDocument } from '../engines/pdfjs'
 import { CancelledError, runJob, type JobEvents } from '../jobs/orchestrator'
 import { verifyOutput, type VerifiedOutput } from '../outputs/verify'
 import { QUOTAS, toolError } from '../registry'
@@ -22,26 +22,36 @@ export function joinTextItems(items: { str: string; hasEOL?: boolean }[]): strin
   return items.map(item => `${item.str ?? ''}${item.hasEOL ? '\n' : ' '}`).join('').trim()
 }
 
+async function cancellable<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
+  let rejectAbort: (error: CancelledError) => void = () => {}
+  const aborted = new Promise<never>((_, reject) => { rejectAbort = reject })
+  const abort = () => rejectAbort(new CancelledError())
+  signal.addEventListener('abort', abort, { once: true })
+  if (signal.aborted) abort()
+  try { return await Promise.race([pending, aborted]) }
+  finally { signal.removeEventListener('abort', abort) }
+}
+
 export function startPdfToText(input: PdfToTextInput, events: JobEvents = {}) {
   return runJob('pdf-to-text', { file: { ...input.file } }, async (request, ctx): Promise<PdfToTextOutcome> => {
     const check = () => { if (ctx.isCancelled()) throw new CancelledError() }
     check()
     const meta = validateFile(request.file.displayName, request.file.bytes, 'pdf')
-    const doc = await openDocument(request.file.bytes, { strict: true })
-    let destroyed: Promise<void> | undefined
-    const destroy = () => destroyed ??= doc.destroy()
-    // Cancel an in-flight worker text request as well as checking between pages.
-    const cancellation = setInterval(() => { if (ctx.isCancelled()) void destroy().catch(() => {}) }, 20)
+    const controller = new AbortController()
+    // Install before loading: abort both parsing and subsequent worker text requests.
+    const cancellation = setInterval(() => { if (ctx.isCancelled()) controller.abort() }, 20)
+    let doc: PdfjsDocument | undefined
     const encoder = new TextEncoder(), chunks: Uint8Array[] = [], without: number[] = []
     let size = 0, withText = 0, preview = '', previewTruncated = false
     try {
+      doc = await openDocument(request.file.bytes, { strict: true, signal: controller.signal })
       for (let number = 1; number <= doc.numPages; number++) {
         check()
-        const page = await doc.getPage(number)
+        const page = await cancellable(doc.getPage(number), controller.signal)
         let text: string
         try {
           check()
-          const content = await page.getTextContent()
+          const content = await cancellable(page.getTextContent(), controller.signal)
           check()
           // Refuse oversized text before joining/encoding another large string.
           const chars = content.items.reduce((sum, item) => sum + (item.str?.length ?? 0) + 1, 0)
@@ -76,6 +86,6 @@ export function startPdfToText(input: PdfToTextInput, events: JobEvents = {}) {
       const output = await verifyOutput({ name: `${stem}.txt`, mimeType: 'text/plain', bytes })
       check()
       return { ...report, kind: 'text', output }
-    } finally { clearInterval(cancellation); await destroy() }
+    } finally { clearInterval(cancellation); await doc?.destroy() }
   }, events)
 }

@@ -2,12 +2,23 @@ import { readFileSync } from 'node:fs'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { describe, expect, it, vi } from 'vitest'
 import { openDocument } from '../engines/pdfjs'
+import { CancelledError } from '../jobs/orchestrator'
 import { joinTextItems, startPdfToText, TEXT_OUTPUT_LIMIT, TEXT_PREVIEW_LIMIT } from '../tools/pdfToTextFlow'
 
 const fixture = (name: string) => new Uint8Array(readFileSync(`../fixtures/pdf/${name}.pdf`))
 const request = (bytes: Uint8Array) => ({ file: { displayName: '../../paper.pdf', bytes } })
 
 describe('PDF to Text', () => {
+  it('aborts before/during document loading and allows a fresh load afterward', async () => {
+    const bytes = fixture('F-001-plain-text-3p'), first = new AbortController()
+    first.abort()
+    await expect(openDocument(bytes, { signal: first.signal })).rejects.toBeInstanceOf(CancelledError)
+    const second = new AbortController(), loading = openDocument(bytes, { signal: second.signal })
+    second.abort()
+    await expect(loading).rejects.toBeInstanceOf(CancelledError)
+    const fresh = await openDocument(bytes, { signal: new AbortController().signal })
+    expect(fresh.numPages).toBe(3); await fresh.destroy(); await fresh.destroy()
+  })
   it('preserves Unicode text items and line-ending hints without guessing column order', () => {
     expect(joinTextItems([{ str: 'Grüße' }, { str: '中文 😀', hasEOL: true }, { str: 'next line' }])).toBe('Grüße 中文 😀\nnext line')
     expect(joinTextItems([{ str: '' }, { str: '  ', hasEOL: true }])).toBe('')
