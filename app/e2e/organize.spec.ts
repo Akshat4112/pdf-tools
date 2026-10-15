@@ -217,7 +217,7 @@ test('download/reset/exit revoke object URLs and clear edit state', async ({ pag
   expect(await page.evaluate(()=>(window as unknown as {pdfDownloadUrls:Set<string>}).pdfDownloadUrls.size)).toBe(0)
   await expect(page.locator('.organize-grid')).toHaveCount(0)
   await page.getByRole('button',{name:'Back',exact:true}).click()
-  await page.locator('a[href="/pdf-tools/organize"]').click()
+  await page.getByRole('link', { name: 'Open Organize PDF', exact: true }).click()
   await expect(page.getByText('No files selected yet.',{exact:true})).toBeVisible()
 })
 
