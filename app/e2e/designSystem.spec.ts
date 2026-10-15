@@ -29,6 +29,11 @@ test('design reference reflows in both themes without loading engines', async ({
         return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1)
       }).map(element => element.tagName + ':' + element.textContent?.slice(0, 40)))
       expect(clipped).toEqual([])
+      const smallLinks = await page.locator('a').evaluateAll(elements => elements.filter(element => {
+        const r = element.getBoundingClientRect()
+        return r.width > 0 && (r.height < 44 || r.width < 44)
+      }).map(element => element.textContent?.trim() || element.getAttribute('aria-label')))
+      expect(smallLinks).toEqual([])
       const columns = await page.locator('.fl-tool-layout').evaluate(element => getComputedStyle(element).gridTemplateColumns.split(' ').length)
       expect(columns).toBe(width > 900 ? 2 : 1)
       const primary = page.getByRole('link', { name: 'Primary action', exact: true })

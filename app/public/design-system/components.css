@@ -42,6 +42,8 @@
 .fl-nav { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; padding-block:20px; }
 .fl-nav-links { display:flex; align-items:center; flex-wrap:wrap; gap:8px 20px; }
 .fl-nav-links a { min-height:44px; display:inline-flex; align-items:center; }
+.fl-nav > a, .fl-system nav a:not(.fl-card), .fl-footer a, .fl-link-target { display:inline-flex; align-items:center; min-height:44px; min-width:44px; }
+.fl-link-target { justify-self:start; }
 .fl-logo { width:185px; height:auto; max-width:100%; display:block; }
 .fl-logo-dark { display:none; }
 [data-fl-theme="dark"] .fl-logo-light { display:none; }
