@@ -88,7 +88,7 @@ export function validateFile(
   rawName: string,
   bytes: Uint8Array,
   expected: InputKind,
-  opts: { maxBytes?: number } = {},
+  opts: { maxBytes?: number; allowEncrypted?: boolean } = {},
 ): ValidatedFileMeta {
   const displayName = sanitizeFileName(rawName)
 
@@ -131,7 +131,7 @@ export function validateFile(
   let encrypted = false
   if (kind === 'pdf' && sniffPdfEncryption(bytes)) {
     encrypted = true
-    throw toolError(
+    if (!opts.allowEncrypted) throw toolError(
       'E-INPUT-02',
       'This PDF is password-protected. Unlocking is not available in this release.',
       'explain-encryption',
@@ -156,7 +156,7 @@ export interface FileOutcome {
 export function validateSelection(
   files: Array<{ name: string; bytes: Uint8Array }>,
   expected: InputKind,
-  opts: { maxBytes?: number } = {},
+  opts: { maxBytes?: number; allowEncrypted?: boolean } = {},
 ): FileOutcome[] {
   return files.map((f, index) => {
     try {

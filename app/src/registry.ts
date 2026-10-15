@@ -200,7 +200,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'view', engines: ['pdfjs'],
     readOnly: true, route: '/doc-info',
     category: 'view',
-    implemented: false,
+    implemented: true,
   },
 ] as const
 

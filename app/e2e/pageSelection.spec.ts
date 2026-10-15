@@ -143,8 +143,8 @@ test('pagination bounds canvases and source replacement resets selection and rev
   await page.getByRole('button', { name: 'Clear files', exact: true }).click()
   await expect(page.locator('.page-grid')).toHaveCount(0)
   await page.getByRole('button', { name: 'Back', exact: true }).click()
-  await expect(page.locator('a[href="/pdf-tools/extract-pages"]')).toBeVisible()
-  await expect(page.locator('a[href="/pdf-tools/delete-pages"]')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open Extract pages', exact: true })).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Open Delete pages', exact: true })).toBeVisible()
 })
 
 test('only-page deletion is blocked and route changes discard document data', async ({ page }) => {
@@ -156,7 +156,7 @@ test('only-page deletion is blocked and route changes discard document data', as
   await page.getByRole('button', { name: 'Page 1', exact: true }).click()
   await expect(page.getByText(/Deleting every page would leave an empty document/)).toBeVisible()
   await page.getByRole('button', { name: 'Back', exact: true }).click()
-  await page.locator('a[href="/pdf-tools/extract-pages"]').click()
+  await page.getByRole('link', { name: 'Open Extract pages', exact: true }).click()
   await expect(page.getByText('No files selected yet.')).toBeVisible()
   await expect(page.locator('.page-grid')).toHaveCount(0)
 })
