@@ -71,7 +71,7 @@ Paths below are relative to `/pdf-tools/`. Keep a single page for closely relate
 | `/` | Live / P0 | free local PDF tools | open-source PDF tools in browser | kostenlose lokale PDF-Tools | Explain collection, pledge and working tool categories; link each tool |
 | `/merge/` | Live / P0 | merge PDF files | combine PDFs without upload | PDF zusammenfügen | File order, two-file minimum, supported inputs and preservation limits |
 | `/split/` | Live / P0 | split PDF | split PDF into separate pages | PDF teilen | Distinguish ranges, every N pages and per-page ZIP from extracting one new PDF |
-| `/images-to-pdf/` | Live / P0 | images to PDF | JPG to PDF; PNG to PDF | Bilder in PDF umwandeln | One combined JPEG/PNG page; ordering, page size/margins and supported format limits |
+| `/images-to-pdf/` | Live / P0 | images to PDF | JPG to PDF; PNG to PDF | Bilder in PDF umwandeln | One combined PDF with one image per page; ordering, page size/margins and supported format limits |
 | `/pdf-to-jpg/` | Live / P0 | PDF to JPG | convert PDF pages to JPEG locally | PDF in JPG umwandeln | Selected pages, DPI, JPEG quality and output packaging |
 | `/pdf-to-png/` | Live / P1 | PDF to PNG | PDF pages to transparent PNG | PDF in PNG umwandeln | Background choice, selected pages and pixel limits; don't promise vector preservation |
 | `/rotate/` | Live / P1 | rotate PDF pages | save rotated PDF locally | PDF-Seiten drehen | Rotation selection, 90-degree steps and saving a new PDF |
