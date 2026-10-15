@@ -113,7 +113,7 @@ export function PdfToImagesTool({ mode, onExit }: { mode: 'pdf-to-jpg' | 'pdf-to
     if (!output.verified) return
     const stored = session.listOutputs().find(item => item.name === output.name) ?? session.addOutput(output.name, output.mimeType, output.bytes)
     const anchor = document.createElement('a')
-    anchor.href = session.objectUrlFor(stored.id); anchor.download = output.name; anchor.click()
+    anchor.href = session.objectUrlFor(stored.id); anchor.download = stored.name; anchor.click()
   }
   const problem = readError ?? configuration.error ?? planError
   const pixels = plans?.reduce((sum, plan) => sum + plan.width * plan.height, 0) ?? 0

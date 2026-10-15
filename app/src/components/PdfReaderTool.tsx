@@ -4,6 +4,7 @@ import type { PDFDocumentProxy } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import 'pdfjs-dist/legacy/web/pdf_viewer.css'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import { openDocument, type PdfjsDocument } from '../engines/pdfjs'
+import { restrictPdfLinks } from '../security/pdfPolicy'
 import { toolError, type ToolError } from '../registry'
 import { clearPrintFrame, prepareReaderPrint } from '../tools/readerPrint'
 
@@ -59,10 +60,12 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
         const { EventBus, PDFViewer, PDFLinkService, PDFFindController } = await import('pdfjs-dist/legacy/web/pdf_viewer.mjs')
         if (disposed) { await loaded.destroy(); return }
         const eventBus = new EventBus(), linkService = new PDFLinkService({ eventBus })
-        linkService.externalLinkEnabled = false
+        restrictPdfLinks(linkService)
         const findController = new PDFFindController({ eventBus, linkService, delay: 100, updateMatchesCountOnProgress: false })
         instance = new PDFViewer({ container: container.current!, viewer: pages.current!, eventBus, linkService, findController,
           annotationMode: 1, annotationEditorMode: -1, textLayerMode: 1, enableAutoLinking: false,
+          scriptingManager: undefined, downloadManager: undefined,
+          imageResourcesPath: `${import.meta.env.BASE_URL}assets/pdfjs-images/`,
           maxCanvasPixels: 2_000_000, maxCanvasDim: 4096, enableDetailCanvas: false,
           // PDF.js runtime accepts a lifetime signal (missing from the distributed declaration).
           ...{ abortSignal: lifecycle.signal },

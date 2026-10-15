@@ -129,7 +129,7 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
     const stored = session.listOutputs()[0] ?? session.addOutput(output.name, output.mimeType, output.bytes)
     const a = document.createElement('a')
     a.href = session.objectUrlFor(stored.id)
-    a.download = output.name
+    a.download = stored.name
     a.click()
   }
   const reset = () => changeFiles([])

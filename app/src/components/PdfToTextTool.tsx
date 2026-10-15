@@ -42,7 +42,7 @@ export function PdfToTextTool({ onExit }: { onExit(): void }) {
   const download = (output: VerifiedOutput) => {
     if (!output.verified) return
     const stored = session.listOutputs().find(item => item.name === output.name) ?? session.addOutput(output.name, output.mimeType, output.bytes)
-    const anchor = document.createElement('a'); anchor.href = session.objectUrlFor(stored.id); anchor.download = output.name; anchor.click()
+    const anchor = document.createElement('a'); anchor.href = session.objectUrlFor(stored.id); anchor.download = stored.name; anchor.click()
   }
   return <div className="tool-screen pdf-to-text-tool">
     <header className="tool-header"><h1 className="tool-heading">PDF to text</h1><p className="tool-subtitle">Download the existing text layer as a UTF-8 text file, entirely on your device.</p></header>

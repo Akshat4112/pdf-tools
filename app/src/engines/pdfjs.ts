@@ -13,6 +13,7 @@
  * The adapter API is identical in both.
  */
 
+import { PDF_DOCUMENT_SAFETY } from '../security/pdfPolicy'
 import type { ToolError } from '../registry'
 import { CancelledError } from '../jobs/orchestrator'
 import { QUOTAS, toolError } from '../registry'
@@ -141,7 +142,7 @@ export async function openDocument(
       iccUrl: `${import.meta.env.BASE_URL}assets/iccs/`,
       stopAtErrors: opts.strict === true,
       canvasMaxAreaInBytes: opts.maxCanvasBytes ?? -1,
-      isEvalSupported: false,
+      ...PDF_DOCUMENT_SAFETY,
       // Node test path has no network fonts; browser self-hosts under BASE_URL
     } as never) as unknown as { promise: Promise<PdfjsDocument>; destroy(): Promise<void> }
     opts.signal?.addEventListener('abort', abort, { once: true })

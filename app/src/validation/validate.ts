@@ -13,6 +13,7 @@
  * no full parse, no engine import, bounded reads.
  */
 
+import { sanitizeFileName } from '../security/fileNames'
 import { QUOTAS, toolError } from '../registry'
 
 export type InputKind = 'pdf' | 'image'
@@ -27,18 +28,6 @@ export interface ValidatedFileMeta {
   byteLength: number
   /** PDF only: true when the encryption dictionary was found (never decrypted) */
   encrypted: boolean
-}
-
-/** PT-SEC-001: display-safe names (same rules as FileSession). */
-function sanitize(raw: string): string {
-  const name = (raw ?? '')
-    .split(/[\\/]/)
-    .pop()!
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001f\u007f]/g, '')
-    .replace(/[<>"'`;&${}\\]/g, '')
-    .trim()
-  return name.length > 120 ? name.slice(0, 120) : name || 'document'
 }
 
 const PDF_MAGIC = [0x25, 0x50, 0x44, 0x46] // %PDF
@@ -101,7 +90,7 @@ export function validateFile(
   expected: InputKind,
   opts: { maxBytes?: number } = {},
 ): ValidatedFileMeta {
-  const displayName = sanitize(rawName)
+  const displayName = sanitizeFileName(rawName)
 
   // ---- size gate first (cheapest, no scanning) ----
   if (!bytes || bytes.byteLength === 0) {

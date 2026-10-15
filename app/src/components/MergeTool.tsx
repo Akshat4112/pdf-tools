@@ -53,11 +53,11 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
 
   const download = useCallback(
     (out: VerifiedOutput) => {
-      session.addOutput(out.name, out.mimeType, out.bytes)
-      const url = session.objectUrlFor(session.listOutputs()[session.listOutputs().length - 1].id)
+      const stored = session.addOutput(out.name, out.mimeType, out.bytes)
+      const url = session.objectUrlFor(stored.id)
       const a = document.createElement('a')
       a.href = url
-      a.download = out.name
+      a.download = stored.name
       a.click()
     },
     [session],

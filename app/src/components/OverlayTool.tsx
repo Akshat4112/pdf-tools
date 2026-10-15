@@ -56,7 +56,7 @@ export function OverlayTool({mode,onExit}:{mode:OverlayMode;onExit():void}) {
     job.current=next;session.jobs.track(next);setState(next.state)
     void next.completion.then(()=>{if(!active.current||job.current!==next)return;if(next.state==='done'&&next.result)setResult(next.result);if(next.error)setError(next.error)})
   }
-  const download=(output:VerifiedOutput)=>{if(!output.verified)return;const stored=session.listOutputs().find(item=>item.name===output.name)??session.addOutput(output.name,output.mimeType,output.bytes);const anchor=document.createElement('a');anchor.href=session.objectUrlFor(stored.id);anchor.download=output.name;anchor.click()}
+  const download=(output:VerifiedOutput)=>{if(!output.verified)return;const stored=session.listOutputs().find(item=>item.name===output.name)??session.addOutput(output.name,output.mimeType,output.bytes);const anchor=document.createElement('a');anchor.href=session.objectUrlFor(stored.id);anchor.download=stored.name;anchor.click()}
   return <div className="tool-screen overlay-tool">
     <header className="tool-header"><h1 className="tool-heading">{mode==='page-numbers'?'Page numbers':'Text watermark'}</h1><p className="tool-subtitle">Add selectable text to a new PDF copy, entirely on your device.</p></header>
     {phase==='configure'?<>
