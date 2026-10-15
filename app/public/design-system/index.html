@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>FolioLocal — visual system reference</title>
+<link rel="stylesheet" href="tokens.css"><link rel="stylesheet" href="components.css">
+</head>
+<body class="fl-system" data-fl-theme="light">
+<a class="fl-skip" href="#reference">Skip to design reference</a>
+<header class="fl-reviewbar"><div class="fl-shell fl-row"><strong>FolioLocal · design reference</strong><button class="fl-button fl-button--secondary" id="theme-toggle" type="button" aria-pressed="false">Dark theme</button></div></header>
+<main id="reference" class="fl-shell" tabindex="-1">
+<section class="fl-section fl-stack" aria-labelledby="reference-title">
+<h1 id="reference-title">Useful tools.<br>Considered details.</h1>
+<p class="fl-lead">PT-BRAND-004 reference for the homepage, tool workspace and shared components. Sample files and processing states below are static design examples.</p>
+<nav class="fl-row" aria-label="Reference sections"><a href="#homepage">Homepage</a><a href="#workspace">Tool workspace</a><a href="#components">Components &amp; states</a><a href="#handoff">Implementation handoff</a></nav>
+</section>
+<section id="homepage" class="fl-section" aria-labelledby="home-example">
+<h2 id="home-example" class="fl-section-title">Homepage example</h2>
+<div class="fl-panel">
+<div class="fl-nav"><a href="../" aria-label="FolioLocal — home"><img class="fl-logo fl-logo-light" src="../brand/logo-light.svg" width="330" height="64" alt=""><img class="fl-logo fl-logo-dark" src="../brand/logo-dark.svg" width="330" height="64" alt=""></a><nav class="fl-nav-links" aria-label="Homepage example navigation"><a href="#sample-tools">All tools</a><a href="https://github.com/Akshat4112/pdf-tools">Source</a></nav></div>
+<div class="fl-hero fl-stack"><span class="fl-label fl-muted">FREE FOREVER · OPEN SOURCE</span><h2 style="font-size:clamp(2rem,4vw,3rem);line-height:1.15;max-width:22ch">Free PDF tools.<br>On your device.</h2><p class="fl-lead">Merge, split, organize and convert everyday documents in your browser. No account required.</p><div class="fl-trust"><span>Free forever</span><span>Open source · MIT</span><span>Files processed on your device</span></div></div>
+<div id="sample-tools" class="fl-stack">
+<div class="fl-tools-heading"><h3>What would you like to do?</h3><span class="fl-small fl-muted">Working tools · selected examples</span></div>
+<div class="fl-grid">
+<a class="fl-card" href="../merge/"><svg class="fl-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6v5H4zM14 4h6v5h-6zM7 9v4h10V9M12 13v7m-3-3 3 3 3-3"/></svg><h3>Merge PDF</h3><p class="fl-small fl-muted">Combine files in the order you choose.</p><span class="fl-small">Open tool →</span></a>
+<a class="fl-card" href="../split/"><svg class="fl-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6H9zM12 9v4H5v7m7-7h7v7M2 17l3 3 3-3m8 0 3 3 3-3"/></svg><h3>Split PDF</h3><p class="fl-small fl-muted">Separate page ranges into new files.</p><span class="fl-small">Open tool →</span></a>
+<a class="fl-card" href="../images-to-pdf/"><svg class="fl-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h12l4 4v14H4zM16 3v5h4M7 17l3-4 3 3 2-2 2 3"/></svg><h3>Images to PDF</h3><p class="fl-small fl-muted">One combined PDF, one image per page.</p><span class="fl-small">Open tool →</span></a>
+</div></div>
+<div class="fl-footer"><div><strong>FolioLocal</strong><p>Free forever. Files processed on your device.</p></div><nav class="fl-row" aria-label="Homepage example footer"><a href="https://github.com/Akshat4112/pdf-tools">Source</a><a href="https://github.com/Akshat4112/pdf-tools/blob/main/LICENSE">MIT license</a></nav></div>
+</div>
+</section>
+<section id="workspace" class="fl-section fl-stack" aria-labelledby="workspace-example">
+<h2 id="workspace-example">Tool workspace example</h2>
+<p class="fl-small fl-muted">Layout reference with synthetic sample filenames. Processing and file-order controls are illustrated; use the working tool for a real document.</p>
+<nav aria-label="Workspace example breadcrumb"><a href="../">All tools</a> <span aria-hidden="true">/</span> <span aria-current="page">Merge PDF</span></nav>
+<div class="fl-stack"><h2>Merge PDF</h2><p class="fl-lead">Combine PDF files in the order you choose.</p></div>
+<div class="fl-tool-layout">
+<div class="fl-stack">
+<section class="fl-panel fl-stack" aria-labelledby="files-heading"><h3 id="files-heading">1. Choose your files</h3><div class="fl-dropzone"><svg class="fl-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 17V3m-5 5 5-5 5 5M4 15v6h16v-6"/></svg><strong>Drop PDFs here or choose files</strong><a class="fl-button" href="../merge/">Open working merge tool</a><span class="fl-small fl-muted">Processed on your device · limits shown by the tool</span></div>
+<ol class="fl-files" aria-label="Synthetic file order"><li class="fl-file"><div class="fl-file-info"><strong>1. sample-notes.pdf</strong><p class="fl-small fl-muted">Synthetic example · 4 pages</p></div><div class="fl-file-actions"><button class="fl-button fl-button--secondary" type="button" disabled aria-label="Move sample notes down — static example">Move down</button></div></li><li class="fl-file"><div class="fl-file-info"><strong>2. sample-appendix.pdf</strong><p class="fl-small fl-muted">Synthetic example · 2 pages</p></div><div class="fl-file-actions"><button class="fl-button fl-button--secondary" type="button" disabled aria-label="Move sample appendix up — static example">Move up</button></div></li></ol></section>
+<section class="fl-panel fl-stack" aria-labelledby="preview-heading"><h3 id="preview-heading">2. Review the order</h3><div class="fl-page-grid"><div class="fl-page"><div class="fl-paper" aria-hidden="true">Sample</div><span>Page 1</span></div><div class="fl-page"><div class="fl-paper" aria-hidden="true">Sample</div><span>Page 2</span></div><div class="fl-page"><div class="fl-paper" aria-hidden="true">Sample</div><span>Page 3</span></div></div><p class="fl-small fl-muted">The actual merge workflow controls file order. Page-selection controls are demonstrated separately below.</p></section>
+</div>
+<aside class="fl-panel fl-stack" aria-labelledby="summary-heading"><h3 id="summary-heading">Ready when you are</h3><p>The primary action follows the file list on mobile. Results appear only after output verification.</p><div class="fl-message"><strong>Local processing</strong><p class="fl-small">Your documents are processed in your browser. Clear files releases this workspace; it does not delete downloads.</p></div><a class="fl-button" href="../merge/">Open Merge PDF</a><details><summary>Supported files and limits</summary><p class="fl-small">The working tool shows its current PDF support, size/page limits and preservation warnings. This reference does not change them.</p></details></aside>
+</div>
+</section>
+<section id="components" class="fl-section fl-stack" aria-labelledby="component-heading">
+<h2 id="component-heading">Component &amp; state library</h2><p class="fl-muted">Theme, native form controls, disclosure and selected-page examples can be exercised. Other states are static specimens.</p>
+<div class="fl-panel fl-stack"><h3>Actions</h3><div class="fl-row"><a class="fl-button" href="../merge/">Primary action</a><a class="fl-button fl-button--secondary" href="#workspace">Secondary action</a><button class="fl-button" type="button" disabled>Unavailable</button><button class="fl-button fl-button--danger" type="button" id="sample-reset">Reset page selection</button></div><p class="fl-small fl-muted">Keyboard focus uses a three-pixel outline; destructive actions are explicit rather than icon-only.</p></div>
+<div class="fl-state-grid">
+<div class="fl-panel fl-stack"><h3>Fields &amp; help</h3><label class="fl-label" for="range-example">Page range</label><input class="fl-input" id="range-example" value="1-3, 6" aria-describedby="range-help"><p id="range-help" class="fl-small fl-muted">Example format: 1-3, 6. This field does not select a real document.</p><label class="fl-label" for="format-example">Output format</label><select id="format-example" class="fl-input"><option>PDF</option><option>PNG — conversion example only</option></select><label class="fl-checkbox"><input type="checkbox"> Include selected pages — example only</label></div>
+<div class="fl-panel fl-stack"><h3>Invalid field</h3><label class="fl-label" for="invalid-example">Page range — invalid specimen</label><input class="fl-input" id="invalid-example" value="1-0" readonly aria-invalid="true" aria-describedby="invalid-help"><p id="invalid-help" class="fl-small" style="color:var(--fl-danger)">Enter a range with the start page before the end page.</p><span class="fl-chip">Error — action needed</span><p class="fl-small fl-muted">Use text and an error border. Associate the message with the field; preserve the user's input for correction.</p></div>
+</div>
+<div class="fl-panel fl-stack"><h3>Selected-page pattern</h3><p class="fl-small fl-muted">Synthetic layout only. Buttons demonstrate selection without reading or storing files.</p><div class="fl-page-grid" id="selection-example"><button class="fl-page" type="button" aria-pressed="false"><span class="fl-paper" aria-hidden="true">Sample</span><span>Page 1 · <span class="selection-label">Not selected</span></span></button><button class="fl-page" type="button" aria-pressed="true"><span class="fl-paper" aria-hidden="true">Sample</span><span>Page 2 · <span class="selection-label">Selected</span></span></button><button class="fl-page" type="button" aria-pressed="false"><span class="fl-paper" aria-hidden="true">Sample</span><span>Page 3 · <span class="selection-label">Not selected</span></span></button></div><p id="selection-status" class="fl-small" role="status">1 example page selected</p></div>
+<div class="fl-state-grid">
+<div class="fl-panel fl-stack"><h3>Empty</h3><p>No files selected yet.</p><p class="fl-small fl-muted">Choose supported files to begin. Always retain a keyboard file-picker alternative to drag and drop.</p></div>
+<div class="fl-panel fl-stack"><h3>Processing — static example</h3><label for="progress-example">Preparing output · example progress</label><progress id="progress-example" value="45" max="100">45%</progress><p class="fl-small fl-muted">45% is a design specimen, not a live job. Real progress must come from the engine; cancellation belongs to the current job.</p></div>
+<div class="fl-message fl-message--error"><strong>Error</strong><p>We could not process this file. Choose a supported PDF and try again.</p><p class="fl-small">Real errors use the shared error taxonomy; never expose raw parser text.</p></div>
+<div class="fl-message fl-message--warning"><strong>Check preservation limits</strong><p>Review the tool's actual warnings before changing the document.</p><p class="fl-small">Warnings explain the consequence and next action; color alone does not carry meaning.</p></div>
+<div class="fl-message fl-message--success"><strong>Verified result — static example</strong><p>Your new PDF is ready to download.</p><p class="fl-small">Production success appears only after output verification. No sample download is fabricated here.</p></div>
+<div class="fl-panel fl-stack"><h3>Cancelled</h3><p>Processing stopped. No partial result is available.</p><p class="fl-small fl-muted">Retain recoverable input state only under the existing lifecycle contract; retries create a new job.</p></div>
+</div>
+</section>
+<section id="handoff" class="fl-section fl-stack" aria-labelledby="handoff-heading"><h2 id="handoff-heading">Implementation handoff</h2><p>This reference is separate from the working application. PT-UI-001/002/003/004/005/006 apply the accepted system to home, navigation, footer, discovery, workspaces and state screens. PT-UI-007 performs the final responsive/accessibility review.</p><p class="fl-small fl-muted">No documents, analytics, storage, remote fonts or processing engines are used by this page. The design specification records exact states, semantic contracts, contrast pairs and migration boundaries.</p><a href="../brand/">View the accepted brand assets</a></section>
+</main>
+<footer class="fl-shell fl-footer"><p>FolioLocal design reference · MIT artwork/code</p><a href="https://github.com/Akshat4112/pdf-tools">Project source</a></footer>
+<script src="reference.js"></script>
+</body>
+</html>
