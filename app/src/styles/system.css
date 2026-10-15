@@ -690,3 +690,14 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 #overlay-preview-page { width: 70px; margin-left: 8px; }
 .overlay-canvas { text-align: center; margin-top: 18px; }
 .overlay-canvas canvas { max-width: 100%; height: auto; background: white; box-shadow: 0 1px 6px #0003; }
+
+/* PT-CORE-017: bounded, readable metadata and geometry. */
+.document-info-list { margin: 16px 0; }
+.document-info-list > div { display: grid; grid-template-columns: minmax(110px,1fr) minmax(0,3fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.document-info-list dt { font-weight: 600; }
+.document-info-list dd { margin: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
+.document-info-table { overflow-x: auto; }
+.document-info-table table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.document-info-table th, .document-info-table td { padding: 10px 5px; text-align: left; border-bottom: 1px solid var(--line); }
+.document-info-table caption { text-align: left; padding: 12px 0; }
+@media(max-width: 480px) { .document-info-list > div { grid-template-columns: 1fr; gap: 4px; } }
