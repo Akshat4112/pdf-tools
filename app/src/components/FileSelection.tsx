@@ -40,6 +40,8 @@ interface FileSelectionProps {
   onChange(files: WorkspaceFile[]): void
   /** i18n hook point (PT-UX-005); defaults en */
   labels?: Partial<FileSelectionLabels>
+  /** Read-only inspection can report locked PDFs without unlocking. */
+  allowEncrypted?: boolean
   maxFiles?: number
   maxTotalBytes?: number
 }
@@ -76,6 +78,7 @@ export function FileSelection({
   files,
   onChange,
   labels: labelOverrides,
+  allowEncrypted = false,
   maxFiles,
   maxTotalBytes,
 }: FileSelectionProps) {
@@ -95,7 +98,7 @@ export function FileSelection({
   const ingest = useCallback(
     (incoming: Array<{ name: string; bytes: Uint8Array; error?: ToolError; size?: number }>) => {
       if (incoming.length === 0) return
-      const outcomes = validateSelection(incoming, toValidateKind(expected))
+      const outcomes = validateSelection(incoming, toValidateKind(expected), { allowEncrypted })
       const accepted: WorkspaceFile[] = []
       for (const o of outcomes) {
         const src = incoming[o.index]
@@ -111,7 +114,7 @@ export function FileSelection({
       const next = multiple ? [...files, ...accepted] : accepted.slice(-1)
       onChange(next)
     },
-    [expected, files, multiple, onChange],
+    [expected, files, multiple, onChange, allowEncrypted],
   )
 
   const readFiles = async (list: File[]) => {
