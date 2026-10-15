@@ -89,8 +89,11 @@ jobs:
       - name: Validate corpus (PyMuPDF + qpdf, per PT-PD-005 §4)
         run: python3 scripts/validate_corpus.py
 
+      - name: Fixture size normalization regression checks
+        run: python3 -m unittest discover -s scripts -p "test_check_reproducibility.py"
+
       # Structural reproducibility: regenerated fixtures must match the committed
-      # corpus structurally (same byte sizes, page counts, markers, fields).
+      # corpus structurally (same normalized byte sizes, page counts, markers, fields).
       # Byte-identical output is NOT expected — PDF creation IDs/timestamps vary.
       # The committed corpus remains the canonical reference (sha256-pinned).
       - name: Corpus structural reproducibility check

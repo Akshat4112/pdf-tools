@@ -12,7 +12,7 @@
 - Signature indicators use PDF.js's public `getSignatures()` metadata plus the document signature flag. Counts mean entries were reported, not that a signature is valid. A flag without signed entries is distinguished from a reported signature; read failures remain unknown. The inspector does not request signature payloads or cryptographic verification, render a signature stamp, or claim a visual mark is a digital signature.
 - The report explains that authenticity, trust, certificate expiry and document integrity are not verified, and that modifying a PDF can invalidate signatures. Inspection preserves the original bytes.
 
-Metadata/signature-read failures produce generic warnings with unknown indicators; geometry/read failures do not expose a partial successful report. Raw parser errors and document values are not logged. Inspection loads set PDF.js verbosity to zero; exception messages are converted to the shared error taxonomy rather than shown verbatim.
+Metadata/signature-read failures produce generic warnings with unknown indicators; geometry/read failures do not expose a partial successful report. Raw parser errors and document values are not logged. Inspection loads set PDF.js verbosity to zero on both the main thread and the owned worker; exception messages are converted to the shared error taxonomy rather than shown verbatim.
 
 ## Lifecycle
 
@@ -26,3 +26,5 @@ Each inspection owns a cancellable PDF.js worker. The cancellation monitor start
 - Required gates: app/test/e2e TypeScript, lint, all unit tests, production build, full desktop/mobile interface and image-engine regression suites, production dependency audit and corpus CI. No dependencies were added.
 
 Next task: **PT-SEC-001 — Harden rendering and exported filenames**.
+
+CI exposed an existing corpus reproducibility flake: MuPDF's generated trailer IDs can have different encoded lengths, changing a PDF's size by a byte. The reproducibility check now normalizes only final-trailer ID contents (hexadecimal or escaped literal strings) before comparing sizes; content/image sizes, page counts, form fields and rotations remain checked, and explicit page dimensions are additionally compared. Four Python regressions cover ID length variation, real content-size changes, non-PDF/truncated input and geometry differences. Canonical fixtures and their pinned hashes remain unchanged.

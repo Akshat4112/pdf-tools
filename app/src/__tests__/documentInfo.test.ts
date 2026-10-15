@@ -9,7 +9,7 @@ afterEach(() => vi.restoreAllMocks())
 async function fixture(signature = false) {
   const pdf = await PDFDocument.create(); pdf.setTitle('<script>alert(1)</script>'); pdf.setAuthor('Prüfung Straße'); pdf.setSubject('x'.repeat(2000)); pdf.setCreationDate(new Date('2026-10-01T12:30:00Z'))
   const page = pdf.addPage([500,400]); page.setCropBox(20,30,400,300); page.setRotation(degrees(90)); page.node.set(PDFName.of('UserUnit'),PDFNumber.of(2)); pdf.addPage([300,200])
-  const xml = '<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title><rdf:Alt><rdf:li xml:lang="x-default">XMP title</rdf:li></rdf:Alt></dc:title></rdf:Description></rdf:RDF></x:xmpmeta>'
+  const xml = `<x:xmpmeta xmlns:x="adobe:ns:meta/"><rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"><rdf:Description xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:creator><rdf:Seq>${Array.from({length:21},(_,i)=>`<rdf:li>Creator${i+1}</rdf:li>`).join('')}</rdf:Seq></dc:creator><dc:title><rdf:Alt><rdf:li xml:lang="x-default">XMP title</rdf:li></rdf:Alt></dc:title></rdf:Description></rdf:RDF></x:xmpmeta>`
   pdf.catalog.set(PDFName.of('Metadata'),pdf.context.register(pdf.context.stream(xml,{Type:'Metadata',Subtype:'XML'})))
   if(signature) {
     const value=pdf.context.register(pdf.context.obj({Type:'Sig',Filter:'Adobe.PPKLite',SubFilter:'adbe.pkcs7.detached',ByteRange:[0,10,20,10],Contents:PDFHexString.of('010203'),Name:PDFString.of('Synthetic unverified signer')}))
@@ -31,6 +31,7 @@ describe('document information inspector',()=>{
     expect(result.fields.find(item=>item.label==='Subject')).toMatchObject({value:'x'.repeat(1000),truncated:true})
     expect(result.fields.find(item=>item.label==='Created (PDF date)')?.value).toContain('D:20261001123000')
     expect(result.xmp.find(item=>item.label==='Title')?.value).toBe('XMP title')
+    expect(result.xmp.find(item=>item.label==='Creator')?.value).toContain('Creator21');expect(result.xmp.find(item=>item.label==='Creator')?.truncated).toBe(false)
   })
   it('reports synthetic signature entries as indicators and distinguishes a visual stamp',async()=>{
     const signed=await inspect(await fixture(true));expect(signed.error).toBeUndefined();expect(signed.result?.signatureFlag).toBe(true);expect(signed.result?.signatureEntries).toBe(1)

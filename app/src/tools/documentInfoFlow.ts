@@ -26,9 +26,19 @@ export const INFO_FIELD_LIMIT = 1000
 const dictionaryFields = [['Title','Title'],['Author','Author'],['Subject','Subject'],['Keywords','Keywords'],['Creator','Creator'],['Producer','Producer'],['CreationDate','Created (PDF date)'],['ModDate','Modified (PDF date)']] as const
 const xmpFields = [['dc:title','Title'],['dc:creator','Creator'],['dc:description','Description'],['pdf:keywords','Keywords'],['xmp:createdate','Created'],['xmp:modifydate','Modified']] as const
 function field(label: string, raw: unknown): InfoField {
-  const arrayTruncated = Array.isArray(raw) && (raw.length > 20 || raw.some(item => typeof item === 'string' && item.length > INFO_FIELD_LIMIT))
-  const value = typeof raw === 'string' ? raw : Array.isArray(raw) ? raw.filter(item => typeof item === 'string').slice(0, 20).map(item => item.slice(0, INFO_FIELD_LIMIT)).join('; ') : ''
-  return { label, value: value.slice(0, INFO_FIELD_LIMIT) || 'Not supplied', truncated: arrayTruncated || value.length > INFO_FIELD_LIMIT }
+  const values = typeof raw === 'string' ? [raw] : Array.isArray(raw) ? raw : []
+  let value = '', truncated = false
+  for (const item of values) {
+    if (typeof item !== 'string') continue
+    const separator = value ? '; ' : ''
+    if (value.length + separator.length + item.length > INFO_FIELD_LIMIT) {
+      value += separator.slice(0, INFO_FIELD_LIMIT - value.length)
+      value += item.slice(0, INFO_FIELD_LIMIT - value.length)
+      truncated = true; break
+    }
+    value += separator + item
+  }
+  return { label, value: value || 'Not supplied', truncated }
 }
 async function wait<T>(pending: Promise<T>, signal: AbortSignal): Promise<T> {
   let rejectAbort: (error: CancelledError) => void = () => {}

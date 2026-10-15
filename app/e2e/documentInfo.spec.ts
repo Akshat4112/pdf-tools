@@ -17,6 +17,7 @@ test.beforeEach(async({page})=>{
   await page.route('**/*',route=>{const url=new URL(route.request().url());if(url.hostname!=='127.0.0.1'&&!['blob:','data:'].includes(url.protocol))throw new Error(`External request: ${url.origin}`);return route.continue()})
 })
 test('metadata is inert and bounded; page dimensions include crop, rotation and UserUnit',async({page},info)=>{
+  await page.addInitScript(()=>{const send=Worker.prototype.postMessage,levels:number[]=[];Object.assign(window,{infoVerbosity:levels});Worker.prototype.postMessage=function(message:unknown,transfer?:Transferable[]|StructuredSerializeOptions){const value=message as {action?:string;data?:{verbosity:number}};if(value.action==='configure')levels.push(value.data!.verbosity);Reflect.apply(send,this,[message,transfer])}})
   const logs:string[]=[];page.on('console',message=>logs.push(message.text()))
   await page.goto('doc-info/');await chooseAndInspect(page)
   await expect(page.getByRole('region',{name:'Document metadata',exact:true})).toContainText(title)
@@ -27,6 +28,7 @@ test('metadata is inert and bounded; page dimensions include crop, rotation and 
   await expect(rows.nth(1)).toContainText('600.00 × 800.00 pt');await expect(rows.nth(1)).toContainText('90°');await expect(rows.nth(2)).toContainText('300.00 × 200.00 pt')
   await expect(page.locator('.document-info-tool script,.document-info-tool iframe,.document-info-tool canvas')).toHaveCount(0)
   expect(logs.some(log=>log.includes('private-title')||log.includes(author))).toBe(false)
+  expect(await page.evaluate(()=>(window as unknown as {infoVerbosity:number[]}).infoVerbosity)).toEqual([0])
   expect(await page.locator('.document-info-list,.document-info-table').evaluateAll(items=>items.every(item=>{const rect=item.getBoundingClientRect();return rect.left>=0&&rect.right<=innerWidth}))).toBe(true)
   if(process.env.PDF_TOOLS_VISUAL_DIR)await page.screenshot({path:`${process.env.PDF_TOOLS_VISUAL_DIR}/document-info-${info.project.name}.png`,fullPage:true})
 })
