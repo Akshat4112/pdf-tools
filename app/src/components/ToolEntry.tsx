@@ -22,6 +22,7 @@ import { ImagesToPdfTool } from './ImagesToPdfTool'
 import { PdfToImagesTool } from './PdfToImagesTool'
 import { PdfReaderTool } from './PdfReaderTool'
 import { PdfToTextTool } from './PdfToTextTool'
+import { OverlayTool } from './OverlayTool'
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -51,6 +52,9 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
   if (tool.implemented) {
     // mounted workspaces per tool id — one case per shipped PT-CORE interface
     switch (tool.id) {
+      case 'page-numbers':
+      case 'watermark':
+        return <OverlayTool key={tool.id} mode={tool.id} onExit={onExit} />
       case 'pdf-to-text':
         return <PdfToTextTool onExit={onExit} />
       case 'reader':

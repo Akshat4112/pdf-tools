@@ -683,3 +683,10 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 
 .text-export-preview { max-height: 360px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 14px; border-radius: 8px; background: var(--paper-3); font: 13px/1.6 var(--mono); }
 .text-missing-pages { max-height: 160px; overflow: auto; overflow-wrap: anywhere; }
+
+.overlay-settings { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; }
+.overlay-settings label { display: grid; gap: 6px; }
+.overlay-settings input, .overlay-settings select, #overlay-preview-page { min-width: 0; max-width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); }
+#overlay-preview-page { width: 70px; margin-left: 8px; }
+.overlay-canvas { text-align: center; margin-top: 18px; }
+.overlay-canvas canvas { max-width: 100%; height: auto; background: white; box-shadow: 0 1px 6px #0003; }

@@ -68,3 +68,9 @@ After merge, PT-PD-006 is **Done**, unblocking PT-SP-001/002/003/004/006 and PT-
 
 - npm registry live metadata: `pdfjs-dist`, `pdf-lib`, `@cantoo/pdf-lib`, `@zip.js/zip.js`, `fflate`, `jszip`, `pdfkit`, `tesseract.js`, `mupdf`, `mupdf-js`, `qpdf-wasm`, `canvg`, `fontkit`, `@pdf-lib/fontkit`
 - GitHub API: `mozilla/pdf.js` (Apache-2.0, active, v6.4.299 released 2026-10-03), `Hopding/pdf-lib` (MIT, last push 2024-07-17, not archived)
+
+## Amendment — PT-CORE-016 overlay font (2026-10-15)
+
+Approve exact runtime dependency `@pdf-lib/fontkit@1.1.1` (MIT), required for pdf-lib to embed and subset custom TrueType glyph programs. Standard Helvetica references alone do not embed a font program, so the overlay tools use a real embedded custom font. The fork is dormant; its narrow use is restricted to the project's trusted bundled font, never user-supplied fonts. It is dynamically loaded and pinned with its registry integrity in the committed lockfile. Its declared runtime dependency `pako ^1.0.6` resolves to the existing locked pako. Upstream: https://github.com/Hopding/fontkit and https://github.com/Hopding/pdf-lib#embed-font-and-measure-text.
+
+Approve the self-hosted, subset OFL-1.1 Noto Sans asset under §4.4's custom-font gate. Source is Fontsource's `@fontsource/noto-sans@5.3.0` Latin regular WOFF; the modified TTF is renamed PDF Tools Sans and retains the upstream copyright/license. No font CDN or user font upload is introduced. OFL permission here applies to the font asset, not a general expansion of the code dependency allowlist. English/German cmap coverage, explicit unsupported-character fallback and an embedded FontFile2 regression are required. Preparation and notice paths are documented in `docs/tools/PT-CORE-016-overlays.md`.

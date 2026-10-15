@@ -14,6 +14,7 @@
     "test:images-engine": "tsc -p tsconfig.e2e.json --noEmit && playwright test --config playwright.images.config.ts"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "1.1.1",
     "@zip.js/zip.js": "2.23.0",
     "fflate": "0.8.3",
     "pdf-lib": "1.17.1",
