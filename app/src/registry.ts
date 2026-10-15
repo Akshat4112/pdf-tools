@@ -176,7 +176,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/page-numbers',
     category: 'markup',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'watermark', featureId: 'PT-FT-012', title: 'Text watermark',
@@ -184,7 +184,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'pdf', engines: ['pdflib'],
     readOnly: false, route: '/watermark',
     category: 'markup',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'pdf-to-text', featureId: 'PT-FT-013', title: 'PDF to text',
