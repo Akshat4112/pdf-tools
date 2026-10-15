@@ -33,7 +33,7 @@ const EXTENSIONS: Readonly<Record<string, string>> = {
 /** A verified file's declared format decides its download extension. */
 export function safeDownloadName(raw: string, mimeType: string): string {
   const name = sanitizeFileName(raw, 'output')
-  const extension = EXTENSIONS[mimeType]
+  const extension = Object.hasOwn(EXTENSIONS, mimeType) ? EXTENSIONS[mimeType] : undefined
   if (!extension) throw toolError('E-OUT-01', 'Unsupported download format.', 'retry-job')
   const stem = name.replace(/\.[^.]*$/, '') || 'output'
   return sanitizeFileName(`${stem}.${extension}`, `output.${extension}`)

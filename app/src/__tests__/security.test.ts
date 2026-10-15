@@ -49,6 +49,8 @@ describe('PT-SEC-001 filename boundaries', () => {
     }
     expect(zipEntryName('CON.pdf', 1, 1, 'pdf')).toBe('CON-1.pdf')
     expect(() => zipEntryName('safe.pdf', 1, 1, '../../html')).toThrow()
-    expect(() => safeDownloadName('safe.bin', 'text/html')).toThrow()
+    for (const mime of ['text/html', '__proto__', 'constructor']) {
+      expect(() => safeDownloadName('safe.bin', mime)).toThrowError(expect.objectContaining({ code: 'E-OUT-01' }))
+    }
   })
 })

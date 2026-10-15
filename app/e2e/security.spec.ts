@@ -1,5 +1,16 @@
 import { test, expect } from '@playwright/test'
+import { readdirSync } from 'node:fs'
 import { PDFDocument, PDFName, PDFString, StandardFonts } from 'pdf-lib'
+
+function assetPaths(directory: URL, prefix: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
+    ? assetPaths(new URL(`${entry.name}/`, directory), `${prefix}${entry.name}/`)
+    : [`${prefix}${entry.name}`])
+}
+const trustedAssets = new Set([
+  ...assetPaths(new URL('../dist/assets/', import.meta.url), '/pdf-tools/assets/'),
+  '/pdf-tools/favicon.svg', '/pdf-tools/brand/logo-light.svg', '/pdf-tools/brand/logo-dark.svg',
+])
 
 /** Synthetic attack fixture only: no customer documents or public exfiltration endpoints. */
 async function hostileDocument() {
@@ -46,14 +57,15 @@ async function hostileDocument() {
 }
 
 test('untrusted PDF actions, rich text and URLs cannot execute or navigate; internal links still work', async ({ page, context }) => {
-  const unexpected: string[] = [], dialogs: string[] = []
+  const unexpected: string[] = [], dialogs: string[] = [], downloads: string[] = []
   await context.route('**/*', route => {
     const url = new URL(route.request().url())
-    const allowed = url.origin === 'http://127.0.0.1:4178' && (url.pathname.startsWith('/pdf-tools/assets/') || url.pathname === '/pdf-tools/reader/')
+    const allowed = url.origin === 'http://127.0.0.1:4178' && !url.search && (trustedAssets.has(url.pathname) || url.pathname === '/pdf-tools/reader/')
     if (!allowed && !['blob:', 'data:'].includes(url.protocol)) { unexpected.push(url.href); return route.abort() }
     return route.continue()
   })
   page.on('pageerror', error => { throw error })
+  page.on('download', download => { downloads.push(download.suggestedFilename()) })
   page.on('dialog', dialog => { dialogs.push(dialog.message()); void dialog.dismiss() })
   await page.addInitScript(() => {
     Object.assign(window, { pdfPayloadRan: false, pdfOpenAttempts: [] as string[] })
@@ -68,6 +80,8 @@ test('untrusted PDF actions, rich text and URLs cannot execute or navigate; inte
   await expect(page.locator('.textLayer')).toContainText('Security sentinel')
   const disabled = page.locator('.annotationLayer a[aria-disabled="true"]')
   await expect.poll(() => disabled.count()).toBeGreaterThanOrEqual(3)
+  const destinations = await page.locator('.annotationLayer a').evaluateAll(links => links.map(link => link.getAttribute('href') ?? ''))
+  expect(destinations.some(url => /^(javascript|data|file|https?|mailto|ftp):/i.test(url))).toBe(false)
   for (const link of await disabled.all()) {
     await expect(link).not.toHaveAttribute('href')
     await expect(link).not.toHaveAttribute('target')
@@ -88,6 +102,7 @@ test('untrusted PDF actions, rich text and URLs cannot execute or navigate; inte
   expect(await frame.evaluate(el => (el as HTMLIFrameElement).contentDocument!.querySelectorAll('script,a,form,img,object,embed').length)).toBe(0)
   expect(await page.evaluate(() => ({ ran: (window as unknown as { pdfPayloadRan: boolean }).pdfPayloadRan, opens: (window as unknown as { pdfOpenAttempts: string[] }).pdfOpenAttempts }))).toEqual({ ran: false, opens: [] })
   expect(dialogs).toEqual([])
+  expect(downloads).toEqual([])
   expect(unexpected).toEqual([])
   await expect(page.locator('.file-row svg[onload], .textLayer img, .reader-viewport script')).toHaveCount(0)
 })
