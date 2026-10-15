@@ -52,6 +52,9 @@ test('mobile keyboard disclosure closes in order and returns focus', async ({ pa
   await menu.click()
   await page.locator('h1').click()
   await expect(menu).toHaveAttribute('aria-expanded', 'false')
+  await menu.click()
+  await header.getByRole('link', { name: 'FolioLocal home' }).click()
+  await expect(menu).toHaveAttribute('aria-expanded', 'false')
 })
 
 test('working-tool navigation and shared header survive routes and history', async ({ page }) => {

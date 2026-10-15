@@ -40,7 +40,10 @@ export function SiteHeader() {
   return (
     <header className="folio-header" ref={root}>
       <div className="folio-header-row">
-        <a className="folio-home" href={SITE_BASE} aria-label="FolioLocal home">
+        <a className="folio-home" href={SITE_BASE} aria-label="FolioLocal home" onClick={() => {
+          setOpen(false)
+          root.current?.querySelectorAll('details[open]').forEach(detail => detail.removeAttribute('open'))
+        }}>
           <picture>
             <source media="(prefers-color-scheme: dark)" srcSet={`${SITE_BASE}brand/logo-dark.svg`} />
             <img src={`${SITE_BASE}brand/logo-light.svg`} width="185" height="36" alt="" />
