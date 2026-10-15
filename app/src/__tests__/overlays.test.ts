@@ -37,9 +37,9 @@ describe('verified overlay export',()=>{
     for(const [,reference]of fonts.entries()){const f=out.context.lookup(reference,PDFDict);if(!f.has(PDFName.of('DescendantFonts')))continue;const descendant=f.lookup(PDFName.of('DescendantFonts'),PDFArray).lookup(0,PDFDict),descriptor=descendant.lookup(PDFName.of('FontDescriptor'),PDFDict);embedded ||= descriptor.has(PDFName.of('FontFile2'))}
     expect(embedded).toBe(true);expect(job.result?.output.name).toBe('report-numbered.pdf')
   })
-  it('watermarks with selectable German text and creates a matching single-page preview',async()=>{
+  it('watermarks with selectable German text and creates a matching full-document preview',async()=>{
     const bytes=await fixture(),input={file:{displayName:'report.pdf',bytes},mode:'watermark' as const,pagesExpr:'2',options:{text:'Prüfung Straße',fontSize:24,opacity:0.4}}
-    for(const previewPage of [undefined,2]){const job=startOverlay({...input,previewPage});await job.completion;expect(job.error).toBeUndefined();const doc=await openDocument(job.result!.output.bytes);try{expect(doc.numPages).toBe(previewPage?1:4);const p=await doc.getPage(previewPage?1:2);expect((await p.getTextContent()).items.map(item=>item.str).join(' ')).toContain('Prüfung Straße');p.cleanup()}finally{await doc.destroy()}}
+    for(const previewPage of [undefined,2]){const job=startOverlay({...input,previewPage});await job.completion;expect(job.error).toBeUndefined();const doc=await openDocument(job.result!.output.bytes);try{expect(doc.numPages).toBe(4);const p=await doc.getPage(2);expect((await p.getTextContent()).items.map(item=>item.str).join(' ')).toContain('Prüfung Straße');p.cleanup()}finally{await doc.destroy()}}
   })
   it('rejects invalid selection and oversized placement without publishing partial output',async()=>{
     const bytes=await fixture()

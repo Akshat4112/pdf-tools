@@ -15,11 +15,12 @@ import type { VerifiedOutput } from '../outputs/verify'
 export function OverlayTool({mode,onExit}:{mode:OverlayMode;onExit():void}) {
   const [files,setFiles]=useState<WorkspaceFile[]>([]),[options,setOptions]=useState(()=>overlayDefaults(mode)),[expression,setExpression]=useState(''),[previewPage,setPreviewPage]=useState(1)
   const [source,setSource]=useState<{id:number;count?:number;error?:ToolError}|null>(null),[preview,setPreview]=useState<{key:string;result?:OverlayOutcome;error?:ToolError}|null>(null)
+  const [renderedKey,setRenderedKey]=useState<string|null>(null)
   const [state,setState]=useState<JobState|null>(null),[progress,setProgress]=useState<JobProgress>({fraction:0}),[result,setResult]=useState<OverlayOutcome|null>(null),[error,setError]=useState<ToolError|null>(null)
   const [session]=useState(()=>new FileSession()),job=useRef<Job<OverlayInput,OverlayOutcome>|null>(null),active=useRef(true)
   const selected=files.find(file=>!file.error),count=selected&&source?.id===selected.id?source.count:undefined,sourceError=selected&&source?.id===selected.id?source.error:undefined,phase=phaseFromJobState(state)
   useEffect(()=>{active.current=true;return()=>{active.current=false;job.current?.cancel();job.current=null;session.resetSession()}},[session])
-  const adjust=useCallback(()=>{const previous=job.current;job.current=null;previous?.cancel();session.resetSession();setState(null);setResult(null);setError(null);setProgress({fraction:0})},[session])
+  const adjust=useCallback(()=>{setRenderedKey(null);const previous=job.current;job.current=null;previous?.cancel();session.resetSession();setState(null);setResult(null);setError(null);setProgress({fraction:0})},[session])
   const changeFiles=(next:WorkspaceFile[])=>{adjust();setFiles(next);setSource(null);setPreview(null);setExpression('');setPreviewPage(1)}
   const reset=()=>{changeFiles([]);setOptions(overlayDefaults(mode))}
   const change=(value:Partial<OverlayOptions>)=>{adjust();setOptions(current=>({...current,...value}))}
@@ -45,7 +46,8 @@ export function OverlayTool({mode,onExit}:{mode:OverlayMode;onExit():void}) {
     },250)
     return()=>{disposed=true;clearTimeout(timer);next?.cancel()}
   },[selected,key,readyOptions,phase,mode,expression,options,previewPage])
-  const currentPreview=preview?.key===key?preview:undefined,problem=sourceError??configurationError??currentPreview?.error,canApply=Boolean(readyOptions&&currentPreview?.result?.output.verified&&!problem)
+  const currentPreview=preview?.key===key?preview:undefined,problem=sourceError??configurationError??currentPreview?.error,canApply=Boolean(readyOptions&&currentPreview?.result?.output.verified&&renderedKey===key&&!problem)
+  const previewReady=useCallback(()=>setRenderedKey(key),[key])
   const unsupported=mode==='watermark'?unsupportedCharacters(options.text):[]
   const run=()=>{
     if(!selected||!canApply||!normalized)return
@@ -74,7 +76,7 @@ export function OverlayTool({mode,onExit}:{mode:OverlayMode;onExit():void}) {
         <p className="panel-hint">Your original is preserved. A modified copy can invalidate digital signatures. This adds text; it does not edit or remove existing content.</p>
         {problem?<p role="alert">{problem.message}</p>:null}
       </section>
-      {selected&&count?<section className="panel" aria-label="Overlay preview"><h2 className="panel-title">Preview — source page {previewPage}</h2><div className="panel-actions"><button className="btn-ghost" disabled={previewPage<=1} onClick={()=>setPreviewPage(page=>page-1)}>Previous preview</button><label htmlFor="overlay-preview-page">Preview page<input id="overlay-preview-page" type="number" min="1" max={count} value={previewPage||''} onChange={event=>setPreviewPage(Number(event.target.value))}/></label><span>of {count}</span><button className="btn-ghost" disabled={previewPage>=count} onClick={()=>setPreviewPage(page=>page+1)}>Next preview</button></div><p className="panel-hint">{pages.includes(previewPage)?`This page will receive: ${mode==='page-numbers'?String((normalized?.startNumber??1)+pages.indexOf(previewPage)):normalized?.text??'—'}`:'This page is outside your selection and stays unchanged.'} Apply checks placement on every selected page.</p>{currentPreview?.result?<OverlayCanvas key={key} bytes={currentPreview.result.output.bytes}/>:<p role="status">{problem?'Correct the settings to create a preview.':!readyOptions?'Choose valid settings and a preview page.':'Preparing the modified PDF preview…'}</p>}</section>:null}
+      {selected&&count?<section className="panel" aria-label="Overlay preview"><h2 className="panel-title">Preview — source page {previewPage}</h2><div className="panel-actions"><button className="btn-ghost" disabled={previewPage<=1} onClick={()=>setPreviewPage(page=>page-1)}>Previous preview</button><label htmlFor="overlay-preview-page">Preview page<input id="overlay-preview-page" type="number" min="1" max={count} value={previewPage||''} onChange={event=>setPreviewPage(Number(event.target.value))}/></label><span>of {count}</span><button className="btn-ghost" disabled={previewPage>=count} onClick={()=>setPreviewPage(page=>page+1)}>Next preview</button></div><p className="panel-hint">{pages.includes(previewPage)?`This page will receive: ${mode==='page-numbers'?String((normalized?.startNumber??1)+pages.indexOf(previewPage)):normalized?.text??'—'}`:'This page is outside your selection and stays unchanged.'} Apply checks placement on every selected page.</p>{currentPreview?.result?<OverlayCanvas key={key} bytes={currentPreview.result.output.bytes} pageNumber={previewPage} onReady={previewReady}/>:<p role="status">{problem?'Correct the settings to create a preview.':!readyOptions?'Choose valid settings and a preview page.':'Preparing the modified PDF preview…'}</p>}</section>:null}
       <PreviewPanel title="Review and apply" summary={canApply?`Modify ${pages.length} of ${count} pages. The PDF page order is preserved.`:'Choose a PDF and valid settings, then wait for the modified preview.'} details={normalized?['A separately named PDF will be created and verified.',`Selected source pages: ${pages.join(', ')||'none'}`]:undefined} actionLabel={mode==='page-numbers'?'Apply page numbers':'Apply watermark'} onConfirm={run} onCancel={onExit} disabled={!canApply} disabledReason={problem?.message??'A verified preview is required.'}/>
     </>:null}
     {phase==='processing'?<ProcessingPanel label="Applying and verifying text overlays" progress={progress} onCancel={()=>job.current?.cancel()}/>:null}

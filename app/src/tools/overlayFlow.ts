@@ -1,4 +1,4 @@
-import { PDFDocument, concatTransformationMatrix, degrees, popGraphicsState, pushGraphicsState, rgb, type PDFFont } from 'pdf-lib'
+import { concatTransformationMatrix, degrees, popGraphicsState, pushGraphicsState, rgb, type PDFDocument, type PDFFont } from 'pdf-lib'
 import { loadWritable } from '../engines/pdflib'
 import { openDocument, type PdfjsDocument, type PdfjsPage } from '../engines/pdfjs'
 import { CancelledError, runJob, type JobEvents } from '../jobs/orchestrator'
@@ -22,7 +22,7 @@ async function embedFont(doc: PDFDocument): Promise<PDFFont> {
   const bytes = Uint8Array.from(atob(OVERLAY_FONT_BASE64), char=>char.charCodeAt(0))
   return doc.embedFont(bytes, { subset: true })
 }
-/** Same writer/layout path for one-page previews and the final, independently verified PDF. */
+/** Same writer/layout path for full-document previews and the final, independently verified PDF. */
 export function startOverlay(input: OverlayInput, events: JobEvents = {}) {
   const snapshot = { ...input, file: { ...input.file }, options: { ...input.options } }
   return runJob(input.previewPage ? 'overlay-preview' : input.mode, snapshot, async (request, ctx): Promise<OverlayOutcome> => {
@@ -44,13 +44,12 @@ export function startOverlay(input: OverlayInput, events: JobEvents = {}) {
       const count = source.numPages, selected = request.pagesExpr === undefined ? Array.from({length:count},(_,i)=>i+1) : parsePageRanges(request.pagesExpr,count).pages.sort((a,b)=>a-b)
       if(!selected.length)throw toolError('E-INPUT-05','Select at least one page.','focus-picker')
       if (request.previewPage !== undefined && (!Number.isInteger(request.previewPage) || request.previewPage < 1 || request.previewPage > count)) throw toolError('E-CONFIG-01','Choose a valid preview page.','fix-field')
-      const sourcePages = request.previewPage === undefined ? Array.from({length:count},(_,i)=>i+1) : [request.previewPage]
+      const sourcePages = Array.from({length:count},(_,i)=>i+1)
       const expected: Evidence[] = []
       for (const [index,number] of sourcePages.entries()) { check(); expected.push(await wait(source.getPage(number).then(evidence))); ctx.reportProgress(0.25*(index+1)/sourcePages.length,`Reading page ${number}`) }
       check()
       const writable = await loadWritable(request.file.bytes)
-      let out = writable
-      if (request.previewPage !== undefined) { out = await PDFDocument.create(); const [copy] = await out.copyPages(writable,[request.previewPage-1]); out.addPage(copy) }
+      const out = writable // Preserve the source catalog, including optional-content visibility, in previews too.
       check()
       const font = await embedFont(out), plans: PaintPlan[] = []
       for (const [index,number] of sourcePages.entries()) {
@@ -83,7 +82,7 @@ export function startOverlay(input: OverlayInput, events: JobEvents = {}) {
       check()
       const stem=metadata.displayName.replace(/\.[^.]*$/,'').replace(/[^\w.-]+/g,'_').slice(0,50)||'document'
       const output=await verifyOutput({name:`${stem}-${request.mode==='page-numbers'?'numbered':'watermarked'}.pdf`,mimeType:'application/pdf',bytes,expectedPages:sourcePages.length})
-      return {output,appliedPages:selected,totalPages:count,previewPage:request.previewPage,previewText:plans[0]?.text}
+      return {output,appliedPages:selected,totalPages:count,previewPage:request.previewPage,previewText:plans.find(plan=>plan.page===(request.previewPage??1))?.text}
     } finally {clearInterval(monitor);await source?.destroy();await result?.destroy()}
   },events)
 }

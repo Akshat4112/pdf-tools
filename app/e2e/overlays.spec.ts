@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
-import { PDFDocument, PDFName, PDFNumber, StandardFonts, degrees } from 'pdf-lib'
+import { PDFDocument, PDFName, PDFNumber, PDFString, StandardFonts, degrees } from 'pdf-lib'
 
 async function sourcePdf() {
   const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica)
@@ -9,6 +9,10 @@ async function sourcePdf() {
     if(index===3)page.node.set(PDFName.of('UserUnit'),PDFNumber.of(2))
     page.drawText(`SOURCE-${index+1}`,{x:70,y:180,size:14,font})
   }
+  const hidden=pdf.context.register(pdf.context.obj({Type:'OCG',Name:PDFString.of('Hidden layer')}))
+  pdf.catalog.set(PDFName.of('OCProperties'),pdf.context.obj({OCGs:[hidden],D:{BaseState:'ON',OFF:[hidden],Order:[hidden]}}))
+  const first=pdf.getPage(0);first.node.Resources()!.set(PDFName.of('Properties'),pdf.context.obj({Hidden:hidden}))
+  first.node.addContentStream(pdf.context.register(pdf.context.flateStream('q /OC /Hidden BDC 1 0 0 rg 20 30 300 200 re f EMC Q')))
   return Buffer.from(await pdf.save())
 }
 async function choose(page:Page,bytes?:Buffer,name='local.pdf') {
@@ -115,4 +119,14 @@ test('cancelling held text work terminates workers and retries retained settings
   await page.getByRole('button',{name:'Adjust settings',exact:true}).click();await expect(page.getByLabel('Starting number',{exact:true})).toHaveValue('13');await preview(page)
   await expect(page.getByRole('button',{name:/^Download/})).toHaveCount(0);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click()
   expect((await inspect(page,(await download(page)).bytes))[0].text).toContain('13')
+})
+
+
+test('Apply waits for the rendered preview',async({page})=>{
+  await page.addInitScript(()=>{const schedule=requestAnimationFrame.bind(window),gate={hold:true,pending:[] as FrameRequestCallback[]};Object.assign(window,{overlayFrames:gate});window.requestAnimationFrame=callback=>{if(gate.hold){gate.pending.push(callback);return -1}return schedule(callback)}})
+  await page.goto('page-numbers/');await choose(page)
+  await expect(page.getByText('Rendering preview…',{exact:true})).toBeVisible()
+  await expect(page.getByRole('button',{name:'Apply page numbers',exact:true})).toBeDisabled()
+  await page.evaluate(()=>{const gate=(window as unknown as {overlayFrames:{hold:boolean;pending:FrameRequestCallback[]}}).overlayFrames;gate.hold=false;gate.pending.splice(0).forEach(callback=>requestAnimationFrame(callback))})
+  await preview(page);await expect(page.getByRole('button',{name:'Apply page numbers',exact:true})).toBeEnabled()
 })
