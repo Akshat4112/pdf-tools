@@ -32,7 +32,7 @@ function App() {
   if (activeTool) {
     return (
       <div className="shell">
-        <SiteHeader />
+        <SiteHeader key={route.path} />
         <ToolEntry tool={activeTool} onExit={() => navigate('/')} />
       </div>
     )
@@ -41,7 +41,7 @@ function App() {
   if (route.name === 'not-found') {
     return (
       <div className="shell">
-        <SiteHeader />
+        <SiteHeader key={route.path} />
         <NotFound />
       </div>
     )
@@ -49,7 +49,7 @@ function App() {
 
   return (
     <div className="shell">
-      <SiteHeader />
+      <SiteHeader key={route.path} />
 
       <section className="hero">
         <h1>Everyday document tools, running entirely in your browser.</h1>
