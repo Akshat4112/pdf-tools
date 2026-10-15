@@ -192,7 +192,7 @@ export const TOOLS: readonly ToolDefinition[] = [
     acceptedInputs: ['pdf'], outputKind: 'txt', engines: ['pdfjs'],
     readOnly: true, route: '/pdf-to-text',
     category: 'convert-from-pdf',
-    implemented: false,
+    implemented: true,
   },
   {
     id: 'doc-info', featureId: 'PT-FT-014', title: 'Document information',

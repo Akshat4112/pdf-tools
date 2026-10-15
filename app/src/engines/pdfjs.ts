@@ -101,9 +101,11 @@ export function assertPixelBudget(widthPx: number, heightPx: number, heldBitmaps
 
 export async function openDocument(
   data: Uint8Array | ArrayBuffer,
-  opts: { maxPages?: number; maxBytes?: number; strict?: boolean; maxCanvasBytes?: number } = {},
+  opts: { maxPages?: number; maxBytes?: number; strict?: boolean; maxCanvasBytes?: number; signal?: AbortSignal } = {},
 ): Promise<PdfjsDocument> {
-  const { getDocument } = await getPdfjs()
+  if (opts.signal?.aborted) throw new CancelledError()
+  const { getDocument, PDFWorker } = await getPdfjs()
+  if (opts.signal?.aborted) throw new CancelledError()
   const input = data instanceof Uint8Array ? data : new Uint8Array(data)
   if (input.byteLength === 0) {
     throw toolError('E-INPUT-03', 'The file is empty.', 'retry-file')
@@ -121,10 +123,18 @@ export async function openDocument(
   const bytes = new Uint8Array(input.byteLength)
   bytes.set(input)
   let task: { promise: Promise<PdfjsDocument>; destroy(): Promise<void> } | undefined
-  let destroyed = false
+  // Signal-bearing loads own their worker so abort can stop parsing immediately,
+  // even when loadingTask.destroy() is waiting for a worker setup acknowledgement.
+  const ownedWorker = opts.signal ? new PDFWorker() : undefined
+  let destruction: Promise<void> | undefined
+  const destroy = () => destruction ??= (async () => { try { await task?.destroy() } finally { ownedWorker?.destroy() } })()
+  let rejectAbort: (error: CancelledError) => void = () => {}
+  const aborted = new Promise<never>((_, reject) => { rejectAbort = reject })
+  const abort = () => { ownedWorker?.destroy(); rejectAbort(new CancelledError()); void destroy().catch(() => {}) }
   try {
     task = getDocument({
       data: bytes, // private copy — pdf.js detaches what it receives
+      ...(ownedWorker ? { worker: ownedWorker } : {}),
       standardFontDataUrl: FONT_URL,
       cMapUrl: `${import.meta.env.BASE_URL}assets/cmaps/`, cMapPacked: true,
       wasmUrl: `${import.meta.env.BASE_URL}assets/wasm/`,
@@ -134,11 +144,13 @@ export async function openDocument(
       isEvalSupported: false,
       // Node test path has no network fonts; browser self-hosts under BASE_URL
     } as never) as unknown as { promise: Promise<PdfjsDocument>; destroy(): Promise<void> }
-    const doc = await task.promise
+    opts.signal?.addEventListener('abort', abort, { once: true })
+    if (opts.signal?.aborted) abort()
+    const doc = await (opts.signal ? Promise.race([task.promise, aborted]) : task.promise)
+    if (opts.signal?.aborted) throw new CancelledError()
     const maxPages = opts.maxPages ?? QUOTAS.maxPages
     if (doc.numPages > maxPages) {
-      await task.destroy()
-      destroyed = true
+      await destroy()
       throw toolError(
         'E-INPUT-04',
         `This document has ${doc.numPages} pages; the current limit is ${maxPages}.`,
@@ -146,10 +158,15 @@ export async function openDocument(
       )
     }
     // pdf.js 6.x: teardown lives on the loadingTask — expose it on the doc handle
-    const loadedTask = task
-    return Object.assign(doc, { destroy: () => loadedTask.destroy() }) as PdfjsDocument
+    return Object.assign(doc, { destroy: () => {
+      opts.signal?.removeEventListener('abort', abort)
+      if (opts.signal?.aborted) { void destroy().catch(() => {}); return Promise.resolve() }
+      return destroy()
+    } }) as PdfjsDocument
   } catch (err) {
-    if (task && !destroyed) await task.destroy().catch(() => {})
+    opts.signal?.removeEventListener('abort', abort)
+    if (opts.signal?.aborted) { void destroy().catch(() => {}); throw new CancelledError() }
+    await destroy().catch(() => {})
     const e = err as ToolError & { name?: string }
     // taxonomy errors only: pdf.js PasswordException carries a NUMERIC code (1),
     // so check for our string codes explicitly — never re-throw raw exceptions.

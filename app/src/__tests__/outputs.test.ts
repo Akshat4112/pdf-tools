@@ -66,6 +66,11 @@ describe('verifyOutput (PT-FND-007 structural gate)', () => {
     await expect(verifyOutput(asOut('t.txt', 'text/plain', badTxt))).rejects.toMatchObject({ code: 'E-OUT-01' })
   })
 
+  it('rejects malformed UTF-8 instead of silently substituting replacement characters', async () => {
+    await expect(verifyOutput(asOut('invalid.txt', 'text/plain', new Uint8Array([0xc3, 0x28])))).rejects.toMatchObject({ code: 'E-OUT-01' })
+    expect((await verifyOutput(asOut('unicode.txt', 'text/plain', new TextEncoder().encode('Grüße 中文 😀')))).verified).toBe(true)
+  })
+
   it('rejects unknown mime kinds (never claim verification blindly)', async () => {
     await expect(verifyOutput(asOut('x.docx', 'application/vnd...', f001))).rejects.toMatchObject({
       code: 'E-OUT-01',

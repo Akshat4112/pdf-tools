@@ -64,7 +64,9 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
 
   if (kind === 'text/plain') {
     // decodable + no NULs
-    const text = new TextDecoder('utf-8', { fatal: false }).decode(bytes)
+    let text: string
+    try { text = new TextDecoder('utf-8', { fatal: true }).decode(bytes) }
+    catch { throw toolError('E-OUT-01', 'The generated text is not valid UTF-8 and did not pass verification.', 'retry-job') }
     if (text.includes('\u0000')) {
       throw toolError('E-OUT-01', 'The generated text did not pass verification.', 'retry-job')
     }
