@@ -1,0 +1,13 @@
+{
+  "name": "FolioLocal",
+  "tagline": "Free PDF tools. On your device.",
+  "colors": {
+    "ink": "#142D3A",
+    "teal": "#08796D",
+    "mint": "#EAF7F3",
+    "white": "#FFFFFF"
+  },
+  "asset_license": "MIT",
+  "outlined_typeface": "Existing PDF Tools Sans derivative of Noto Sans; OFL-1.1 notice in FONT-LICENSE.txt",
+  "source": "scripts/build_brand_assets.py"
+}
