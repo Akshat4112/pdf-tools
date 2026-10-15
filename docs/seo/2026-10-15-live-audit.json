@@ -1,0 +1,1126 @@
+{
+  "observed_at_utc": "2026-10-15T14:11:57.602627+00:00",
+  "method": "HTTP GET; redirects followed; static HTML only, no JavaScript",
+  "pages": [
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "observed_at_utc": "2026-10-15T14:11:56.036603+00:00",
+      "bytes": 1584,
+      "sha256": "5e7dd42ea3da3e950032c5d80532a4087e5d3f51757bca0aa5890a3e6f993f19",
+      "title": "PDF Tools — free local PDF tools in your browser",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Merge, split, convert and inspect PDFs free in your browser. No accounts, no uploads — your files are processed entirely on your own device."
+        ],
+        "og:title": [
+          "PDF Tools — free local PDF tools in your browser"
+        ],
+        "og:description": [
+          "Merge, split, convert and inspect PDFs free in your browser. No accounts, no uploads — your files are processed entirely on your own device."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "PDF Tools — free local PDF tools in your browser"
+        ],
+        "twitter:description": [
+          "Merge, split, convert and inspect PDFs free in your browser. No accounts, no uploads — your files are processed entirely on your own device."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": "",
+      "previous_attempt": {
+        "requested_url": "https://akshat4112.github.io/pdf-tools/",
+        "final_url": "https://akshat4112.github.io/pdf-tools/",
+        "status": 502,
+        "content_type": "text/html",
+        "x_robots_tag": null,
+        "last_modified": null,
+        "bytes": 150,
+        "sha256": "81074a9c8dfb24290e8fc4af14d20f67f5304618d27ac713628b1126e41dbd8e",
+        "title": "502 Bad Gateway",
+        "lang": null,
+        "meta": {},
+        "canonical": [],
+        "h1": [
+          "502 Bad Gateway"
+        ],
+        "links": [],
+        "root_text": ""
+      }
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/merge/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/merge/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "observed_at_utc": "2026-10-15T14:11:57.600904+00:00",
+      "bytes": 1422,
+      "sha256": "12f2fb022090fabd639c7585f4a4822ab4b56efb3f5fb687c8145bddebfd4877",
+      "title": "Merge PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/merge/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/merge/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": "",
+      "previous_attempt": {
+        "requested_url": "https://akshat4112.github.io/pdf-tools/merge/",
+        "final_url": "https://akshat4112.github.io/pdf-tools/merge/",
+        "status": 502,
+        "content_type": "text/html",
+        "x_robots_tag": null,
+        "last_modified": null,
+        "bytes": 150,
+        "sha256": "81074a9c8dfb24290e8fc4af14d20f67f5304618d27ac713628b1126e41dbd8e",
+        "title": "502 Bad Gateway",
+        "lang": null,
+        "meta": {},
+        "canonical": [],
+        "h1": [
+          "502 Bad Gateway"
+        ],
+        "links": [],
+        "root_text": ""
+      }
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/split/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/split/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "observed_at_utc": "2026-10-15T14:11:56.122020+00:00",
+      "bytes": 1440,
+      "sha256": "d2a4fd37fe2fc914b209686a65257aa6dedfd2bbcaeda71b6eb47e6b31892ab2",
+      "title": "Split PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Split by page ranges, every N pages, or one file per page. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Split PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Split by page ranges, every N pages, or one file per page. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/split/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Split PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Split by page ranges, every N pages, or one file per page. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/split/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": "",
+      "previous_attempt": {
+        "requested_url": "https://akshat4112.github.io/pdf-tools/split/",
+        "final_url": "https://akshat4112.github.io/pdf-tools/split/",
+        "status": 502,
+        "content_type": "text/html",
+        "x_robots_tag": null,
+        "last_modified": null,
+        "bytes": 150,
+        "sha256": "81074a9c8dfb24290e8fc4af14d20f67f5304618d27ac713628b1126e41dbd8e",
+        "title": "502 Bad Gateway",
+        "lang": null,
+        "meta": {},
+        "canonical": [],
+        "h1": [
+          "502 Bad Gateway"
+        ],
+        "links": [],
+        "root_text": ""
+      }
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "observed_at_utc": "2026-10-15T14:11:57.600372+00:00",
+      "bytes": 1400,
+      "sha256": "5588d83aa7d6fdb605210a1c88734cb67e1accab37956f078ee040784174fd26",
+      "title": "Rotate PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Rotate selected or all pages in 90° steps. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Rotate PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Rotate selected or all pages in 90° steps. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/rotate/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Rotate PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Rotate selected or all pages in 90° steps. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/rotate/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": "",
+      "previous_attempt": {
+        "requested_url": "https://akshat4112.github.io/pdf-tools/rotate/",
+        "final_url": "https://akshat4112.github.io/pdf-tools/rotate/",
+        "status": 502,
+        "content_type": "text/html",
+        "x_robots_tag": null,
+        "last_modified": null,
+        "bytes": 150,
+        "sha256": "81074a9c8dfb24290e8fc4af14d20f67f5304618d27ac713628b1126e41dbd8e",
+        "title": "502 Bad Gateway",
+        "lang": null,
+        "meta": {},
+        "canonical": [],
+        "h1": [
+          "502 Bad Gateway"
+        ],
+        "links": [],
+        "root_text": ""
+      }
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1403,
+      "sha256": "c2e6845971adea54d037e51b9eb45c80ed9bfd0a3afb41f316b54aa037e00d3e",
+      "title": "Delete pages — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Remove selected pages into a new copy. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Delete pages — PDF Tools"
+        ],
+        "og:description": [
+          "Remove selected pages into a new copy. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/delete-pages/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Delete pages — PDF Tools"
+        ],
+        "twitter:description": [
+          "Remove selected pages into a new copy. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/delete-pages/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1474,
+      "sha256": "33edaa27ed799260ae570274404c578db48dcb40053542023bbd569780ae3fe4",
+      "title": "Extract pages — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Pull selected pages into a new PDF, in the order you choose. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Extract pages — PDF Tools"
+        ],
+        "og:description": [
+          "Pull selected pages into a new PDF, in the order you choose. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/extract-pages/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Extract pages — PDF Tools"
+        ],
+        "twitter:description": [
+          "Pull selected pages into a new PDF, in the order you choose. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/extract-pages/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/organize/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/organize/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1443,
+      "sha256": "4eefd0d3bb8321030aa7dc82fbc046a48b36e695d7ba2777659f30b22fe07b46",
+      "title": "Organize PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Reorder, rotate, duplicate and delete pages with undo. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Organize PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Reorder, rotate, duplicate and delete pages with undo. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/organize/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Organize PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Reorder, rotate, duplicate and delete pages with undo. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/organize/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1492,
+      "sha256": "22bc0e6b9155ad1bcda94f976937ef27a61267827141553fa5324f65c5952119",
+      "title": "JPG/PNG to PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Turn JPG or PNG images into one PDF with size and margin options. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "JPG/PNG to PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Turn JPG or PNG images into one PDF with size and margin options. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/images-to-pdf/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "JPG/PNG to PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Turn JPG or PNG images into one PDF with size and margin options. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/images-to-pdf/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1408,
+      "sha256": "95259d3246bc5e1c6fda0dc4086fa1a0eda94c2f3669112d4edaba1f8b4555f7",
+      "title": "PDF to JPG — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Render pages to JPG images at a chosen DPI. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "PDF to JPG — PDF Tools"
+        ],
+        "og:description": [
+          "Render pages to JPG images at a chosen DPI. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "PDF to JPG — PDF Tools"
+        ],
+        "twitter:description": [
+          "Render pages to JPG images at a chosen DPI. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1465,
+      "sha256": "38eb0deab419a466d9a906d7733556b6fc7e87b81989829d16c81275cd482523",
+      "title": "PDF to PNG — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Render pages to PNG images with an explicit background choice. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "PDF to PNG — PDF Tools"
+        ],
+        "og:description": [
+          "Render pages to PNG images with an explicit background choice. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/pdf-to-png/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "PDF to PNG — PDF Tools"
+        ],
+        "twitter:description": [
+          "Render pages to PNG images with an explicit background choice. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-png/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/reader/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/reader/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1421,
+      "sha256": "9bc2bbba11336194ed86e023910678c441ac9a032ae71bcd0a262e9773719e11",
+      "title": "PDF reader — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Read, search, copy and print — entirely locally. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "PDF reader — PDF Tools"
+        ],
+        "og:description": [
+          "Read, search, copy and print — entirely locally. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/reader/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "PDF reader — PDF Tools"
+        ],
+        "twitter:description": [
+          "Read, search, copy and print — entirely locally. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/reader/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1460,
+      "sha256": "ea0463023e7653e006335c09d2cdbfcc8e12e351097175fb682e70c3e1604ef3",
+      "title": "Page numbers — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Add page numbers with start, position and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Page numbers — PDF Tools"
+        ],
+        "og:description": [
+          "Add page numbers with start, position and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/page-numbers/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Page numbers — PDF Tools"
+        ],
+        "twitter:description": [
+          "Add page numbers with start, position and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/page-numbers/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1484,
+      "sha256": "41ea5a7ef09d60a1dd84e183c19af74fbebbc9f9e402966dfd88e42774a0bfda",
+      "title": "Text watermark — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Stamp a text watermark with position, opacity and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Text watermark — PDF Tools"
+        ],
+        "og:description": [
+          "Stamp a text watermark with position, opacity and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/watermark/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Text watermark — PDF Tools"
+        ],
+        "twitter:description": [
+          "Stamp a text watermark with position, opacity and page selection. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/watermark/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1440,
+      "sha256": "1b3a172d818b638e8a4bb74f2770214c740dc7c2ec3ce0d3f5eb47c25e6e6434",
+      "title": "PDF to text — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Export the text layer of a PDF as a UTF-8 .txt file. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "PDF to text — PDF Tools"
+        ],
+        "og:description": [
+          "Export the text layer of a PDF as a UTF-8 .txt file. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/pdf-to-text/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "PDF to text — PDF Tools"
+        ],
+        "twitter:description": [
+          "Export the text layer of a PDF as a UTF-8 .txt file. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-text/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1473,
+      "sha256": "dfe77711cd580d0f2e510ba0f5f172da9a6b6a9c3d91ab241e52aa279a2e6bc3",
+      "title": "Document information — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Inspect page count, dimensions, metadata and indicators. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Document information — PDF Tools"
+        ],
+        "og:description": [
+          "Inspect page count, dimensions, metadata and indicators. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/doc-info/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Document information — PDF Tools"
+        ],
+        "twitter:description": [
+          "Inspect page count, dimensions, metadata and indicators. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/doc-info/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/sitemap.xml",
+      "final_url": "https://akshat4112.github.io/pdf-tools/sitemap.xml",
+      "status": 200,
+      "content_type": "application/xml",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 2817,
+      "sha256": "4fac38fc8d053c47ffb199c1bca59dd385d0ad554bd23008389242f9536320f9",
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>1.0</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/merge/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/split/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/rotate/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/delete-pages/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/extract-pages/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/organize/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/images-to-pdf/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/pdf-to-jpg/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/pdf-to-png/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/reader/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/page-numbers/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/watermark/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/pdf-to-text/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n  <url>\n    <loc>https://akshat4112.github.io/pdf-tools/doc-info/</loc>\n    <lastmod>2026-10-15</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n</urlset>\n"
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/robots.txt",
+      "final_url": "https://akshat4112.github.io/pdf-tools/robots.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 84,
+      "sha256": "763a7904fc8d4921ba30031223eb0fdf451a408484c7a4a120357cf656cac3ee",
+      "body": "User-agent: *\nAllow: /\n\nSitemap: https://akshat4112.github.io/pdf-tools/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/404.html",
+      "final_url": "https://akshat4112.github.io/pdf-tools/404.html",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1297,
+      "sha256": "4c31166cf6a078c2253007cc16009811109854802682131b79099cab3d6d5cfc",
+      "title": "Page not found — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ],
+        "og:title": [
+          "Page not found — PDF Tools"
+        ],
+        "og:description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/404.html"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Page not found — PDF Tools"
+        ],
+        "twitter:description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/404.html"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/seo-audit-missing-page/",
+      "final_url": "https://akshat4112.github.io/pdf-tools/seo-audit-missing-page/",
+      "status": 404,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": null,
+      "bytes": 1297,
+      "sha256": "4c31166cf6a078c2253007cc16009811109854802682131b79099cab3d6d5cfc",
+      "title": "Page not found — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ],
+        "og:title": [
+          "Page not found — PDF Tools"
+        ],
+        "og:description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/404.html"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Page not found — PDF Tools"
+        ],
+        "twitter:description": [
+          "This page does not exist. Browse the PDF Tools catalog instead."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/404.html"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/merge",
+      "final_url": "https://akshat4112.github.io/pdf-tools/merge/",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1422,
+      "sha256": "12f2fb022090fabd639c7585f4a4822ab4b56efb3f5fb687c8145bddebfd4877",
+      "title": "Merge PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/merge/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/merge/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/pdf-tools/merge/index.html",
+      "final_url": "https://akshat4112.github.io/pdf-tools/merge/index.html",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Thu, 15 Oct 2026 10:35:20 GMT",
+      "bytes": 1422,
+      "sha256": "12f2fb022090fabd639c7585f4a4822ab4b56efb3f5fb687c8145bddebfd4877",
+      "title": "Merge PDF — PDF Tools",
+      "lang": "en",
+      "meta": {
+        "": [
+          null
+        ],
+        "viewport": [
+          "width=device-width, initial-scale=1.0"
+        ],
+        "description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "og:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ],
+        "og:url": [
+          "https://akshat4112.github.io/pdf-tools/merge/"
+        ],
+        "og:site_name": [
+          "PDF Tools"
+        ],
+        "og:type": [
+          "website"
+        ],
+        "twitter:card": [
+          "summary"
+        ],
+        "twitter:title": [
+          "Merge PDF — PDF Tools"
+        ],
+        "twitter:description": [
+          "Combine PDFs in your chosen order into one document. Runs entirely in your browser — no uploads, no accounts."
+        ]
+      },
+      "canonical": [
+        "https://akshat4112.github.io/pdf-tools/merge/"
+      ],
+      "h1": [],
+      "links": [],
+      "root_text": ""
+    },
+    {
+      "requested_url": "https://akshat4112.github.io/robots.txt",
+      "final_url": "https://akshat4112.github.io/robots.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "x_robots_tag": null,
+      "last_modified": "Sat, 26 Sep 2026 22:02:26 GMT",
+      "bytes": 74,
+      "sha256": "86f35ea71e93e9a49596d0aee4fbf930c8bedbbeea868914e0f2cc4bbd4e1a5d",
+      "body": "User-agent: *\nDisallow:\nSitemap: https://akshat4112.github.io/sitemap.xml\n"
+    }
+  ]
+}
