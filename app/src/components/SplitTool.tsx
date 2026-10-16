@@ -44,6 +44,7 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
   const [error, setError] = useState<ToolError | null>(null)
 
   const session = useMemo(() => new FileSession(), [])
+  useEffect(() => () => session.resetSession(), [session])
 
   const selected = files.find((f) => !f.error)
   const phase = phaseFromJobState(job?.state ?? null)
@@ -106,12 +107,13 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
       },
       { onProgress: setProgress },
     )
+    session.jobs.track(j)
     void j.completion.then(() => {
       if (j.state === 'done' && j.result) setResult([j.result])
       if (j.state === 'failed' && j.error) setError(j.error)
     })
     setJob(j as unknown as Job<never, VerifiedOutput>)
-  }, [selected, mode, rangesExpr, everyN])
+  }, [selected, mode, rangesExpr, everyN, session])
 
   const download = useCallback(
     (out: VerifiedOutput) => {

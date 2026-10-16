@@ -75,6 +75,8 @@ for (const tool of TOOLS.filter(tool => tool.implemented)) test(`privacy lifecyc
   await audit.assertClean()
   await audit.assertPrivate(baseline)
   await select(page, route)
+  await run(page, route)
+  await audit.assertPrivate(baseline)
   await page.locator('.folio-header').getByRole('link', { name: 'All tools', exact: true }).click()
   await audit.assertClean()
   await expect(page.locator('body')).not.toContainText(NAME)
@@ -83,7 +85,7 @@ for (const tool of TOOLS.filter(tool => tool.implemented)) test(`privacy lifecyc
   // Back uses the router's non-document state. Reload must also have no saved source/output.
   await page.reload()
   await audit.assertClean()
-  expect(await audit.snapshot()).toEqual(baseline)
+  await audit.assertPrivate(baseline)
   expect(audit.requests.length).toBeGreaterThan(0)
 })
 

@@ -22,7 +22,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
     const req = request.request(), url = new URL(req.url())
     if (['blob:', 'data:'].includes(url.protocol)) return request.continue()
     const allowed = url.origin === 'http://127.0.0.1:4178' && !url.search &&
-      (assets.has(url.pathname) || url.pathname === `/pdf-tools/${route}/`)
+      (assets.has(url.pathname) || url.pathname === '/pdf-tools/' || url.pathname === `/pdf-tools/${route}/`)
     // No POST/Beacon/form bodies, query strings, private path names, or telemetry URLs.
     if (!allowed || req.method() !== 'GET' || req.postDataBuffer() !== null) {
       violations.push('unexpected-request'); return request.abort()
@@ -93,6 +93,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
     expect(page.url()).toBe(`http://127.0.0.1:4178/pdf-tools/${route}/`)
     expect(await page.evaluate(() => history.state)).toBeNull()
     await expect(page).toHaveTitle(/PDF Tools/)
+    expect(await page.title()).not.toContain('PRIVATE_')
   }
   async function assertClean() {
     await expect.poll(() => page.evaluate(() => ({ urls: window.privacyAudit.urls.size, workers: window.privacyAudit.workers.size }))).toEqual({ urls: 0, workers: 0 })
