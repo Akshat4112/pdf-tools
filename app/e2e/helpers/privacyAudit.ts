@@ -1,5 +1,6 @@
 import { expect, type BrowserContext, type Page } from '@playwright/test'
 import { readdirSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 
 function files(directory: URL, prefix: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => entry.isDirectory()
@@ -17,6 +18,14 @@ declare global { interface Window { privacyAudit: AuditState } }
 
 /** Test-only observers call the native APIs; they never suppress an app write or retain bytes. */
 export async function installPrivacyAudit(page: Page, context: BrowserContext, route: string) {
+  // zip.js caches its immutable worker loader URL even after workers terminate.
+  // Exempt only those exact bytes, never arbitrary JavaScript-typed blobs.
+  const zipWorker = await import(new URL('../../node_modules/@zip.js/zip.js/lib/core/web-worker-inline-wasm.js', import.meta.url).href) as {
+    configureWebWorker(apply: (options: { workerURI(asBlob: boolean): string }) => void): void
+  }
+  let workerSource = ''
+  zipWorker.configureWebWorker(options => { workerSource = options.workerURI(false) })
+  const expectedHash = createHash('sha256').update(Buffer.from(workerSource.split(',')[1], 'base64')).digest('hex')
   const violations: string[] = [], logs: string[] = [], requests: string[] = []
   await context.route('**/*', request => {
     const req = request.request(), url = new URL(req.url())
@@ -33,7 +42,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
   page.on('console', message => logs.push(message.text()))
   page.on('pageerror', () => violations.push('page-error'))
   page.on('dialog', dialog => { violations.push('unexpected-dialog'); void dialog.dismiss() })
-  await page.addInitScript(() => {
+  await page.addInitScript((expectedStaticWorkerHash: string) => {
     const state: AuditState = { urls: new Set(), workers: new Set(), writes: [], channels: [], workerVerbosity: [] }
     window.privacyAudit = state
     // Prove reset does not wipe a sibling project's origin-scoped preferences.
@@ -62,7 +71,16 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
     window.WebSocket = class extends Socket { constructor(url: string | URL, protocols?: string | string[]) { state.channels.push('websocket'); super(url, protocols) } }
     window.EventSource = class extends Events { constructor(url: string | URL, options?: EventSourceInit) { state.channels.push('event-source'); super(url, options) } }
     const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
-    URL.createObjectURL = object => { const url = create(object); state.urls.add(url); return url }
+    URL.createObjectURL = object => {
+      const url = create(object); state.urls.add(url)
+      if (object instanceof Blob && object.type === 'text/javascript') {
+        void object.arrayBuffer().then(bytes => crypto.subtle.digest('SHA-256', bytes)).then(digest => {
+          const hash = Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('')
+          if (hash === expectedStaticWorkerHash) state.urls.delete(url)
+        })
+      }
+      return url
+    }
     URL.revokeObjectURL = url => { state.urls.delete(url); revoke(url) }
     const NativeWorker = window.Worker
     window.Worker = class extends NativeWorker {
@@ -74,7 +92,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
         Reflect.apply(super.postMessage, this, [message, transfer])
       }
     }
-  })
+  }, expectedHash)
   async function snapshot() {
     return {
       ...await page.evaluate(async () => ({

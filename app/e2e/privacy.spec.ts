@@ -57,6 +57,24 @@ async function run(page: Page, route: string) {
   expect((await readFile((await download.path())!)).length).toBeGreaterThan(0)
 }
 
+test('audit observer does not exempt arbitrary JavaScript-typed document blobs', async ({ page, context }) => {
+  const audit = await installPrivacyAudit(page, context, 'merge')
+  await page.goto('merge/')
+  const baseline = await audit.snapshot()
+  const url = await page.evaluate(async () => {
+    const blob = new Blob(['PRIVATE_TEXT_72841'], { type: 'text/javascript' })
+    const url = URL.createObjectURL(blob)
+    // Let classification complete; MIME alone must never exclude a blob.
+    await crypto.subtle.digest('SHA-256', await blob.arrayBuffer())
+    await Promise.resolve()
+    return url
+  })
+  expect(await page.evaluate(url => window.privacyAudit.urls.has(url), url)).toBe(true)
+  await page.evaluate(url => URL.revokeObjectURL(url), url)
+  await audit.assertClean()
+  await audit.assertPrivate(baseline)
+})
+
 for (const tool of TOOLS.filter(tool => tool.implemented)) test(`privacy lifecycle: ${tool.id}`, async ({ page, context }) => {
   test.setTimeout(60_000)
   const route = tool.route.slice(1), audit = await installPrivacyAudit(page, context, route)
