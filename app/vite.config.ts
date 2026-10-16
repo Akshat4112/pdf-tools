@@ -28,6 +28,7 @@ function copyPdfjsAssets(): Plugin {
       for (const directory of ['cmaps', 'wasm', 'iccs']) {
         cpSync(resolve(process.cwd(), `node_modules/pdfjs-dist/${directory}`), resolve(dist, directory), { recursive: true })
       }
+      cpSync(resolve(process.cwd(), 'node_modules/pdfjs-dist/web/images'), resolve(dist, 'pdfjs-images'), { recursive: true })
       console.log('copied PDF.js worker, fonts, cmaps, wasm and ICC assets -> dist/assets/')
     },
   }

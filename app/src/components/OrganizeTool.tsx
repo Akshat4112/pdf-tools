@@ -156,7 +156,7 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
     const stored = session.listOutputs()[0] ?? session.addOutput(output.name, output.mimeType, output.bytes)
     const anchor = document.createElement('a')
     anchor.href = session.objectUrlFor(stored.id)
-    anchor.download = output.name
+    anchor.download = stored.name
     anchor.click()
   }
   const reset = () => changeFiles([])

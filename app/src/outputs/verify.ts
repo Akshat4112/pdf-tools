@@ -16,6 +16,7 @@
  * input name + part index; collision-safe within the archive.
  */
 
+import { sanitizeFileName, safeDownloadName } from '../security/fileNames'
 import { QUOTAS, toolError } from '../registry'
 
 export interface VerifiableOutput {
@@ -59,7 +60,7 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
     if (!hasHeader || !hasEof) {
       throw toolError('E-OUT-01', 'The generated PDF did not pass structure verification.', 'retry-job')
     }
-    return { ...out, verified: true, actualBytes: bytes.byteLength }
+    return { ...out, name: safeDownloadName(out.name, kind), verified: true, actualBytes: bytes.byteLength }
   }
 
   if (kind === 'text/plain') {
@@ -70,14 +71,14 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
     if (text.includes('\u0000')) {
       throw toolError('E-OUT-01', 'The generated text did not pass verification.', 'retry-job')
     }
-    return { ...out, verified: true, actualBytes: bytes.byteLength }
+    return { ...out, name: safeDownloadName(out.name, kind), verified: true, actualBytes: bytes.byteLength }
   }
 
   if (kind === 'image/jpeg') {
     if (!(bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)) {
       throw toolError('E-OUT-01', 'The generated image did not pass verification.', 'retry-job')
     }
-    return { ...out, verified: true, actualBytes: bytes.byteLength }
+    return { ...out, name: safeDownloadName(out.name, kind), verified: true, actualBytes: bytes.byteLength }
   }
 
   if (kind === 'image/png') {
@@ -87,7 +88,7 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
         throw toolError('E-OUT-01', 'The generated image did not pass verification.', 'retry-job')
       }
     }
-    return { ...out, verified: true, actualBytes: bytes.byteLength }
+    return { ...out, name: safeDownloadName(out.name, kind), verified: true, actualBytes: bytes.byteLength }
   }
 
   if (kind === 'application/zip') {
@@ -98,7 +99,7 @@ export async function verifyOutput(out: VerifiableOutput): Promise<VerifiedOutpu
     if (!isZip) {
       throw toolError('E-OUT-01', 'The generated ZIP did not pass verification.', 'retry-job')
     }
-    return { ...out, verified: true, actualBytes: bytes.byteLength }
+    return { ...out, name: safeDownloadName(out.name, kind), verified: true, actualBytes: bytes.byteLength }
   }
 
   throw toolError('E-OUT-01', `Unknown output type '${kind}' cannot be verified.`, 'retry-job')
@@ -148,7 +149,8 @@ export interface ZipEntry {
 /** Deterministic, collision-safe entry naming: base-1..N with extension kept. */
 export function zipEntryName(base: string, index: number, total: number, ext: string): string {
   // strip any path components first, then sanitize the stem
-  const nameOnly = (base ?? '').split(/[\\/]/).pop() ?? ''
+  if (!/^[a-z0-9]{1,10}$/i.test(ext)) throw toolError('E-OUT-01', 'Invalid output extension.', 'retry-job')
+  const nameOnly = sanitizeFileName(base, 'output')
   const stem =
     nameOnly
       .replace(/\.[^.]*$/, '')
@@ -156,7 +158,7 @@ export function zipEntryName(base: string, index: number, total: number, ext: st
       .replace(/^_+|_+$/g, '')
       .slice(0, 60) || 'output'
   const pad = String(total).length
-  return `${stem}-${String(index).padStart(pad, '0')}.${ext}`
+  return sanitizeFileName(`${stem}-${String(index).padStart(pad, '0')}.${ext}`)
 }
 
 /**
@@ -177,6 +179,9 @@ export async function buildZip(entries: ZipEntry[]): Promise<Uint8Array> {
   }
   const names = new Set<string>()
   for (const e of entries) {
+    if (e.name !== safeDownloadName(e.name, e.mimeType)) {
+      throw toolError('E-OUT-01', 'An archive filename failed safety verification.', 'retry-job')
+    }
     if (names.has(e.name)) {
       throw toolError('E-OUT-01', `Duplicate output name '${e.name}'.`, 'retry-job')
     }

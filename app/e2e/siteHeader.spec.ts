@@ -67,7 +67,9 @@ test('working-tool navigation and shared header survive routes and history', asy
   for (const tool of TOOLS.filter(tool => tool.implemented)) {
     await expect(header.getByRole('link', { name: tool.title, exact: true })).toHaveAttribute('href', `/pdf-tools${tool.route}`)
   }
-  await expect(header.getByRole('link', { name: 'Document information', exact: true })).toHaveCount(0)
+  for (const tool of TOOLS.filter(tool => !tool.implemented)) {
+    await expect(header.getByRole('link', { name: tool.title, exact: true })).toHaveCount(0)
+  }
   await header.getByRole('link', { name: 'Merge PDF', exact: true }).click()
   await expect(page).toHaveURL(/\/pdf-tools\/merge$/)
   await expect(header.locator('details')).not.toHaveAttribute('open')

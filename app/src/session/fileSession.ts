@@ -10,6 +10,7 @@
  * - Clear files = tool reset; session reset cancels jobs + revokes everything
  */
 
+import { sanitizeFileName, safeDownloadName } from '../security/fileNames'
 import { QUOTAS, toolError } from '../registry'
 import { JobSession } from '../jobs/orchestrator'
 
@@ -33,19 +34,8 @@ export interface SessionOutput {
   objectUrl?: string
 }
 
-/** PT-SEC-001: sanitize file names — text, no path traversal, no control chars. */
-export function sanitizeFileName(raw: string, fallback = 'document'): string {
-  let name = (raw ?? '')
-    .split(/[\\/]/) // strip any path components
-    .pop()!
-    // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u001f\u007f]/g, '') // control chars
-    .replace(/[<>"'`;&${}\\]/g, '') // chars that could confuse markup/shell contexts
-    .trim()
-  if (!name) name = fallback
-  if (name.length > 120) name = name.slice(0, 120)
-  return name
-}
+// Compatibility export; validation and downloads use this same policy.
+export { sanitizeFileName } from '../security/fileNames'
 
 const MIME_BY_EXT: Record<string, SessionFile['mimeType']> = {
   pdf: 'application/pdf',
@@ -117,7 +107,7 @@ export class FileSession {
   addOutput(name: string, mimeType: string, bytes: Uint8Array): SessionOutput {
     const output: SessionOutput = {
       id: nextOutputId++,
-      name: sanitizeFileName(name, 'output'),
+      name: safeDownloadName(name, mimeType),
       mimeType,
       bytes,
     }

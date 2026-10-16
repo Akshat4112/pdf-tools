@@ -57,7 +57,7 @@ export function startMerge(
 
       // verify-before-success: structure + independent page-count readback
       const out = await verifyOutput({
-        name: 'merged.pdf',
+        name: outputNameFor(inp),
         mimeType: 'application/pdf',
         bytes: merged,
       })
@@ -74,7 +74,7 @@ export function startMerge(
       }
       await verifyPdfPageCount(merged, expectedPages)
 
-      return { ...out, name: outputNameFor(inp) }
+      return out
     },
     { onProgress: events.onProgress, onState: events.onState },
   )
