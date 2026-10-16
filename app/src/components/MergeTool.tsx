@@ -7,7 +7,7 @@
  * everything (session.clearFiles) — audit zeros are asserted in tests.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import {
   CancelledPanel,
@@ -33,6 +33,7 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
 
   // one session per screen mount; dropped on unmount (memory-only)
   const session = useMemo(() => new FileSession(), [])
+  useEffect(() => () => session.resetSession(), [session])
 
   const valid = files.filter((f) => !f.error)
   const phase = phaseFromJobState(job?.state ?? null)
@@ -44,12 +45,13 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
       { files: valid.map((f) => ({ displayName: f.displayName, bytes: f.bytes })) },
       { onProgress: setProgress },
     )
+    session.jobs.track(j)
     void j.completion.then(() => {
       if (j.state === 'done' && j.result) setResult([j.result])
       if (j.state === 'failed' && j.error) setError(j.error)
     })
     setJob(j as unknown as Job<never, VerifiedOutput>)
-  }, [valid])
+  }, [valid, session])
 
   const download = useCallback(
     (out: VerifiedOutput) => {

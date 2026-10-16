@@ -125,3 +125,18 @@ describe('FileSession (PT-FND-004 / PT-PD-003 contracts)', () => {
     expect(s.removeFile(999)).toBe(false)
   })
 })
+
+// Clear files itself must enforce the cancellation contract, even without a UI wrapper.
+it('clearFiles cancels a held job and discards its late private output', async () => {
+  const { runJob } = await import('../jobs/orchestrator')
+  const session = new FileSession()
+  let release!: (value: string) => void
+  const job = session.jobs.track(runJob('privacy-held', null, () => new Promise<string>(resolve => { release = resolve })))
+  await Promise.resolve()
+  session.clearFiles()
+  expect(job.state).toBe('cancelled')
+  expect(session.audit()).toEqual({ files: 0, outputs: 0, objectUrls: 0, activeJobs: 0 })
+  release('synthetic-private-late-output')
+  await job.completion
+  expect(job.result).toBeUndefined()
+})

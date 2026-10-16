@@ -159,6 +159,7 @@ export class FileSession {
    * Leaves UI preferences untouched (PT-PD-003 §5 level 1).
    */
   clearFiles(): void {
+    this.jobs.cancelAll()
     this.revokeAllObjectUrls()
     this.files.clear()
     this.outputs.clear()
@@ -169,7 +170,6 @@ export class FileSession {
    * The app calls this on Start over and on page unload (best-effort).
    */
   resetSession(): void {
-    this.jobs.cancelAll()
     this.clearFiles()
   }
 
