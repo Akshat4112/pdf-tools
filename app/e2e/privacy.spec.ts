@@ -39,7 +39,7 @@ async function run(page: Page, route: string) {
   }
   if (route === 'extract-pages' || route === 'delete-pages') {
     await expect(page.getByRole('button', { name: 'Page 1', exact: true })).toBeVisible()
-    await page.getByLabel(route === 'extract-pages' ? 'Pages to extract' : 'Pages to remove', { exact: true }).fill('1')
+    await page.getByRole('textbox', { name: route === 'extract-pages' ? 'Pages to extract' : 'Pages to remove', exact: true }).fill('1')
     if (route === 'delete-pages') await page.locator('.page-delete-confirmation input').check()
   }
   if (route === 'split') await page.getByLabel('Ranges (comma separated)', { exact: true }).fill('1, 2')
