@@ -58,7 +58,7 @@ async function run(page: Page, route: string) {
 }
 
 for (const tool of TOOLS.filter(tool => tool.implemented)) test(`privacy lifecycle: ${tool.id}`, async ({ page, context }) => {
-  test.setTimeout(90_000)
+  test.setTimeout(60_000)
   const route = tool.route.slice(1), audit = await installPrivacyAudit(page, context, route)
   await page.goto(`${route}/`)
   const baseline = await audit.snapshot()
@@ -77,6 +77,8 @@ for (const tool of TOOLS.filter(tool => tool.implemented)) test(`privacy lifecyc
   await select(page, route)
   await run(page, route)
   await audit.assertPrivate(baseline)
+  const menu = page.locator('.folio-header').getByRole('button', { name: 'Menu', exact: true })
+  if (await menu.isVisible()) await menu.click()
   await page.locator('.folio-header').getByRole('link', { name: 'All tools', exact: true }).click()
   await audit.assertClean()
   await expect(page.locator('body')).not.toContainText(NAME)
