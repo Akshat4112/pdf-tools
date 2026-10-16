@@ -43,7 +43,10 @@ async function run(page: Page, route: string) {
     if (route === 'delete-pages') await page.locator('.page-delete-confirmation input').check()
   }
   if (route === 'split') await page.getByLabel('Ranges (comma separated)', { exact: true }).fill('1, 2')
-  if (route === 'watermark') await page.getByLabel('Watermark text', { exact: true }).fill(TEXT)
+  if (route === 'watermark') {
+    await page.getByLabel('Watermark text', { exact: true }).fill(TEXT)
+    await page.getByLabel('Font size (pt)', { exact: true }).fill('12')
+  }
   if (route === 'watermark' || route === 'page-numbers') await expect(page.getByText('Preview ready', { exact: true })).toBeVisible()
   const actions: Record<string, string> = { merge: 'Merge PDFs', split: 'Split PDF', rotate: 'Create rotated copy', organize: 'Create organized copy',
     'extract-pages': 'Extract pages', 'delete-pages': 'Create copy without selected pages', 'images-to-pdf': 'Create PDF',
