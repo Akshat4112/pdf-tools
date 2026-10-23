@@ -126,7 +126,7 @@ export async function openDocument(
   let task: { promise: Promise<PdfjsDocument>; destroy(): Promise<void> } | undefined
   // Signal-bearing loads own their worker so abort can stop parsing immediately,
   // even when loadingTask.destroy() is waiting for a worker setup acknowledgement.
-  const ownedWorker = opts.signal ? new PDFWorker(opts.quiet ? { verbosity: 0 } : {}) : undefined
+  const ownedWorker = opts.signal ? new PDFWorker({ verbosity: 0 }) : undefined
   let destruction: Promise<void> | undefined
   const destroy = () => destruction ??= (async () => { try { await task?.destroy() } finally { ownedWorker?.destroy() } })()
   let rejectAbort: (error: CancelledError) => void = () => {}
@@ -134,6 +134,7 @@ export async function openDocument(
   const abort = () => { ownedWorker?.destroy(); rejectAbort(new CancelledError()); void destroy().catch(() => {}) }
   try {
     task = getDocument({
+      verbosity: 0, // document-controlled parser warnings must not reach application logs
       data: bytes, // private copy — pdf.js detaches what it receives
       ...(ownedWorker ? { worker: ownedWorker } : {}),
       standardFontDataUrl: FONT_URL,

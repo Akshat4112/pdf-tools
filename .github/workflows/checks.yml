@@ -49,6 +49,9 @@ jobs:
       - name: Build (tsc -b && vite build)
         run: npm run build
 
+      - name: R1 privacy surface guard
+        run: node ../scripts/check_privacy_surface.mjs
+
       - name: Design reference contrast and local links
         run: python3 ../scripts/check_design_reference.py
 
@@ -56,7 +59,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Extract and Delete Pages browser regression checks
-        run: npm run test:pages-ui
+        run: npm run test:pages-ui -- --max-failures=1
 
       - name: JPG and PNG conversion engine browser checks
         run: npm run test:images-engine
