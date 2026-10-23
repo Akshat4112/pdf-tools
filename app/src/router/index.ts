@@ -89,6 +89,8 @@ export function usePathRoute(): [Route, (path: string) => void] {
       if (!anchor) return
       const url = new URL(anchor.href, window.location.href)
       if (url.origin !== window.location.origin) return
+      // Native fragment navigation must scroll to homepage sections.
+      if (url.hash) return
       const path = routePathOf(url.pathname)
       // only intercept registry routes + the catalog; let real files
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
