@@ -46,6 +46,9 @@ jobs:
       - name: Typecheck tests config
         run: npx tsc -p tsconfig.test.json --noEmit
 
+      - name: Supply-chain license, integrity and notice gate
+        run: node ../scripts/check_supply_chain.mjs --self-test --write-notices
+
       - name: Build (tsc -b && vite build)
         run: npm run build
 
@@ -63,9 +66,6 @@ jobs:
 
       - name: JPG and PNG conversion engine browser checks
         run: npm run test:images-engine
-
-      - name: Supply-chain license, integrity and notice gate
-        run: node ../scripts/check_supply_chain.mjs --self-test --write-notices
 
       - name: Production dependency audit gate
         run: npm audit --omit=dev --audit-level=high
