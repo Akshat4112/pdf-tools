@@ -38,6 +38,7 @@ jobs:
       - run: npm run lint
       - run: npm test
       - run: npx tsc -p tsconfig.test.json --noEmit
+      - run: node ../scripts/check_supply_chain.mjs --self-test --write-notices
       - run: npm run build
       - run: npm audit --omit=dev --audit-level=high
       - name: Verify base path
@@ -58,6 +59,7 @@ jobs:
         working-directory: app
         run: |
           npm ci
+          node ../scripts/check_supply_chain.mjs --self-test --write-notices
           npm run build
 
       # PT-SP-001 §2.1: pdf.js needs its worker + standard fonts self-hosted
