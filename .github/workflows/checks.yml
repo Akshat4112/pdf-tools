@@ -46,6 +46,9 @@ jobs:
       - name: Typecheck tests config
         run: npx tsc -p tsconfig.test.json --noEmit
 
+      - name: Supply-chain license, integrity and notice gate
+        run: node ../scripts/check_supply_chain.mjs --self-test --write-notices
+
       - name: Build (tsc -b && vite build)
         run: npm run build
 
