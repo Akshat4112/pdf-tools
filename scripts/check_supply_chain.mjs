@@ -6,12 +6,13 @@ import { resolve } from 'node:path'
 const root = resolve(import.meta.dirname, '..')
 const pkg = JSON.parse(readFileSync(resolve(root, 'app/package.json'), 'utf8'))
 const lock = JSON.parse(readFileSync(resolve(root, 'app/package-lock.json'), 'utf8'))
-const allowed = new Set(['MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD', 'CC0-1.0', 'Unlicense', 'BlueOak-1.0.0'])
+const allowed = new Set(['MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD', 'CC0-1.0', 'Unlicense', 'BlueOak-1.0.0', 'Zlib'])
 
 function assert(cond, message) { if (!cond) throw new Error(message) }
-function licenseAllowed(expression) {
+function licenseAllowed(expression, devOnly = false) {
   if (typeof expression !== 'string' || !expression.trim()) return false
-  if (/SEE LICENSE|UNLICENSED|PROPRIETARY|GPL|AGPL|LGPL|MPL|UNKNOWN/i.test(expression)) return false
+  if (/SEE LICENSE|UNLICENSED|PROPRIETARY|GPL|AGPL|LGPL|UNKNOWN/i.test(expression)) return false
+  if (expression === 'MPL-2.0') return devOnly // lightningcss and platform variants: build tooling only
   // Permit only listed SPDX licenses joined by SPDX AND/OR syntax.
   const tokens = expression.replace(/[()]/g, ' ').trim().split(/\s+/)
   if (!tokens.length || tokens.some(t => !allowed.has(t) && t !== 'AND' && t !== 'OR')) return false
@@ -36,7 +37,7 @@ function validate() {
   for (const [path, entry] of packages) {
     assert(entry.version, `Missing locked version: ${path}`)
     assert(entry.integrity && entry.resolved?.startsWith('https://registry.npmjs.org/'), `Untrusted or unpinned package source: ${path}`)
-    assert(licenseAllowed(entry.license), `License not approved or absent: ${path} (${entry.license || 'missing'})`)
+    assert(licenseAllowed(entry.license, entry.dev === true), `License not approved or absent: ${path} (${entry.license || 'missing'})`)
     notices.push(`${path.replace(/^node_modules\//, '')}@${entry.version} — ${entry.license}${entry.dev ? ' [build/dev]' : ''}`)
   }
   assert(packages.length > 0, 'Empty dependency graph')
@@ -46,7 +47,7 @@ if (process.argv.includes('--self-test')) {
   for (const x of ['GPL-3.0-only', 'AGPL-3.0', 'MIT OR GPL-3.0', 'UNLICENSED', '', undefined, 'LicenseRef-private']) {
     assert(!licenseAllowed(x), `Unsafe license passed: ${x}`)
   }
-  for (const x of ['MIT', 'Apache-2.0', '(MIT OR Apache-2.0)', 'BSD-3-Clause']) assert(licenseAllowed(x), `Expected license rejected: ${x}`)
+  for (const x of ['MIT', 'Apache-2.0', '(MIT OR Apache-2.0)', '(MIT AND Zlib)', 'BSD-3-Clause']) assert(licenseAllowed(x), `Expected license rejected: ${x}`)
 }
 const result = validate()
 const target = resolve(root, 'app/public/THIRD_PARTY_LICENSE_INVENTORY.txt')
