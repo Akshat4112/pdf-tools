@@ -98,6 +98,9 @@ jobs:
       - name: Validate corpus (PyMuPDF + qpdf, per PT-PD-005 §4)
         run: python3 scripts/validate_corpus.py
 
+      - name: Independent output validator self-tests
+        run: python3 -m unittest discover -s scripts -p 'test_validate_outputs.py'
+
       - name: Fixture size normalization regression checks
         run: python3 -m unittest discover -s scripts -p "test_check_reproducibility.py"
 
