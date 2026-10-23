@@ -1,6 +1,7 @@
 /* Entry stylesheet — design system + utilities.
    system.css (PT-UX-001, PR #19) is the canonical visual system; keep it first. */
 @import './styles/system.css';
+@import './styles/home.css';
 
 /* PT-UX-004: client 404 screen (NotFound.tsx + static 404.html) */
 .not-found { max-width: 760px; margin: 0 auto; padding: 72px 0 96px; text-align: center; }
