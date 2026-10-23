@@ -106,6 +106,18 @@ function prerenderRoutes(): Plugin {
           `  <meta name="twitter:description" content="${description}" />\n` +
           `</head>`
         html = html.replace('</head>', head)
+        // Crawlable, truthful no-JS navigation and description. Interactive
+        // processing still requires JavaScript, and no document inputs leak
+        // into the static source. This remains present without hydration.
+        const routeLinks = ROUTES.filter(r => r.dir !== '.').map(r =>
+          `<li><a href="${ORIGIN}${r.dir}/">${r.title.split(' — ')[0]}</a></li>`
+        ).join('')
+        const noJs = dir === '404'
+          ? `<h1>Page not found</h1><p>This page does not exist. <a href="${ORIGIN}">Browse PDF tools</a>.</p>`
+          : dir === '.'
+            ? `<h1>Free PDF tools in your browser</h1><p>FolioLocal provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>`
+            : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`
+        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main>${noJs}</main></noscript>`)
         return html
       }
 
@@ -129,7 +141,8 @@ function prerenderRoutes(): Plugin {
       writeFileSync(resolve(dist, '404.html'), nfHtml)
 
       // sitemap.xml + robots.txt (registry-driven, same URLs as meta tags).
-      const today = new Date().toISOString().slice(0, 10)
+      // Do not invent modification dates on every build. Add <lastmod> only
+      // when a route-specific content modification date is sourced and verified.
       const urls = ROUTES.map((r) =>
         r.dir === '.' ? ORIGIN : `${ORIGIN}${r.dir}/`,
       )
@@ -138,12 +151,14 @@ function prerenderRoutes(): Plugin {
         urls
           .map(
             (u) =>
-              `  <url>\n    <loc>${u}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${u === ORIGIN ? '1.0' : '0.8'}</priority>\n  </url>`,
+              `  <url>\n    <loc>${u}</loc>\n  </url>`,
           )
           .join('\n') +
         `\n</urlset>\n`
       writeFileSync(resolve(dist, 'sitemap.xml'), sitemap)
-      writeFileSync(resolve(dist, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${ORIGIN}sitemap.xml\n`)
+      // Project-folder robots.txt is NOT the shared origin's /robots.txt.
+      // Publish sitemap here; origin robots is owned by Akshat4112.github.io.
+
 
       const pages = readdirSync(dist).filter((f) => f === '404.html' || f.endsWith('.html') || f.endsWith('.xml') || f.endsWith('.txt'))
       console.log(`prerendered routes: ${ROUTES.length} pages + 404.html + sitemap.xml + robots.txt (${pages.length} top-level entries)`)
