@@ -1,4 +1,4 @@
-import { HUBS, hubPath, type CategoryHub } from './categoryHubs.ts'
+import { HUBS, hubPath, hubForTool, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
 
@@ -122,7 +122,52 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
   const clean = html
     .replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(meta.title)}</title>`)
     .replace(/\s*<meta\b[^>]*(?:name|property)=["'](?:description|og:[\w:]+|twitter:[\w:]+)["'][^>]*>/gi, '')
+    .replace(/<script\b[^>]*id=["']public-structured-data["'][^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/\s*<link\b[^>]*rel=["']canonical["'][^>]*>/gi, '')
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
-  return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
+  return clean.replace('</head>', `${tags}\n${structuredDataScript(meta.canonical)}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
+}
+
+
+export const STRUCTURED_DATA_ID = 'public-structured-data'
+export type SchemaNode = { '@type': string; '@id': string; [key: string]: unknown }
+/** An exact public canonical allowlist prevents query/file state from entering JSON-LD. */
+export function pageStructuredData(canonical: string): { '@context': string; '@graph': SchemaNode[] } | null {
+  const page = PUBLIC_PAGES.find(page => page.canonical === canonical)
+  if (!page) return null
+  const license = 'https://github.com/Akshat4112/pdf-tools/blob/main/LICENSE'
+  const site = { '@id': `${SITE_URL}#website` }
+  const application = (url: string, name: string, description: string): SchemaNode => ({
+    '@type': 'WebApplication', '@id': `${url}#application`, url, name, description,
+    applicationCategory: 'UtilitiesApplication', applicationSuite: SITE_NAME,
+    browserRequirements: 'Requires JavaScript and a modern web browser.',
+    isAccessibleForFree: true, license, offers: { '@type': 'Offer', price: 0 },
+  })
+  const graph: SchemaNode[] = []
+  if (canonical === SITE_URL) {
+    graph.push({ '@type': 'WebSite', ...site, url: SITE_URL, name: SITE_NAME, description: SITE_DESCRIPTION, inLanguage: 'en' })
+    graph.push(application(SITE_URL, SITE_NAME, SITE_DESCRIPTION))
+  } else {
+    const tool = TOOLS.find(tool => tool.implemented && toolPageMeta(tool).canonical === canonical)
+    const hub = tool ? hubForTool(tool) : HUBS.find(hub => hubPageMeta(hub).canonical === canonical)!
+    const trail = [{ name: 'All PDF tools', item: SITE_URL }, { name: hub.title, item: hubPageMeta(hub).canonical }]
+    if (tool) trail.push({ name: tool.title, item: canonical })
+    const breadcrumb = { '@id': `${canonical}#breadcrumb` }
+    graph.push({ '@type': tool ? 'WebPage' : 'CollectionPage', '@id': `${canonical}#webpage`, url: canonical,
+      name: tool ? tool.title : hub.title, description: page.description, inLanguage: 'en', isPartOf: site, breadcrumb,
+      ...(tool ? { mainEntity: { '@id': `${canonical}#application` } } : {}),
+    })
+    if (tool) graph.push(application(canonical, tool.title, page.description))
+    graph.push({ '@type': 'BreadcrumbList', ...breadcrumb, itemListElement: trail.map((entry, index) => ({ '@type': 'ListItem', position: index + 1, ...entry })) })
+  }
+  return { '@context': 'https://schema.org', '@graph': graph }
+}
+
+/** JSON inside HTML must never be able to close its script element. */
+export function serializeStructuredData(data: unknown): string {
+  return JSON.stringify(data).replace(/[<>&\u2028\u2029]/g, char => `\\u${char.charCodeAt(0).toString(16).padStart(4, '0')}`)
+}
+export function structuredDataScript(canonical: string): string {
+  const data = pageStructuredData(canonical)
+  return data ? `<script id="${STRUCTURED_DATA_ID}" type="application/ld+json">${serializeStructuredData(data)}</script>` : ''
 }
