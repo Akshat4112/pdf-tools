@@ -21,7 +21,7 @@ for (const javaScriptEnabled of [true, false]) {
         await expect(page.locator('input[type=file]')).toHaveCount(1)
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
       } else {
-        await expect(page.getByText('JavaScript is required to process files locally.', { exact: false })).toBeVisible()
+        await expect(page.getByRole('main'), tool.id).toContainText('JavaScript is required')
       }
     }
     await context.close()
