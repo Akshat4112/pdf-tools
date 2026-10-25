@@ -701,3 +701,29 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 .document-info-table th, .document-info-table td { padding: 10px 5px; text-align: left; border-bottom: 1px solid var(--line); }
 .document-info-table caption { text-align: left; padding: 12px 0; }
 @media(max-width: 480px) { .document-info-list > div { grid-template-columns: 1fr; gap: 4px; } }
+
+/* PT-UI-006: shared processing and outcome hierarchy uses existing theme tokens. */
+.state-panel { border-inline-start: 4px solid var(--line); }
+.state-panel.is-processing, .state-panel.is-result { border-inline-start-color: var(--accent); }
+.state-panel.is-error { border-inline-start-color: var(--warn); }
+.state-panel .panel-title:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+.state-panel .panel-title { scroll-margin-block: 100px; }
+.state-panel .panel-summary, .state-panel .panel-hint, .state-panel .result-row { overflow-wrap: anywhere; }
+.state-panel .cleanup-note { margin-block: 20px 0; padding-block-start: 14px; border-block-start: 1px solid var(--line); }
+.state-panel .error-details { margin-block: 12px; }
+.state-panel .error-details summary { cursor: pointer; min-height: 44px; display: list-item; align-content: center; }
+.state-panel .result-row { min-width: 0; }
+.state-panel .panel-actions { flex-wrap: wrap; }
+@media (max-width: 540px) {
+  .state-panel .result-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+  .state-panel .btn-download { grid-column: 1 / -1; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .state-panel .progress-fill { transition: none; }
+}
+
+.state-panel .progress-fill.is-indeterminate { animation: workspace-progress 1.5s ease-in-out infinite alternate; }
+@keyframes workspace-progress { to { transform: translateX(180%); } }
+@media (prefers-reduced-motion: reduce) {
+  .state-panel .progress-fill.is-indeterminate { animation: none; }
+}

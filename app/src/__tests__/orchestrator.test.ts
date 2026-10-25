@@ -137,3 +137,38 @@ describe('JobSession (PT-PD-003 §5 reset semantics)', () => {
     expect(j.state).toBe('done')
   })
 })
+
+
+describe('PT-UI-006 cancellation and progress boundaries', () => {
+  it('never starts an executor cancelled while queued', async () => {
+    let calls = 0
+    const states: string[] = []
+    const job = runJob('queued', null, async () => { calls++; return 'obsolete' }, { onState: state => states.push(state) })
+    job.cancel()
+    await job.completion
+    expect(calls).toBe(0)
+    expect(states).toEqual(['cancelled'])
+    expect(job.result).toBeUndefined()
+  })
+
+  it('notifies cancellation at timeout before a delayed executor returns', async () => {
+    let release!: () => void
+    const gate = new Promise<void>(resolve => { release = resolve })
+    const states: string[] = []
+    const job = runJob('slow', null, async () => { await gate; return 'obsolete' }, { timeoutMs: 5, onState: state => states.push(state) })
+    await tick(20)
+    expect(job.state).toBe('cancelled')
+    expect(states).toEqual(['running', 'cancelled'])
+    release()
+    await job.completion
+    expect(job.result).toBeUndefined()
+  })
+
+  it('rejects non-finite progress instead of exposing NaN to the UI', async () => {
+    const job = runJob('invalid', null, async (_input, ctx) => { ctx.reportProgress(NaN); return 'invalid' })
+    await job.completion
+    expect(job.state).toBe('failed')
+    expect(job.error?.code).toBe('E-PROC-01')
+    expect(job.result).toBeUndefined()
+  })
+})

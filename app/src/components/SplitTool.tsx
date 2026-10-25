@@ -10,7 +10,7 @@
  * Session lifecycle per PT-PD-003: memory-only; Start over clears everything.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import {
   CancelledPanel,
@@ -23,7 +23,7 @@ import { phaseFromJobState } from './screenPhase'
 import { startSplit, resolveSplitGroups, type SplitMode } from '../tools/splitFlow'
 import { FileSession } from '../session/fileSession'
 import { getTool, type ToolError } from '../registry'
-import type { Job, JobProgress } from '../jobs/orchestrator'
+import type { Job, JobProgress, JobState } from '../jobs/orchestrator'
 import type { VerifiedOutput } from '../outputs/verify'
 
 const MODES: Array<{ id: SplitMode; label: string; hint: string }> = [
@@ -38,16 +38,21 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
   const [mode, setMode] = useState<SplitMode>('ranges')
   const [rangesExpr, setRangesExpr] = useState('')
   const [everyN, setEveryN] = useState(1)
-  const [job, setJob] = useState<Job<never, VerifiedOutput> | null>(null)
+  const job = useRef<Job<never, VerifiedOutput> | null>(null)
+  const active = useRef(true)
+  const [state, setState] = useState<JobState | null>(null)
   const [progress, setProgress] = useState<JobProgress>({ fraction: 0 })
   const [result, setResult] = useState<VerifiedOutput[] | null>(null)
   const [error, setError] = useState<ToolError | null>(null)
 
   const session = useMemo(() => new FileSession(), [])
-  useEffect(() => () => session.resetSession(), [session])
+  useEffect(() => {
+    active.current = true
+    return () => { active.current = false; job.current = null; session.resetSession() }
+  }, [session])
 
   const selected = files.find((f) => !f.error)
-  const phase = phaseFromJobState(job?.state ?? null)
+  const phase = phaseFromJobState(state)
 
   /** Live plan preview from the pure layer — same code the flow runs. */
   const preview = useMemo(() => {
@@ -83,21 +88,27 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
     warning?: string
     error?: ToolError
   }
-  const [plan, setPlan] = useState<SplitPlan | null>(null)
+  const [planState, setPlan] = useState<{ source: typeof preview; value: SplitPlan } | null>(null)
+  const plan = planState?.source === preview ? planState?.value : null
 
   // resolve the live preview through the same pure layer the flow runs
   useEffect(() => {
     let cancelled = false
     void preview?.then((p) => {
-      if (!cancelled) setPlan(p ?? null)
+      if (!cancelled) setPlan({ source: preview, value: p })
     })
     return () => { cancelled = true }
   }, [preview])
 
   const run = useCallback(() => {
-    if (!selected) return
+    if (!selected || !plan || plan.error || plan.warning || !plan.groups?.length) return
+    const old = job.current
+    job.current = null
+    old?.cancel()
+    session.resetSession()
     setError(null)
     setResult(null)
+    setProgress({ fraction: 0 })
     const j = startSplit(
       {
         file: { displayName: selected.displayName, bytes: selected.bytes },
@@ -105,19 +116,24 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
         rangesExpr: mode === 'ranges' ? rangesExpr : undefined,
         everyN: mode === 'every' ? everyN : undefined,
       },
-      { onProgress: setProgress },
+      {
+        onProgress: value => { if (active.current && job.current === j) setProgress(value) },
+        onState: () => { if (active.current && job.current === j) setState(j.state) },
+      },
     )
     session.jobs.track(j)
     void j.completion.then(() => {
+      if (!active.current || job.current !== j) return
       if (j.state === 'done' && j.result) setResult([j.result])
       if (j.state === 'failed' && j.error) setError(j.error)
     })
-    setJob(j as unknown as Job<never, VerifiedOutput>)
-  }, [selected, mode, rangesExpr, everyN, session])
+    job.current = j as unknown as Job<never, VerifiedOutput>
+    setState(j.state)
+  }, [selected, mode, rangesExpr, everyN, session, plan])
 
   const download = useCallback(
     (out: VerifiedOutput) => {
-      const stored = session.addOutput(out.name, out.mimeType, out.bytes)
+      const stored = session.listOutputs().find(item => item.name === out.name) ?? session.addOutput(out.name, out.mimeType, out.bytes)
       const url = session.objectUrlFor(stored.id)
       const a = document.createElement('a')
       a.href = url
@@ -127,15 +143,22 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
     [session],
   )
 
-  const reset = useCallback(() => {
+  const adjust = useCallback(() => {
+    const old = job.current
+    job.current = null
+    old?.cancel()
     session.resetSession()
-    setFiles([])
-    setJob(null)
+    setState(null)
     setResult(null)
     setError(null)
     setProgress({ fraction: 0 })
-    setPlan(null)
   }, [session])
+
+  const reset = useCallback(() => {
+    adjust()
+    setFiles([])
+    setPlan(null)
+  }, [adjust])
 
   const canRun =
     Boolean(selected && plan && !plan.error && !plan.warning && (plan.groups?.length ?? 0) > 0)
@@ -246,19 +269,19 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
         </>
       ) : null}
 
-      {phase === 'processing' && job ? (
-        <ProcessingPanel label="Splitting your PDF" progress={progress} onCancel={() => job.cancel()} />
+      {phase === 'processing' ? (
+        <ProcessingPanel label="Splitting your PDF" progress={progress} onCancel={() => job.current?.cancel()} />
       ) : null}
 
       {phase === 'result' && result ? (
-        <ResultPanel outputs={result} onDownload={download} onRetry={reset} onReset={reset} />
+        <ResultPanel outputs={result} onDownload={download} onRetry={adjust} retryLabel="Adjust settings" onContinue={onExit} onReset={reset} />
       ) : null}
 
       {phase === 'failed' && error ? (
-        <FailurePanel error={error} onRetry={run} onReset={reset} />
+        <FailurePanel error={error} onRetry={adjust} onReset={reset} />
       ) : null}
 
-      {phase === 'cancelled' && job ? <CancelledPanel onReset={reset} /> : null}
+      {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={adjust} /> : null}
     </div>
   )
 }

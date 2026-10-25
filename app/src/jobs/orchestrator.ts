@@ -90,16 +90,17 @@ export function runJob<TIn, TOut>(
   }
 
   const start = async () => {
+    if (cancelled) { settled = true; return }
     state('running')
     progress({ fraction: 0 })
     timer = setTimeout(() => {
       // soft time cap: cancel, do not leave a zombie job (PT-SP-002 quota)
-      cancelled = true
+      job.cancel()
     }, timeoutMs)
 
     const ctx: JobContext = {
       reportProgress(fraction, detail) {
-        if (fraction < 0 || fraction > 1) {
+        if (!Number.isFinite(fraction) || fraction < 0 || fraction > 1) {
           throw toolError('E-PROC-01', 'Internal progress error.', 'retry-job')
         }
         progress({ fraction, detail })

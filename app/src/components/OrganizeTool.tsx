@@ -239,9 +239,9 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
         {removed.length ? <label className="page-delete-confirmation"><input type="checkbox" checked={confirmed === reviewKey} onChange={e => setConfirmed(e.target.checked ? reviewKey : null)} /><span>I reviewed the output order and source pages to remove. Create a new copy without those pages.</span></label> : null}
       </> : null}
       {phase === 'processing' ? <ProcessingPanel label="Creating and verifying your new copy" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
-      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={reset} onReset={reset} /> : null}
+      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}
       {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
-      {phase === 'cancelled' ? <CancelledPanel onReset={reset} /> : null}
+      {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
     </div>
   )
 }

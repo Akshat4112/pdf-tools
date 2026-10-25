@@ -69,7 +69,7 @@ test('scan-only PDFs produce an OCR notice without a blank file; invalid sources
   await expect(page.getByRole('button', { name: 'Export text', exact: true })).toBeDisabled()
   await choose(page, Buffer.from('%PDF-broken'), 'broken.pdf')
   await page.getByRole('button', { name: 'Export text', exact: true }).click(); await expect(page.getByRole('alert')).toContainText('could not be read')
-  await page.getByRole('button', { name: 'Try again', exact: true }).click(); await choose(page); await convert(page)
+  await page.getByRole('button', { name: 'Review settings', exact: true }).click(); await choose(page); await convert(page)
 })
 
 test('download URLs are reused, revoked on retry/reset/exit and long text preview is bounded', async ({ page }) => {
@@ -84,7 +84,7 @@ test('download URLs are reused, revoked on retry/reset/exit and long text previe
   expect((await page.locator('.text-export-preview').textContent())!.length).toBeLessThan(8400)
   const text = new TextDecoder().decode((await download(page)).bytes); expect(text).toContain('PACKING-BOX-0030')
   await download(page); expect(await count()).toBe(1)
-  await page.getByRole('button', { name: 'Run again with other files', exact: true }).click(); expect(await count()).toBe(0)
+  await page.getByRole('button', { name: 'Adjust settings', exact: true }).click(); expect(await count()).toBe(0)
   await convert(page); await download(page); await page.getByRole('button', { name: 'Start over', exact: true }).click(); expect(await count()).toBe(0)
   await choose(page); await convert(page); await download(page)
   await page.getByRole('button', { name: 'Continue to another tool', exact: true }).click(); expect(await count()).toBe(0)

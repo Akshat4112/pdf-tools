@@ -10,10 +10,16 @@
  * - FailurePanel: taxonomy error + recovery affordance (S7)
  */
 
+import { useId } from 'react'
+import { usePanelHeading } from './usePanelHeading'
 import type { JobProgress } from '../jobs/orchestrator'
 import type { ToolError } from '../registry'
 import type { VerifiedOutput } from '../outputs/verify'
 import { formatBytes } from './format'
+
+export function WorkspaceCleanupNote() {
+  return <p className="panel-hint cleanup-note">Start over removes selected files and results from this workspace. Original files and downloads already saved to your device are unaffected.</p>
+}
 
 /** S4 — preview before processing. */
 export function PreviewPanel({
@@ -35,8 +41,9 @@ export function PreviewPanel({
   disabledReason?: string
   onCancel?(): void
 }) {
+  const hintId = useId()
   return (
-    <section className="panel" aria-label="Preview">
+    <section className="panel state-panel is-preview" aria-label="Preview">
       <h2 className="panel-title">{title}</h2>
       <p className="panel-summary">{summary}</p>
       {details && details.length > 0 ? (
@@ -53,6 +60,7 @@ export function PreviewPanel({
           onClick={onConfirm}
           disabled={disabled}
           aria-disabled={disabled}
+          aria-describedby={disabled && disabledReason ? hintId : undefined}
         >
           {actionLabel}
         </button>
@@ -63,7 +71,7 @@ export function PreviewPanel({
         ) : null}
       </div>
       {disabled && disabledReason ? (
-        <p className="panel-hint" role="note">
+        <p id={hintId} className="panel-hint" role="note">
           {disabledReason}
         </p>
       ) : null}
@@ -81,28 +89,35 @@ export function ProcessingPanel({
   progress: JobProgress
   onCancel(): void
 }) {
-  const pct = Math.round(progress.fraction * 100)
+  const heading = usePanelHeading()
+  const pct = Math.max(0, Math.min(100, Math.round((Number.isFinite(progress.fraction) ? progress.fraction : 0) * 100)))
+  // Unknown startup work and final checks are indeterminate; do not invent progress.
+  const determinate = pct > 0 && pct < 100
+  const detail = pct === 100 ? 'Finishing checks…' : progress.detail || 'Preparing and checking your files…'
   return (
-    <section className="panel" aria-label="Processing" aria-live="polite">
-      <h2 className="panel-title">{label}</h2>
+    <section className="panel state-panel is-processing" aria-label="Processing">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">{label}</h2>
       <div
         className="progress-track"
         role="progressbar"
+        aria-label={label}
+        aria-valuetext={determinate ? `${pct}% — ${detail}` : detail}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-valuenow={pct}
+        aria-valuenow={determinate ? pct : undefined}
       >
-        <div className="progress-fill" style={{ width: `${pct}%` }} />
+        <div className={`progress-fill${determinate ? '' : ' is-indeterminate'}`} style={{ width: determinate ? `${pct}%` : '35%' }} />
       </div>
       <p className="panel-summary">
-        {progress.detail ? `${progress.detail} · ` : ''}
-        {pct}%
+        {detail}{determinate ? ` · ${pct}%` : ''}
       </p>
+      <p className="panel-hint">Processing on your device. Downloads appear after the result passes verification.</p>
       <div className="panel-actions">
         <button type="button" className="btn-ghost" onClick={onCancel}>
           Cancel
         </button>
       </div>
+      <WorkspaceCleanupNote />
     </section>
   )
 }
@@ -117,21 +132,34 @@ export function FailurePanel({
   onRetry(): void
   onReset(): void
 }) {
+  const heading = usePanelHeading()
+  const recovery: Record<ToolError['recovery'], string> = {
+    'show-formats': 'Choose a supported file format.',
+    'explain-encryption': 'Password unlocking is not supported. Choose an unlocked copy you are permitted to use.',
+    'retry-file': 'Choose a different file or try a fresh copy.',
+    'show-limits': 'Use fewer pages or smaller files within the displayed limits.',
+    'focus-picker': 'Review your file selection before running again.',
+    'fix-field': 'Review the settings and correct any highlighted fields.',
+    'retry-job': 'Review your settings, then try processing again.',
+    'reduce-scope': 'Try fewer pages or a lower resolution.',
+    'retry-download': 'Try the download again, or regenerate the result.',
+    'suggest-browser': 'Try a current browser with the required features.',
+  }
   return (
-    <section className="panel is-error" aria-label="Something went wrong" role="alert">
-      <h2 className="panel-title">That didn't work</h2>
+    <section className="panel state-panel is-error" aria-label="Something went wrong" role="alert">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">That didn't work</h2>
       <p className="panel-summary">{error.message}</p>
-      <p className="panel-hint">
-        Error <code>{error.code}</code> — you can retry or start over.
-      </p>
+      <p className="panel-hint">{recovery[error.recovery]} No download is available from this attempt.</p>
+      <details className="error-details"><summary>Error details</summary><p>Error <code>{error.code}</code></p></details>
       <div className="panel-actions">
         <button type="button" className="btn-primary" onClick={onRetry}>
-          Try again
+          Review settings
         </button>
         <button type="button" className="btn-ghost" onClick={onReset}>
           Start over
         </button>
       </div>
+      <WorkspaceCleanupNote />
     </section>
   )
 }
@@ -143,28 +171,34 @@ export function ResultPanel({
   onRetry,
   onReset,
   onContinue,
+  retryLabel = 'Run again with other files',
 }: {
   outputs: VerifiedOutput[]
   onDownload(output: VerifiedOutput): void
   onRetry(): void
   onReset(): void
   onContinue?(): void
+  retryLabel?: string
 }) {
+  const heading = usePanelHeading()
+  const ready = outputs.length > 0 && outputs.every(output => output.verified && output.actualBytes > 0 && output.actualBytes === output.bytes.byteLength)
+  if (!ready) return <section className="panel state-panel" aria-label="Results"><h2 ref={heading} tabIndex={-1} className="panel-title">No verified result available</h2><p>Start over and create a new result before downloading.</p><button type="button" className="btn-ghost" onClick={onReset}>Start over</button></section>
   return (
-    <section className="panel" aria-label="Results">
-      <h2 className="panel-title">Done — your files are ready</h2>
+    <section className="panel state-panel is-result" aria-label="Results">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">Done — your files are ready</h2>
       <p className="panel-summary">
         {outputs.length === 1
           ? 'One file was generated and verified.'
           : `${outputs.length} files were generated and verified.`}
       </p>
+      <p className="panel-hint" role="status">Ready to download · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} total. Sizes are the actual generated files, not estimates.</p>
       <ul className="result-list">
         {outputs.map((o) => (
           <li key={o.name} className="result-row">
             <span className="file-name" title={o.name}>
               {o.name}
             </span>
-            <span className="file-size">{formatBytes(o.actualBytes)}</span>
+            <span className="file-size" title={`${o.actualBytes.toLocaleString('en-US')} bytes`}>{formatBytes(o.actualBytes)}</span>
             <button
               type="button"
               className="btn-primary btn-download"
@@ -178,28 +212,30 @@ export function ResultPanel({
       </ul>
       <div className="panel-actions">
         <button type="button" className="btn-ghost" onClick={onRetry}>
-          Run again with other files
+          {retryLabel}
         </button>
         <button type="button" className="btn-ghost" onClick={onReset}>
           Start over
         </button>
         {onContinue ? (
           <button type="button" className="btn-ghost" onClick={onContinue}>
-            Continue to another tool
+            Back to all tools
           </button>
         ) : null}
       </div>
+      <WorkspaceCleanupNote />
     </section>
   )
 }
 
 /** Cancelled state — S5 exit without partial results (PT-PD-003 §5). */
 export function CancelledPanel({ onReset, onAdjust }: { onReset(): void; onAdjust?(): void }) {
+  const heading = usePanelHeading()
   return (
-    <section className="panel" aria-label="Cancelled" role="status">
-      <h2 className="panel-title">Cancelled</h2>
+    <section className="panel state-panel is-cancelled" aria-label="Cancelled" role="status">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">Cancelled</h2>
       <p className="panel-summary">
-        The job was stopped and no partial files were kept.
+        This attempt was cancelled. No partial result is available to download. You can adjust the settings and try again.
       </p>
       <div className="panel-actions">
         {onAdjust ? <button type="button" className="btn-primary" onClick={onAdjust}>Adjust settings</button> : null}
@@ -207,6 +243,7 @@ export function CancelledPanel({ onReset, onAdjust }: { onReset(): void; onAdjus
           Start over
         </button>
       </div>
+      <WorkspaceCleanupNote />
     </section>
   )
 }
