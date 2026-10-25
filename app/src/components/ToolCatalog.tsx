@@ -10,9 +10,11 @@
  * - search + category nav are keyboard-first
  */
 
-import { useMemo, useState } from 'react'
-import { CATEGORIES, TOOLS, type ToolCategory, type ToolDefinition } from '../registry'
+import { useMemo, useRef, useState } from 'react'
+import { CATEGORIES, TOOLS, QUOTAS, type ToolCategory, type ToolDefinition } from '../registry'
 import { href } from '../router'
+import { matchesTool, formatCue } from '../catalog/search'
+import './ToolCatalog.css'
 
 /** Original inline icons — stroke style, no icon-font dependency (self-hosted rule). */
 function ToolIcon({ tool }: { tool: ToolDefinition }) {
@@ -136,7 +138,7 @@ function ToolIcon({ tool }: { tool: ToolDefinition }) {
   }
 }
 
-function ToolCard({ tool }: { tool: ToolDefinition }) {
+export function ToolCard({ tool }: { tool: ToolDefinition }) {
   const classes = ['tool-card']
   if (!tool.implemented) classes.push('is-disabled')
   if (tool.implemented) {
@@ -145,11 +147,11 @@ function ToolCard({ tool }: { tool: ToolDefinition }) {
         <span className="tool-icon">
           <ToolIcon tool={tool} />
         </span>
-        <p className="tool-title">{tool.title}</p>
+        <h3 className="tool-title">{tool.title}</h3>
         <p className="tool-desc">{tool.description}</p>
         <span className="tool-meta">
           <span className="badge badge-live">Open tool</span>
-          <span>{tool.acceptedInputs.join(', ').toUpperCase()}</span>
+          <span>{formatCue(tool)}</span>
         </span>
       </a>
     )
@@ -159,11 +161,11 @@ function ToolCard({ tool }: { tool: ToolDefinition }) {
       <span className="tool-icon">
         <ToolIcon tool={tool} />
       </span>
-      <p className="tool-title">{tool.title}</p>
+      <h3 className="tool-title">{tool.title}</h3>
       <p className="tool-desc">{tool.description}</p>
       <span className="tool-meta">
-        <span className="badge badge-soon">In progress</span>
-        <span>{tool.acceptedInputs.join(', ').toUpperCase()}</span>
+        <span className="badge badge-soon">Not available yet</span>
+        <span>{formatCue(tool)}</span>
       </span>
     </div>
   )
@@ -173,80 +175,62 @@ export function ToolCatalog() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ToolCategory | 'all'>('all')
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return TOOLS.filter((t) => {
-      if (category !== 'all' && t.category !== category) return false
-      if (!q) return true
-      return (
-        t.title.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.featureId.toLowerCase().includes(q)
-      )
-    })
-  }, [query, category])
-
-  const liveCount = TOOLS.filter((t) => t.implemented).length
+  const searchInput = useRef<HTMLInputElement>(null)
+  const filtered = useMemo(() => TOOLS.filter(tool =>
+    (category === 'all' || tool.category === category) && matchesTool(tool, query),
+  ), [query, category])
+  const availableCount = filtered.filter(tool => tool.implemented).length
+  const selectedCategory = CATEGORIES.find(item => item.id === category)
+  const isFiltered = Boolean(query || category !== 'all')
+  const clearSearch = () => { setQuery(''); searchInput.current?.focus() }
+  const reset = () => { setQuery(''); setCategory('all'); searchInput.current?.focus() }
 
   return (
     <section aria-label="Tool catalog" className="catalog">
       <div className="search-row">
+        <label className="catalog-search-label" htmlFor="catalog-search">Search tools</label>
         <div className="search-box">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
           </svg>
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${TOOLS.length} tools…`}
-            aria-label="Search tools"
-          />
+          <input ref={searchInput} id="catalog-search" type="search" value={query} maxLength={100}
+            onChange={event => setQuery(event.target.value)}
+            onKeyDown={event => { if (event.key === 'Escape') clearSearch() }}
+            placeholder="Try merge, rotate or JPG…" aria-label="Search tools"
+            aria-describedby="catalog-search-help" aria-controls="catalog-results" />
+          <button type="button" className="catalog-clear" onClick={clearSearch} disabled={!query} aria-label="Clear search">Clear</button>
           <kbd aria-hidden="true">/</kbd>
         </div>
+        <p id="catalog-search-help" className="catalog-search-help">Search by task or format. Press / to search, or Escape to clear your search.</p>
       </div>
-
       <div className="category-row" role="group" aria-label="Filter by category">
-        <button
-          type="button"
-          className="cat-chip"
-          aria-pressed={category === 'all'}
-          onClick={() => setCategory('all')}
-        >
-          All
+        <button type="button" className="cat-chip" aria-pressed={category === 'all'} onClick={() => setCategory('all')}>
+          All tools <span className="catalog-chip-count" aria-hidden="true">{TOOLS.length}</span>
         </button>
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            className="cat-chip"
-            aria-pressed={category === c.id}
-            onClick={() => setCategory(c.id)}
-            title={c.description}
-          >
-            {c.title}
+        {CATEGORIES.map(item => (
+          <button type="button" className="cat-chip" key={item.id} aria-pressed={category === item.id}
+            onClick={() => setCategory(item.id)} title={item.description}>
+            {item.title} <span className="catalog-chip-count" aria-hidden="true">{TOOLS.filter(tool => tool.category === item.id).length}</span>
           </button>
         ))}
       </div>
-
-      {filtered.length === 0 ? (
-        <p className="empty-state" role="status">
-          No tools match “{query}”. Try another search or pick a category.
-        </p>
-      ) : (
-        <ul className="tool-grid">
-          {filtered.map((t) => (
-            <li key={t.id}>
-              <ToolCard tool={t} />
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <p className="visually-hidden" role="status">
-        {liveCount} of {TOOLS.length} tools are currently available.
-      </p>
+      <div className="catalog-results-heading">
+        <p role="status" aria-live="polite" aria-atomic="true">{filtered.length} {filtered.length === 1 ? 'tool' : 'tools'} {isFiltered ? 'found' : 'in your toolbox'} · {availableCount} ready to use</p>
+        <button type="button" className="catalog-reset" disabled={!isFiltered} onClick={reset}>Reset filters</button>
+      </div>
+      {selectedCategory ? <p className="catalog-category-help">{selectedCategory.description}</p> : null}
+      <div id="catalog-results">
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <h3>No matching tools</h3>
+            <p>{query.trim() ? `No tools match “${query.trim()}”${selectedCategory ? ` in ${selectedCategory.title}` : ''}.` : 'There are no tools in this category yet.'}</p>
+            <p>Try a shorter task name, choose another category, or reset the filters to see the full toolbox.</p>
+          </div>
+        ) : (
+          <ul className="tool-grid">{filtered.map(tool => <li key={tool.id}><ToolCard tool={tool} /></li>)}</ul>
+        )}
+      </div>
+      <p className="catalog-limits">Files up to {QUOTAS.maxInputBytes / (1024 * 1024)} MiB each. Page, output and device-memory limits vary by tool; check the limits before processing.</p>
     </section>
   )
 }
