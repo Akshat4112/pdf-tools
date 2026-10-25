@@ -24,7 +24,7 @@
 .reader-print > label { display: grid; gap: 6px; font-size: 14px; }
 .reader-search > label:first-child { flex: 1 1 220px; }
 .reader-search .reader-case { display: flex; align-items: center; min-height: 44px; }
-.reader-workspace input:not([type=checkbox]), .reader-workspace select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); min-width: 0; max-width: 100%; }
+:is(.reader-toolbar,.reader-search,.reader-print) input:not([type=checkbox]), :is(.reader-toolbar,.reader-search,.reader-print) select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); min-width: 0; max-width: 100%; }
 .reader-viewport-shell { position: relative; height: min(72vh, 800px); min-height: 360px; margin: 16px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--paper-3); }
 .reader-viewport { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain; }
 .reader-viewport .pdfViewer { min-width: 100%; }
@@ -41,6 +41,8 @@
 
 
 * { box-sizing: border-box; }
+/* PDF.js page dimensions describe the content; its transparent border is extra. */
+.reader-viewport .pdfViewer .page { box-sizing: content-box; }
 
 /* Shared by every FileSelection, including Merge and Split. Keep the native
    input available to the custom button without a second visible picker. */

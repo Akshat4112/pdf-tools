@@ -8,7 +8,7 @@ All 14 shipped tools use the same ToolEntry main landmark, breadcrumb back to th
 
 `workspaces.css` scopes typography, upload areas, file rows, panels, configuration fields, previews, action controls and focus treatment to the tool workspace. Controls have 44px minimum targets and visible 3px focus outlines. Error surfaces use the semantic danger colors. Mobile panels reduce padding and maintain wrapping. Help remains collapsed initially so it does not displace the utility.
 
-PDF.js page/text/annotation layers retain their geometry and native appearance; application control overrides explicitly exclude those layers. No filter or dark-mode inversion is applied to document canvases. No document or export code is changed.
+PDF.js page/text/annotation layers retain their geometry and native appearance; application control overrides explicitly exclude those layers. No filter or dark-mode inversion is applied to document canvases. The reader page restores PDF.js content-box sizing so the global app reset cannot shrink its canvas inside the page border at narrow widths. No document or export code is changed.
 
 ## Verification and captures
 
