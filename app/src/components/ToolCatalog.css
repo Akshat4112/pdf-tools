@@ -35,4 +35,4 @@
 .catalog-limits { margin-top:20px; }
 @media(max-width:420px) { .catalog .search-box kbd { display:none; } .catalog .search-box { gap:6px; padding-inline:8px; } .catalog .tool-card { padding:18px; } }
 @media(prefers-color-scheme:dark) { .catalog { --cd-text:#edf6f3; --cd-muted:#b8ccc8; --cd-surface:#192e39; --cd-line:#3c535d; --cd-subtle:#213d43; --cd-accent:#79dcc6; } }
-@media(prefers-reduced-motion:reduce) { .catalog .tool-card,.catalog .cat-chip,.catalog .search-box { transition:none; transform:none; } }
+@media(prefers-reduced-motion:reduce) { .catalog .tool-card,.catalog a.tool-card:hover,.catalog a.tool-card:focus-visible,.catalog .cat-chip,.catalog .search-box { transition:none; transform:none; } }
