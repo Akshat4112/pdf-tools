@@ -90,6 +90,9 @@ jobs:
       - name: JPG and PNG conversion engine browser checks
         run: npm run test:images-engine
 
+      - name: Full dependency audit gate
+        run: npm audit --audit-level=high
+
       - name: Production dependency audit gate
         run: npm audit --omit=dev --audit-level=high
 
