@@ -1,4 +1,4 @@
-/* PT-UI-001: FolioLocal homepage; scoped to home only. */
+/* PT-UI-001: PDF Tools homepage; scoped to home only. */
 .fl-home { --fl-page:#f5f8f7; --fl-surface:#fff; --fl-text:#142d3a; --fl-muted:#4b606a; --fl-line:#d4dfdc; --fl-teal:#08796d; --fl-subtle:#eaf7f3; color:var(--fl-text); }
 .fl-home .fl-eyebrow { font-size:.77rem; font-weight:750; letter-spacing:.12em; color:var(--fl-teal); margin:0 0 10px; }
 .fl-hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(220px,.8fr); align-items:center; gap:28px; padding:52px 0 30px; }

@@ -59,7 +59,7 @@ function App() {
           <div className="fl-hero-copy">
             <p className="fl-eyebrow">FREE FOREVER · OPEN SOURCE</p>
             <h1 id="home-heading">PDF tools that work in your browser.</h1>
-            <p className="fl-lead">Merge, split, organize, read and convert PDFs with FolioLocal. Free forever, open source, and processed on your device — no account required.</p>
+            <p className="fl-lead">Merge, split, organize, read and convert PDFs with PDF Tools. Free forever, open source, and processed on your device — no account required.</p>
             <div className="fl-hero-actions">
               <a className="fl-cta" href="#tool-catalog">Explore all PDF tools <span aria-hidden="true">→</span></a>
               <a className="fl-secondary-link" href="https://github.com/Akshat4112/pdf-tools">View source code <span aria-hidden="true">↗</span></a>
@@ -113,7 +113,7 @@ function App() {
         </section>
       </main>
       <footer className="site-footer fl-home-footer">
-        <span>FolioLocal · Free and open-source PDF tools. <a href="https://github.com/Akshat4112/pdf-tools/blob/main/LICENSE">MIT license</a>.</span>
+        <span>PDF Tools · Free and open-source PDF tools. <a href="https://github.com/Akshat4112/pdf-tools/blob/main/LICENSE">MIT license</a>.</span>
         <span><a href="https://github.com/Akshat4112/pdf-tools/blob/main/docs/security/PT-SEC-002-local-processing-audit.md">How local processing works</a> · <a href="https://github.com/Akshat4112/pdf-tools">Source on GitHub</a></span>
       </footer>
     </div>

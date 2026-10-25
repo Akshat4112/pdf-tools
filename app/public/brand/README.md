@@ -1,4 +1,4 @@
-# FolioLocal brand assets
+# PDF Tools brand assets
 
 Usage, provenance, dimensions, licenses and integration handoff: [PT-BRAND-003](../../../docs/brand/PT-BRAND-003-asset-kit.md).
 

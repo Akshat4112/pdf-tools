@@ -1,6 +1,6 @@
 # PT-UI-004 — Tool discovery and search
 
-The catalog reuses FolioLocal's light/dark palette, original icons, registry routes and availability flags. Cards have consistent headings, descriptions, file-format cues and full-card links. Unavailable capabilities remain inert, visibly labelled cards. The file-limit cue comes from the shared quota and distinguishes tool/device limits.
+The catalog reuses PDF Tools's light/dark palette, original icons, registry routes and availability flags. Cards have consistent headings, descriptions, file-format cues and full-card links. Unavailable capabilities remain inert, visibly labelled cards. The file-limit cue comes from the shared quota and distinguishes tool/device limits.
 
 Search accepts multiple task/format words, punctuation, case differences and familiar aliases (join/combine, photos, metadata/properties, and similar). Aliases describe existing operations, not unavailable conversions or OCR. All words must match. Matching is local React state: no query URL, storage or analytics is introduced; titles, canonical URLs and sitemap stay unchanged.
 

@@ -1,4 +1,4 @@
-"""Validate documented FolioLocal reference contrast and HTML asset/ID wiring.
+"""Validate documented PDF Tools reference contrast and HTML asset/ID wiring.
 Run from any directory: python scripts/check_design_reference.py
 Uses only Python's standard library; prints measured pairs as JSON. No network.
 """

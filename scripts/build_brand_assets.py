@@ -1,4 +1,4 @@
-"""Build FolioLocal SVG sources and PNG/ICO exports (PT-BRAND-003).
+"""Build PDF Tools SVG sources and PNG/ICO exports (PT-BRAND-003).
 Requires Python fontTools, Inkscape and ImageMagick convert on PATH; no network or runtime changes.
 Run: python scripts/build_brand_assets.py
 Typography outlines come from the existing OFL overlay font, not a new font download.
@@ -61,23 +61,25 @@ def write(name, width, height, title, body):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    write('mark.svg',64,64,'FolioLocal document mark',mark())
-    write('mark-mono.svg',64,64,'FolioLocal monochrome mark',mono_mark(INK))
-    write('mark-reversed.svg',64,64,'FolioLocal reversed mark',mono_mark(WHITE))
-    write('favicon.svg',64,64,'FolioLocal',mark())
+    write('mark.svg',64,64,'PDF Tools document mark',mark())
+    write('mark-mono.svg',64,64,'PDF Tools monochrome mark',mono_mark(INK))
+    write('mark-reversed.svg',64,64,'PDF Tools reversed mark',mono_mark(WHITE))
+    write('favicon.svg',64,64,'PDF Tools',mark())
     for name, word_color, bg, fg in [('logo-light',INK,TEAL,WHITE),('logo-dark',WHITE,TEAL,WHITE),('logo-mono',INK,INK,WHITE),('logo-reversed',WHITE,WHITE,INK)]:
-        write(name+'.svg',330,64,'FolioLocal',(mono_mark(word_color) if name in ('logo-mono','logo-reversed') else mark(bg,fg))+text_paths('FolioLocal',82,46,43,word_color,-.3))
+        write(name+'.svg',330,64,'PDF Tools',(mono_mark(word_color) if name in ('logo-mono','logo-reversed') else mark(bg,fg))+text_paths('PDF Tools',82,46,43,word_color,-.3))
     for name,color in [('wordmark',INK),('wordmark-reversed',WHITE)]:
-        write(name+'.svg',250,64,'FolioLocal',text_paths('FolioLocal',0,46,43,color,-.3))
-    write('apple-touch-icon.svg',180,180,'FolioLocal touch icon',
+        write(name+'.svg',250,64,'PDF Tools',text_paths('PDF Tools',0,46,43,color,-.3))
+    write('apple-touch-icon.svg',180,180,'PDF Tools touch icon',
           f'<rect width="180" height="180" fill="{TEAL}"/><g transform="translate(26 26) scale(2)">{mark()}</g>')
     social=(f'<rect width="1200" height="630" fill="{MINT}"/>'
-            f'<g transform="translate(64 54)">{mark()}{text_paths("FolioLocal",82,46,43,INK,-.3)}</g>'
+            f'<g transform="translate(64 54)">{mark()}{text_paths("PDF Tools",82,46,43,INK,-.3)}</g>'
             +text_paths('Free PDF tools.',64,274,66)+text_paths('On your device.',64,354,66)
             +text_paths('Free forever  /  Open source',66,440,25,TEAL)
             +text_paths('akshat4112.github.io/pdf-tools/',66,558,20,INK)
             +f'<g transform="translate(886 196) scale(3.5)">{mark()}</g>')
-    write('social-card.svg',1200,630,'FolioLocal — Free PDF tools. On your device.',social)
+    write('social-card.svg',1200,630,'PDF Tools — Free PDF tools. On your device.',social)
+    # Keep the browser's existing public favicon path on the canonical document mark.
+    (ROOT / 'app/public/favicon.svg').write_bytes((OUT / 'favicon.svg').read_bytes())
     # Render SVG paths without depending on system fonts or external image resources.
     for source, target, size in [('favicon.svg','favicon-16.png',16),('favicon.svg','favicon-32.png',32),
                                  ('mark.svg','icon-192.png',192),('mark.svg','icon-512.png',512),
@@ -87,7 +89,7 @@ def main():
     # ICO is a container around the actual 16/32 PNG exports (ImageMagick 6).
     subprocess.run(['convert',str(OUT/'favicon-16.png'),str(OUT/'favicon-32.png'),str(OUT/'favicon.ico')],check=True,capture_output=True)
     (OUT/'FONT-LICENSE.txt').write_text((ROOT/'app/public/licenses/overlay-font.txt').read_text())
-    (OUT/'brand.json').write_text(json.dumps({'name':'FolioLocal','tagline':'Free PDF tools. On your device.',
+    (OUT/'brand.json').write_text(json.dumps({'name':'PDF Tools','tagline':'Free PDF tools. On your device.',
         'colors':{'ink':INK,'teal':TEAL,'mint':MINT,'white':WHITE},'asset_license':'MIT',
         'outlined_typeface':'Existing PDF Tools Sans derivative of Noto Sans; OFL-1.1 notice in FONT-LICENSE.txt',
         'source':'scripts/build_brand_assets.py'},indent=2)+'\n')

@@ -1,19 +1,19 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="app/public/brand/logo-dark.svg">
-  <img src="app/public/brand/logo-light.svg" alt="FolioLocal" width="280">
+  <img src="app/public/brand/logo-light.svg" alt="PDF Tools" width="280">
 </picture>
 
-# FolioLocal
+# PDF Tools
 
 **Free PDF tools. On your device.**
 
-Merge, split, organize, read and convert PDFs in your browser. FolioLocal is open source, requires no account, and processes your selected documents on your device instead of uploading them to a conversion server.
+Merge, split, organize, read and convert PDFs in your browser. PDF Tools is open source, requires no account, and processes your selected documents on your device instead of uploading them to a conversion server.
 
-**[Open FolioLocal](https://akshat4112.github.io/pdf-tools/)** · [Browse tools](https://akshat4112.github.io/pdf-tools/#tool-catalog) · [Report an issue](https://github.com/Akshat4112/pdf-tools/issues) · [MIT license](LICENSE)
+**[Open PDF Tools](https://akshat4112.github.io/pdf-tools/)** · [Browse tools](https://akshat4112.github.io/pdf-tools/#tool-catalog) · [Report an issue](https://github.com/Akshat4112/pdf-tools/issues) · [MIT license](LICENSE)
 
-The repository and site path remain `pdf-tools`; the product name is FolioLocal.
+The repository and site path are `pdf-tools`.
 
-## Why FolioLocal?
+## Why PDF Tools?
 
 - **Free forever for the browser-based tools we release:** no subscriptions, paid exports, account requirements or forced watermarks. File and browser limits apply.
 - **Local document processing:** file contents are handled in your browser, with no document-processing backend.
@@ -112,4 +112,4 @@ Keep contributions scoped to one task, verify relevant checks, and preserve the 
 
 Application code is [MIT licensed](LICENSE). Third-party libraries and fonts retain their own licenses and distribution requirements; see the [dependency decisions](docs/architecture/PT-PD-006-dependency-decisions.md) and [supply-chain policy](docs/security/PT-SEC-003-supply-chain.md).
 
-The original FolioLocal artwork, editable SVGs, export files and font notices are in the [brand asset kit](app/public/brand/README.md).
+The original PDF Tools artwork, editable SVGs, export files and font notices are in the [brand asset kit](app/public/brand/README.md).
