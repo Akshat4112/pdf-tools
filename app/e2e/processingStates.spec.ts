@@ -37,7 +37,7 @@ for (const tool of ['merge', 'split'] as const) {
       if (tool === 'split') await expect(page.getByRole('textbox', { name: 'Ranges (comma separated)' })).toHaveValue('1, 2-3')
       await expect(run).toBeEnabled()
     } finally { release() }
-    await page.unroute('**/assets/pdf.worker.min.mjs')
+    await page.unrouteAll({ behavior: 'wait' })
     await run.click()
     const result = page.getByRole('region', { name: 'Results', exact: true })
     await expect(result).toBeVisible()
