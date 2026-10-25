@@ -11,10 +11,9 @@
  * - PT-PD-003: nothing here writes to localStorage or any storage.
  */
 
-import { TOOLS } from '../registry'
 
 export * from './pageMetadata'
-import { SITE_URL, CATALOG_META, toolPageMeta, pageMetaTags, type PageMeta } from './pageMetadata'
+import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -66,7 +65,7 @@ export function sitemapLastmod(date = new Date()): string {
  * Only canonical, indexable pages — no query/user URLs can ever appear.
  */
 export function buildSitemapXml(lastmod = sitemapLastmod()): string {
-  const urls = [CATALOG_META.canonical, ...TOOLS.map((t) => toolPageMeta(t).canonical)]
+  const urls = PUBLIC_PAGES.map(page => page.canonical)
   const entries = urls
     .map(
       (u) =>

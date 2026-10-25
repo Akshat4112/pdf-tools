@@ -1,3 +1,4 @@
+import { HUBS, hubPath, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
 
@@ -62,6 +63,10 @@ export function toolMetaById(id: ToolId): PageMeta {
   return toolPageMeta(getTool(id))
 }
 
+export function hubPageMeta(hub: CategoryHub): PageMeta {
+  return { title: `${hub.title} — PDF Tools`, description: `${hub.description} Free tools in your browser.`, canonical: `${SITE_URL}${hubPath(hub).slice(1)}/`, ogType: 'website' }
+}
+
 /** 404 page metadata (also used by 404.html). */
 export const NOT_FOUND_META: PageMeta = {
   title: 'Page not found — PDF Tools',
@@ -74,6 +79,7 @@ export const NOT_FOUND_META: PageMeta = {
 /** Only implemented tool routes may be advertised in generated entry pages. */
 export const PUBLIC_PAGES = [
   { dir: '.', ...CATALOG_META },
+  ...HUBS.map(hub => ({ dir: hubPath(hub).slice(1), ...hubPageMeta(hub) })),
   ...TOOLS.filter(tool => tool.implemented).map(tool => ({ dir: tool.route.slice(1), ...toolPageMeta(tool) })),
 ]
 

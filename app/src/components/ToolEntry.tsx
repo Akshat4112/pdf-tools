@@ -1,3 +1,4 @@
+import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHubs'
 /**
  * Generated tool entry page — PT-UX-004.
  *
@@ -107,9 +108,7 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   return <main id="main-content" className="tool-workspace">
     <div className="workspace-context">
-      <nav className="workspace-breadcrumb" aria-label="Breadcrumb">
-        <a href={SITE_BASE}>All PDF tools</a><span aria-hidden="true">/</span><span aria-current="page">{tool.title}</span>
-      </nav>
+      <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />
       {tool.implemented ? <details className="workspace-help">
         <summary>How to use this tool</summary>
         <p>{TOOL_HELP[tool.id]}</p>
@@ -117,6 +116,6 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       </details> : null}
     </div>
     <ToolContent tool={tool} onExit={onExit} />
-    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) }} /> : null}
+    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) }} /> : null}
   </main>
 }
