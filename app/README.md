@@ -1,4 +1,4 @@
-# FolioLocal application
+# PDF Tools application
 
 This directory contains the React/TypeScript browser application. Start with the [project README](../README.md) for available tools, privacy boundaries, limitations and contribution guidance.
 
@@ -80,7 +80,7 @@ See the [CI workflow](../.github/workflows/checks.yml) for the authoritative ful
 | `src/session/`, `src/jobs/` | In-memory resources and job orchestration. |
 | `src/security/`, `src/outputs/` | PDF loading/filename policies and output verification. |
 | `e2e/` | Browser journeys, privacy audits and downloaded-output checks. |
-| `public/brand/` | FolioLocal logo, icon and social artwork with license notices. |
+| `public/brand/` | PDF Tools logo, icon and social artwork with license notices. |
 | `vite.config.ts` | Project base, PDF.js asset copying and generated static route pages. |
 
 Use synthetic documents for tests. Do not commit private files or document-bearing debug artifacts. Application changes must preserve the [local data lifecycle](../docs/product/PT-PD-003-data-lifecycle.md) and the [contributor workflow](../docs/operations/PT-OPS-001-pr-task-workflow.md).

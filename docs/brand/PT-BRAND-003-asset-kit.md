@@ -1,12 +1,12 @@
-# PT-BRAND-003 — FolioLocal logo and brand asset kit
+# PT-BRAND-003 — PDF Tools logo and brand asset kit
 
 Prepared 2026-10-15. Status: ready for review. Depends on accepted positioning (PR #44) and name/URL strategy (PR #45). Source assets: [`app/public/brand`](../../app/public/brand/). Review sheet: [`index.html`](../../app/public/brand/index.html).
 
 ## Identity and provenance
 
-The original mark combines a folded document with an offset lower sheet suggesting an L. It represents document work on the user's device; it is not a shield, certificate or promise that a document is encrypted. Geometry was drawn for this project in the generator, without tracing a competitor or using stock artwork.
+The original mark combines a folded document with an offset lower sheet. It represents document work on the user's device; it is not a shield, certificate or promise that a document is encrypted. Geometry was drawn for this project in the generator, without tracing a competitor or using stock artwork.
 
-The wordmark is **FolioLocal**, using outlined glyphs from the repository's existing PDF Tools Sans derivative of Noto Sans. There is no new font download, runtime font request or icon library. SVG paths remain editable in a vector editor; edit the text and geometry in the generator to regenerate the kit. Do not substitute a system font and still call it the canonical logo.
+The wordmark is **PDF Tools**, using outlined glyphs from the repository's existing PDF Tools Sans derivative of Noto Sans. There is no new font download, runtime font request or icon library. SVG paths remain editable in a vector editor; edit the text and geometry in the generator to regenerate the kit. Do not substitute a system font and still call it the canonical logo.
 
 Original mark/artwork and generator follow the repository's [MIT license](../../LICENSE). Typeface provenance and the existing OFL-1.1 notice are included in [`FONT-LICENSE.txt`](../../app/public/brand/FONT-LICENSE.txt). The font itself remains under OFL; the rendered wordmark/artwork is not a newly redistributed font. No fonts or photos with unknown licenses were introduced. This records asset provenance, not trademark exclusivity.
 
@@ -35,12 +35,12 @@ The social artwork uses the accepted tagline **“Free PDF tools. On your device
 - Use the light logo on white/mint and the dark logo on ink. Use single-ink files when color reproduction is unavailable. Reversed assets have transparent cutouts and must sit on a dark surface. Do not treat the teal and white primary mark as a one-ink print file.
 - Colors: ink `#142D3A`, teal `#08796D`, mint `#EAF7F3`, white `#FFFFFF`. These are identity colors, not a complete UI token system; PT-BRAND-004 defines semantic states and component styles.
 - Measured sRGB contrast: teal/white **5.29:1**, teal/mint **4.82:1**, ink/white **14.32:1**, ink/mint **13.02:1**. White wordmark on ink also measures 14.32:1. The mark on dark ink uses distinct white strokes; its teal outer tile must not become a UI focus/selection boundary by itself. Recheck any new surface/pairing in the visual-system task.
-- For an image-only home link, use `alt="FolioLocal — home"`. If visible adjacent text already says FolioLocal, the duplicate mark uses empty alt / `aria-hidden`. When inserting SVG markup inline, use unique title/mask IDs per instance or the corresponding `img` asset to avoid ID collisions. The external SVGs contain accessible titles; HTML `img` still needs contextual alt text.
+- For an image-only home link, use `alt="PDF Tools — home"`. If visible adjacent text already says PDF Tools, the duplicate mark uses empty alt / `aria-hidden`. When inserting SVG markup inline, use unique title/mask IDs per instance or the corresponding `img` asset to avoid ID collisions. The external SVGs contain accessible titles; HTML `img` still needs contextual alt text.
 - Future social metadata should use a stable absolute public image URL, PNG dimensions, and descriptive image alt text. Never render a user's PDF as an OG image. PT-SEO-005 owns metadata wiring and platform preview verification.
 
 ## Build and verification
 
-Run `python scripts/build_brand_assets.py` from the repository root. Build tools: Python fontTools, Inkscape, and ImageMagick's `convert` (ICO container). They are development/export tools, not application dependencies. The script reads the existing font from `app/src/assets/overlayFont.ts`, writes only this asset directory, and makes no network requests. It does not rewrite the review HTML. Keep the generated outputs committed so ordinary app builds need none of these export tools.
+Run `python scripts/build_brand_assets.py` from the repository root. Build tools: Python fontTools, Inkscape, and ImageMagick's `convert` (ICO container). They are development/export tools, not application dependencies. The script reads the existing font from `app/src/assets/overlayFont.ts`, writes this asset directory and the matching public favicon, and makes no network requests. It does not rewrite the review HTML. Keep the generated outputs committed so ordinary app builds need none of these export tools.
 
 Verification performed:
 

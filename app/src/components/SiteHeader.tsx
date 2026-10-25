@@ -40,7 +40,7 @@ export function SiteHeader() {
   return (
     <header className="folio-header" ref={root}>
       <div className="folio-header-row">
-        <a className="folio-home" href={SITE_BASE} aria-label="FolioLocal home" onClick={() => {
+        <a className="folio-home" href={SITE_BASE} aria-label="PDF Tools home" onClick={() => {
           setOpen(false)
           root.current?.querySelectorAll('details[open]').forEach(detail => detail.removeAttribute('open'))
         }}>

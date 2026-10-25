@@ -1,6 +1,6 @@
 # PT-TRUST-001 — Evidence-backed privacy and product copy
 
-Status: proposed publication copy specification (2026-10-23). **This document alone does not publish website copy.** Product: **FolioLocal** at https://akshat4112.github.io/pdf-tools/. Scope: shipped browser-only R1 tools; changes to processing architecture require revalidation.
+Status: proposed publication copy specification (2026-10-23). **This document alone does not publish website copy.** Product: **PDF Tools** at https://akshat4112.github.io/pdf-tools/. Scope: shipped browser-only R1 tools; changes to processing architecture require revalidation.
 
 ## Source-of-truth evidence and scope
 
@@ -14,7 +14,7 @@ Status: proposed publication copy specification (2026-10-23). **This document al
 
 | Public claim | Approved wording | Evidence | Mandatory qualifier / placement |
 | --- | --- | --- | --- |
-| Product identity | “FolioLocal — everyday PDF tools” | Brand name decision and shipped catalog | Do not imply every imagined tool is shipped. |
+| Product identity | “PDF Tools — everyday PDF tools” | Brand name decision and shipped catalog | Do not imply every imagined tool is shipped. |
 | Price | “Free forever for the browser-based PDF tools we release.” | PT-BRAND-001 commitment | No subscription, paywall, account, paid export or forced watermark on promised local tools. Browser/file limits apply; optional future cloud services are not part of this promise. |
 | Open source | “Open source · MIT-licensed application.” | Root LICENSE, public GitHub repo | Link to repo/license; don't say every dependency or downstream fork is MIT/free. |
 | Account | “No account required.” | R1 flows, PT-SEC-002 | Only released browser workflows; no guarantee for unbuilt optional future services. |
@@ -29,7 +29,7 @@ Status: proposed publication copy specification (2026-10-23). **This document al
 
 ### Homepage (PT-UI-001)
 - **Hero heading:** “PDF tools that work in your browser.”
-- **Subtitle:** “Merge, split, organize, read and convert PDFs with FolioLocal. Free forever, open source, and processed on your device — no account required.”
+- **Subtitle:** “Merge, split, organize, read and convert PDFs with PDF Tools. Free forever, open source, and processed on your device — no account required.”
 - **Trust strip:** “Free forever for local tools” · “Open source (MIT)” · “Files processed in your browser” · “No account required”.
 - **How it works:** “Choose a tool, select files on your device, then download the result. In the current release, document processing runs in your browser rather than uploading files to a conversion server.”
 - **Disclosure link label:** “How local processing and privacy work” (point to the real PT-REL-001 privacy/help URL **only after that page ships**; until then link to PT-SEC-002 evidence instead, with an accurate label).
@@ -40,7 +40,7 @@ Status: proposed publication copy specification (2026-10-23). **This document al
 - “Privacy” should link to a **real existing** resource until PT-REL-001 publishes the privacy route. Never use a dead link or disguise a GitHub specification as a legal privacy policy.
 
 ### Footer (PT-UI-003)
-- Short: “FolioLocal — free and open-source PDF tools. Documents are processed on your device in this browser-based release.”
+- Short: “PDF Tools — free and open-source PDF tools. Documents are processed on your device in this browser-based release.”
 - Links: Source (public repository), MIT license (root LICENSE), How privacy works (the eventual published PT-REL-001 page), Help/limitations (once published).
 - **Small-print note near privacy copy:** “Loading this site contacts GitHub Pages, which logs visitor IP addresses for security. Clearing files does not remove files you downloaded or printed.”
 - Keep copyright and license attribution factual; no fabricated certificates/security badges.

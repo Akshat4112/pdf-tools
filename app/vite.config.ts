@@ -115,7 +115,7 @@ function prerenderRoutes(): Plugin {
         const noJs = dir === '404'
           ? `<h1>Page not found</h1><p>This page does not exist. <a href="${ORIGIN}">Browse PDF tools</a>.</p>`
           : dir === '.'
-            ? `<h1>Free PDF tools in your browser</h1><p>FolioLocal provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>`
+            ? `<h1>Free PDF tools in your browser</h1><p>PDF Tools provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>`
             : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`
         html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main>${noJs}</main></noscript>`)
         return html

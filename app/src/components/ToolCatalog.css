@@ -1,4 +1,4 @@
-/* PT-UI-004: FolioLocal discovery palette, independent of document rendering. */
+/* PT-UI-004: PDF Tools discovery palette, independent of document rendering. */
 .catalog { --cd-text:#142d3a; --cd-muted:#4b606a; --cd-surface:#fff; --cd-line:#d4dfdc; --cd-subtle:#eaf7f3; --cd-accent:#08796d; --cd-control:#70838a; --cd-focus:#08796d; color:var(--cd-text); }
 .catalog .search-row { padding-bottom:4px; }
 .catalog-search-label { display:block; font-size:1rem; font-weight:650; margin-bottom:10px; }

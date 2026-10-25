@@ -29,7 +29,7 @@ function validate(dir:string) {
 }
 for(const tool of TOOLS.filter(t=>t.implemented)) test(`independent output: ${tool.id}`,async({page})=>{
   test.setTimeout(90_000)
-  const route=tool.route.slice(1),dir=await mkdtemp(join(tmpdir(),'foliolocal-output-'))
+  const route=tool.route.slice(1),dir=await mkdtemp(join(tmpdir(),'pdf-tools-output-'))
   try {
     const bytes=await source();await writeFile(join(dir,'source.pdf'),bytes)
     await page.goto(`${route}/`)
@@ -119,7 +119,7 @@ for(const tool of TOOLS.filter(t=>t.implemented)) test(`independent output: ${to
 // Forms/annotations are reviewed separately: page-copy output does not promise interactive preservation.
 for(const fixture of ['F-001-plain-text-3p.pdf','F-002-plain-text-30p.pdf','F-003-mixed-sizes.pdf','F-004-rotated-pages.pdf','F-005-form-acroform.pdf','F-006-annotations.pdf','F-007-image-page.pdf','F-008-scan-like.pdf','F-009-signed-marker.pdf','F-014-outline.pdf','F-015-pages-60p.pdf']) test(`independent corpus export: ${fixture}`,async({page})=>{
   test.setTimeout(120_000)
-  const dir=await mkdtemp(join(tmpdir(),'foliolocal-corpus-'))
+  const dir=await mkdtemp(join(tmpdir(),'pdf-tools-corpus-'))
   try {
     const bytes=await readFile(`../fixtures/pdf/${fixture}`);await writeFile(join(dir,'source.pdf'),bytes)
     await page.goto('extract-pages/');await page.locator('input[type=file]').setInputFiles({name:'source.pdf',mimeType:'application/pdf',buffer:bytes})
@@ -133,7 +133,7 @@ for(const fixture of ['F-001-plain-text-3p.pdf','F-002-plain-text-30p.pdf','F-00
 })
 
 for(const fixture of ['F-007-photo.jpg','F-013-diagram.png']) test(`independent image corpus export: ${fixture}`,async({page})=>{
-  const dir=await mkdtemp(join(tmpdir(),'foliolocal-image-'))
+  const dir=await mkdtemp(join(tmpdir(),'pdf-tools-image-'))
   try {
     const path=`../fixtures/images/${fixture}`
     await page.goto('images-to-pdf/');await page.locator('input[type=file]').setInputFiles(path)
