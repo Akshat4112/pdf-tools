@@ -71,7 +71,18 @@ jobs:
           sudo apt-get update && sudo apt-get install -y qpdf
 
       - name: Extract and Delete Pages browser regression checks
+        env:
+          PDF_TOOLS_CATALOG_VISUAL_DIR: ${{ runner.temp }}/catalog-visuals
         run: npm run test:pages-ui -- --max-failures=1
+
+      # Only empty tool-catalog captures from toolDiscovery.spec.ts. No document screenshots.
+      - name: Empty catalog visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-discovery-${{ github.sha }}
+          path: ${{ runner.temp }}/catalog-visuals/*.png
+          retention-days: 1
+          if-no-files-found: error
 
       - name: JPG and PNG conversion engine browser checks
         run: npm run test:images-engine
