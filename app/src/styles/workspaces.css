@@ -20,7 +20,7 @@
 .tool-workspace .file-error { color:var(--fl-danger); }
 .tool-workspace :is(input:not([type=file]):not([type=checkbox]):not([type=radio]),select,textarea):not(:where(.pdfViewer *, .textLayer *, .annotationLayer *)),
 .tool-workspace #overlay-preview-page { min-height:44px; max-width:100%; border-color:var(--fl-control); border-radius:var(--fl-radius-sm); font-family:var(--fl-font); color:var(--fl-text); background:var(--fl-surface); }
-.tool-workspace input:is([type=checkbox],[type=radio]) { accent-color:var(--fl-accent); }
+.tool-workspace input:is([type=checkbox],[type=radio]):not(:where(.pdfViewer *, .textLayer *, .annotationLayer *)) { accent-color:var(--fl-accent); }
 .tool-workspace .split-mode { background:var(--fl-surface); border-color:var(--fl-control); min-height:64px; }
 .tool-workspace .split-mode.is-active { background:var(--fl-subtle); border-color:var(--fl-accent); }
 .tool-workspace .page-pick { border-color:var(--fl-control); }
