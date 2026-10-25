@@ -156,7 +156,7 @@ test('download URLs are reused/revoked and cancellation discards a late conversi
   await page.evaluate(()=>{const state=window as unknown as {holdImageDecode:boolean;pendingImageDecodes:(()=>void)[]};state.holdImageDecode=false;state.pendingImageDecodes.splice(0).forEach(release=>release())})
   await expect(page.getByText('No images selected yet.')).toBeVisible();await expect(page.getByRole('region',{name:'Results'})).toHaveCount(0)
   await choose(page,[{name:'retry.png',bytes:png()}]);await exported(page)
-  await page.getByRole('button',{name:'Continue to another tool',exact:true}).click();expect(await count()).toBe(0)
+  await page.getByRole('button',{name:'Back to all tools',exact:true}).click();expect(await count()).toBe(0)
 })
 
 test('file-size guards skip reads, and clear/exit discard pending file reads',async({page})=>{

@@ -101,7 +101,7 @@ test('download URLs are reused and revoked when adjusting, resetting or exiting'
   await page.goto('page-numbers/');await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await download(page);expect(await count()).toBe(1)
   await page.getByRole('button',{name:'Adjust settings',exact:true}).click();expect(await count()).toBe(0);await preview(page)
   await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Start over',exact:true}).click();expect(await count()).toBe(0)
-  await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Continue to another tool',exact:true}).click();expect(await count()).toBe(0)
+  await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Back to all tools',exact:true}).click();expect(await count()).toBe(0)
 })
 
 test('cancelling held text work terminates workers and retries retained settings without stale output',async({page})=>{

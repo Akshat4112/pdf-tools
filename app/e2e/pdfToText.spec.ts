@@ -87,7 +87,7 @@ test('download URLs are reused, revoked on retry/reset/exit and long text previe
   await page.getByRole('button', { name: 'Adjust settings', exact: true }).click(); expect(await count()).toBe(0)
   await convert(page); await download(page); await page.getByRole('button', { name: 'Start over', exact: true }).click(); expect(await count()).toBe(0)
   await choose(page); await convert(page); await download(page)
-  await page.getByRole('button', { name: 'Continue to another tool', exact: true }).click(); expect(await count()).toBe(0)
+  await page.getByRole('button', { name: 'Back to all tools', exact: true }).click(); expect(await count()).toBe(0)
 })
 
 for (const action of ['GetDocRequest', 'GetTextContent']) test(`cancelling pending ${action} terminates loading/text work and discards late output`, async ({ page }) => {
