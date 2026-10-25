@@ -13,6 +13,7 @@
  */
 
 import type { ToolDefinition } from '../registry'
+import { toolArticleHtml } from '../lib/toolContent'
 import { SITE_BASE } from '../lib/seo'
 import { MergeTool } from './MergeTool'
 import { SplitTool } from './SplitTool'
@@ -116,5 +117,6 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       </details> : null}
     </div>
     <ToolContent tool={tool} onExit={onExit} />
+    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) }} /> : null}
   </main>
 }

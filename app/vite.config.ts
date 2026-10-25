@@ -1,3 +1,5 @@
+import { TOOLS } from './src/registry.ts'
+import { toolArticleHtml } from './src/lib/toolContent.ts'
 import { CATALOG_META, NOT_FOUND_META, PUBLIC_PAGES, SITE_URL, withPageMetadata } from './src/lib/pageMetadata.ts'
 import react from '@vitejs/plugin-react'
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -71,7 +73,9 @@ function prerenderRoutes(): Plugin {
           : dir === '.'
             ? `<h1>Free PDF tools in your browser</h1><p>PDF Tools provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>`
             : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`
-        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main>${noJs}</main></noscript>`)
+        const tool = TOOLS.find(tool => tool.implemented && tool.route.slice(1) === dir)
+        const article = tool ? toolArticleHtml(tool.id, tool.title) : ''
+        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main>${noJs}${article}</main></noscript>`)
         return html
       }
 

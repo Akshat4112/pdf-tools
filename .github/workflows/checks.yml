@@ -70,6 +70,9 @@ jobs:
           pip install pymupdf==1.28.0
           sudo apt-get update && sudo apt-get install -y qpdf
 
+      - name: Public tool guide browser checks
+        run: npx playwright test toolContent.spec.ts --max-failures=1
+
       - name: Shared workspace browser checks
         env:
           PDF_TOOLS_WORKSPACE_VISUAL_DIR: ${{ runner.temp }}/workspace-visuals
@@ -96,7 +99,7 @@ jobs:
         run: npx playwright test toolDiscovery.spec.ts --max-failures=1
 
       - name: R1 browser regression checks
-        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery|PT-UI-006|PT-SEO-005 metadata|PT-UI-005 workspaces'
+        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery|PT-UI-006|PT-SEO-005 metadata|PT-UI-005 workspaces|PT-SEO-003 public guides'
 
       # Only empty tool-catalog captures from toolDiscovery.spec.ts. No document screenshots.
       - name: Empty catalog visual review
