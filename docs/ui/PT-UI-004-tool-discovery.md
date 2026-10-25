@@ -13,3 +13,5 @@ Validation includes task/format lookup and unavailable-card unit tests; browser 
 Footer/help/trust content tasks retain their declared dependencies. PT-UI-004 depends only on merged PT-UI-001 and PT-BRAND-004 and is independent of security maintenance PR #58. Public help/privacy is PT-REL-001; this task does not publish those pages or claim broad browser/device validation.
 
 CI captures only the empty catalog in light/dark at 320/1440px, with a dedicated variable used exclusively in the discovery test. Those PNG files are the only uploaded visual artifacts, retained one day. Document tests keep screenshots/video/traces disabled. Local Chrome launch was blocked by the environment; use exact-head CI browser results and these catalog captures for visual review.
+
+The six discovery scenarios run first in CI; the following R1 regression step explicitly excludes that already-run describe group and executes the other 200 scenarios. This preserves all 206 interface scenarios while failing quickly on discovery regressions. Theme colors change without color transitions, so control boundaries do not briefly inherit low-contrast colors from the previous theme.

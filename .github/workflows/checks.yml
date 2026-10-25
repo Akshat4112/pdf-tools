@@ -70,10 +70,13 @@ jobs:
           pip install pymupdf==1.28.0
           sudo apt-get update && sudo apt-get install -y qpdf
 
-      - name: Extract and Delete Pages browser regression checks
+      - name: Tool discovery browser checks
         env:
           PDF_TOOLS_CATALOG_VISUAL_DIR: ${{ runner.temp }}/catalog-visuals
-        run: npm run test:pages-ui -- --max-failures=1
+        run: npx playwright test toolDiscovery.spec.ts --max-failures=1
+
+      - name: R1 browser regression checks
+        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery'
 
       # Only empty tool-catalog captures from toolDiscovery.spec.ts. No document screenshots.
       - name: Empty catalog visual review

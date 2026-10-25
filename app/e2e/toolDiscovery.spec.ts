@@ -3,6 +3,7 @@ import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { CATEGORIES, TOOLS, QUOTAS } from '../src/registry'
 
+test.describe('PT-UI-004 discovery', () => {
 // Empty catalog only. No document inputs, captured document images or external requests.
 test('task discovery combines search and categories, announces results and retains focus', async ({ page }) => {
   await page.goto('./')
@@ -66,7 +67,7 @@ test('discovery is readable and usable in both themes, narrow layouts and zoom-e
         return {text:ratio(getComputedStyle(desc).color,getComputedStyle(desc.closest('.tool-card')!).backgroundColor),control:ratio(field.borderTopColor,field.backgroundColor)}
       })
       expect(contrast.text).toBeGreaterThanOrEqual(4.5)
-      expect(contrast.control).toBeGreaterThanOrEqual(3)
+      expect(contrast.control, `Control boundary at ${width}px in ${colorScheme}`).toBeGreaterThanOrEqual(3)
     }
   }
   for(const category of CATEGORIES) {
@@ -87,4 +88,6 @@ test('all enabled result cards lead to working tool routes',async({page})=>{
     await expect(page).toHaveURL(new RegExp(`/pdf-tools${tool.route}/?$`))
     await expect(page.locator('input[type=file]')).toHaveCount(1)
   }
+})
+
 })
