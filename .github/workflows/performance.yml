@@ -32,6 +32,9 @@ jobs:
       - name: Build candidate
         run: npm run build
         working-directory: app
+      - name: Lazy workspace request and recovery checks
+        run: npx playwright test startupPerformance.spec.ts
+        working-directory: app
       - name: Compare cold mobile startup on the same runner
         shell: bash
         run: |
