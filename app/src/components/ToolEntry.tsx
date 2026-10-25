@@ -49,7 +49,7 @@ function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   )
 }
 
-export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
+function ToolContent({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   if (tool.implemented) {
     // mounted workspaces per tool id — one case per shipped PT-CORE interface
     switch (tool.id) {
@@ -82,4 +82,39 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
     }
   }
   return <ToolWorkInProgress tool={tool} />
+}
+
+
+const TOOL_HELP: Record<ToolDefinition['id'], string> = {
+  merge: 'Choose at least two PDFs, put them in the required order and select Merge PDFs. Download the verified new copy; your originals are unchanged.',
+  split: 'Choose a PDF and split it by ranges, every N pages or one file per page. Review the parts before splitting, then download the ZIP.',
+  rotate: 'Choose a PDF, select pages and rotate them in 90-degree steps. Review the preview and create a new copy.',
+  'delete-pages': 'Choose a PDF and mark the pages to remove. Confirm the deletion review before creating a new copy. Keep at least one page.',
+  'extract-pages': 'Choose a PDF and select pages using thumbnails or page ranges. Review the output order before creating a new PDF.',
+  organize: 'Choose a PDF, then reorder, rotate, duplicate or remove pages. Use undo if needed and review the output order before saving a new copy.',
+  'images-to-pdf': 'Choose JPG or PNG images, arrange their order and set page size, fit and margins. Review the layout, then create one PDF with one image per page.',
+  'pdf-to-jpg': 'Choose a PDF and the pages to render. Set resolution and JPG quality, then create images. Download them individually or together as a ZIP.',
+  'pdf-to-png': 'Choose a PDF and pages to render. Set resolution and a white or transparent background. Download the generated images or a ZIP.',
+  reader: 'Choose a PDF to read, zoom, search its existing text, copy or print. Image-only pages cannot be searched without OCR.',
+  'page-numbers': 'Choose a PDF and pages to number, then set the starting number, position and style. Wait for the modified preview before applying it.',
+  watermark: 'Choose a PDF and watermark text, position, opacity and pages. Wait for the modified preview before applying it. A watermark does not remove underlying content.',
+  'pdf-to-text': 'Choose a PDF to export its existing text layer as UTF-8 TXT. Scanned pages need OCR, which is not available in this tool.',
+  'doc-info': 'Choose a PDF and select Inspect PDF to view metadata and page dimensions. Password-protected files show a limited report. Signature indicators do not validate authenticity.',
+}
+
+/** The same lightweight chrome wraps every shipped workspace without owning its state. */
+export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
+  return <main id="main-content" className="tool-workspace">
+    <div className="workspace-context">
+      <nav className="workspace-breadcrumb" aria-label="Breadcrumb">
+        <a href={SITE_BASE}>All PDF tools</a><span aria-hidden="true">/</span><span aria-current="page">{tool.title}</span>
+      </nav>
+      {tool.implemented ? <details className="workspace-help">
+        <summary>How to use this tool</summary>
+        <p>{TOOL_HELP[tool.id]}</p>
+        <p>Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.</p>
+      </details> : null}
+    </div>
+    <ToolContent tool={tool} onExit={onExit} />
+  </main>
 }

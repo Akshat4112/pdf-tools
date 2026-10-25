@@ -1,7 +1,7 @@
 /* PT-UI-002: scoped brand tokens, independent of document/workspace styling. */
 .folio-header {
-  --fh-text: #142d3a; --fh-muted: #4b606a; --fh-surface: #ffffff;
-  --fh-subtle: #eaf7f3; --fh-accent: #08796d; --fh-line: #d4dfdc;
+  --fh-text:var(--fl-text); --fh-muted:var(--fl-muted); --fh-surface:var(--fl-surface);
+  --fh-subtle:var(--fl-subtle); --fh-accent:var(--fl-accent); --fh-line:var(--fl-line);
   color: var(--fh-text); position: relative; margin: 16px 0 0;
   background: var(--fh-surface); border: 1px solid var(--fh-line); border-radius: 12px;
 }
@@ -11,7 +11,7 @@
 .folio-header .folio-home { padding: 0; flex-shrink: 0; }
 .folio-home picture, .folio-home img { display: block; }
 .folio-home img { width: 185px; height: auto; }
-.folio-header :is(a, summary, button):focus-visible { outline: 3px solid var(--fh-accent); outline-offset: 3px; box-shadow: none; }
+.folio-header :is(a, summary, button):focus-visible { outline: 3px solid var(--fl-focus); outline-offset: 3px; box-shadow: none; }
 .folio-header :is(a, summary, button):hover, .folio-header a[aria-current="page"] { background: var(--fh-subtle); color: var(--fh-accent); }
 .folio-header .folio-home:hover { background: transparent; }
 .folio-navigation { display: flex; align-items: center; gap: 4px; }
@@ -33,9 +33,6 @@
   .folio-trust { padding: 12px; }
 }
 @media (max-width: 480px) { .folio-categories { grid-template-columns: minmax(0, 1fr); } }
-@media (prefers-color-scheme: dark) {
-  .folio-header { --fh-text: #edf6f3; --fh-muted: #b8ccc8; --fh-surface: #192e39; --fh-subtle: #213d43; --fh-accent: #a3ecda; --fh-line: #3c535d; }
-}
 @media (forced-colors: active) {
   .folio-header, .folio-categories { border-color: CanvasText; }
   .folio-header :is(a, summary, button):focus-visible { outline-color: Highlight; }

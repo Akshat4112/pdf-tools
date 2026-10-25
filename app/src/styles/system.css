@@ -2,34 +2,9 @@
    Own palette/typography; no UI framework; system fonts only (no external
    font CDN — PT-PD-001 §5). Light/dark via prefers-color-scheme. */
 
+@import './theme.css';
+
 :root {
-  /* palette — "ink & paper" scheme, original to this project */
-  --ink-900: #14121a;
-  --ink-700: #37323f;
-  --ink-500: #5f5968;
-  --ink-300: #a49fae;
-  --paper: #fdfdfb;
-  --paper-2: #f6f4ef;
-  --paper-3: #eeecf4;
-  --line: #ded9e3;
-  --accent: #6d4aff;
-  --accent-ink: #ffffff;
-  --accent-soft: rgba(109, 74, 255, 0.12);
-  --ok: #1a7f4e;
-  --ok-soft: rgba(26, 127, 78, 0.12);
-  --warn: #8a6d1a;
-  --warn-soft: rgba(138, 109, 26, 0.12);
-
-  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-  --mono: ui-monospace, 'SF Mono', Consolas, 'Roboto Mono', monospace;
-
-  --radius-s: 6px;
-  --radius-m: 12px;
-  --radius-l: 18px;
-  --shadow-1: 0 1px 2px rgba(20, 18, 26, 0.06), 0 2px 8px rgba(20, 18, 26, 0.04);
-  --shadow-2: 0 4px 12px rgba(20, 18, 26, 0.08), 0 12px 32px rgba(20, 18, 26, 0.08);
-  --focus: 0 0 0 3px var(--accent-soft), 0 0 0 1.5px var(--accent);
-
   font-family: var(--sans);
   font-size: 16px;
   line-height: 1.5;
@@ -49,7 +24,7 @@
 .reader-print > label { display: grid; gap: 6px; font-size: 14px; }
 .reader-search > label:first-child { flex: 1 1 220px; }
 .reader-search .reader-case { display: flex; align-items: center; min-height: 44px; }
-.reader-workspace input:not([type=checkbox]), .reader-workspace select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); min-width: 0; max-width: 100%; }
+:is(.reader-toolbar,.reader-search,.reader-print) input:not([type=checkbox]), :is(.reader-toolbar,.reader-search,.reader-print) select { padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink-900); min-width: 0; max-width: 100%; }
 .reader-viewport-shell { position: relative; height: min(72vh, 800px); min-height: 360px; margin: 16px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--paper-3); }
 .reader-viewport { position: absolute; inset: 0; overflow: auto; overscroll-behavior: contain; }
 .reader-viewport .pdfViewer { min-width: 100%; }
@@ -63,25 +38,11 @@
   .reader-viewport-shell { height: 60vh; min-height: 320px; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink-900: #f2f0f6;
-    --ink-700: #d4cfdc;
-    --ink-500: #a89fb2;
-    --ink-300: #6b6375;
-    --paper: #171520;
-    --paper-2: #1e1b29;
-    --paper-3: #262233;
-    --line: #332e42;
-    --accent: #9d86ff;
-    --accent-ink: #171520;
-    --accent-soft: rgba(157, 134, 255, 0.16);
-    --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.4);
-  }
-}
+
 
 * { box-sizing: border-box; }
+/* PDF.js page dimensions describe the content; its transparent border is extra. */
+.reader-viewport .pdfViewer .page { box-sizing: content-box; }
 
 /* Shared by every FileSelection, including Merge and Split. Keep the native
    input available to the custom button without a second visible picker. */
@@ -92,9 +53,7 @@
 
 body {
   margin: 0;
-  background:
-    radial-gradient(1200px 400px at 80% -10%, var(--paper-3), transparent 60%),
-    var(--paper);
+  background: var(--fl-bg);
   min-height: 100vh;
 }
 
