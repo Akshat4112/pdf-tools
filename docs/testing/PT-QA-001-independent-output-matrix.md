@@ -1,32 +1,44 @@
-# PT-QA-001 — Independent R1 output audit (incremental)
+# PT-QA-001 — Independent R1 output audit
 
-The R1 regression suites already exercise all 14 tool flows using synthetic inputs and app/browser PDF.js assertions. The fixture corpus gate additionally uses PyMuPDF and qpdf on source fixtures. **Neither is proof that all generated outputs are independently verified by both readers.**
+`app/e2e/independentOutputs.spec.ts` drives the built production app, downloads real outputs, and invokes `scripts/validate_outputs.py` in a temporary synthetic-only directory. Each test removes its directory in `finally`. CI installs pinned PyMuPDF 1.28.0 and qpdf before browser execution. No downloads, traces, screenshots or reports containing document data are uploaded.
 
-This increment adds `scripts/validate_outputs.py` to verify downloaded/generated **synthetic** files independently of the browser implementation:
+## Coverage
+
+| Flow | Independent evidence |
+| --- | --- |
+| Merge | Six pages from two inputs; text, rotations, geometry and rendered content compared to source-page plan |
+| Split | Ordered ZIP members; each PDF parsed by qpdf and PyMuPDF and compared against its range |
+| Rotate | Selected rotation composed with existing rotation; text and raster compared to externally rotated source |
+| Organize | Reorder and rotation; source-page plan controls expected text and raster order |
+| Extract / Delete | Requested order / complement; text, rotation, geometry and raster preservation |
+| Images to PDF | Original-size 96-DPI geometry, independent rendered pixel comparison; generated PNG plus corpus JPEG/PNG |
+| PDF to PNG / JPG | Reversed page order; ZIP CRC/names/member decoding, 96-DPI dimensions/colors/content compared with independent source render; individual download byte equality |
+| Page numbers / Watermark | Original text and geometry preserved, per-page expected added text (including German glyphs), nonzero bounded raster change |
+| Text | UTF-8, NUL rejection and ordered page/text markers including German glyphs |
+| Reader | All three source-page text layers, independent source structure/order/rotation checks; read-only, no export |
+| Document information | Page count, metadata and per-page geometry/rotation compared with synthetic known values, independently parsed source; no export |
+
+Every implemented registry tool produces a scenario on desktop Chromium and Pixel 7 emulation. Existing tool suites retain more detailed selection, cancellation, preview/print, transparency, EXIF, range and UI regressions. The external readers are separate implementations from production PDF.js/pdf-lib; source construction is synthetic pdf-lib while expected rendering/inspection is external PyMuPDF.
+
+## Corpus and losses
+
+All readable, unlocked PDF corpus fixtures F-001–009, F-014 and F-015 are exported through Extract pages, including the 30/60-page cases. All pages are compared for source text and geometry/rotation; normal page content is raster-compared. F-005 forms and F-006 annotations are compared with annotation rendering disabled on both sides: this checks page contents, **not preservation of interactive widgets or annotation appearances**. F-007 JPEG and F-013 PNG are converted through Images to PDF with independent pixel comparison. Existing malformed/empty/encrypted rejection suites cover F-010–012; these are not supported modifying-tool inputs.
+
+The shared PDF selection UI now explains that modified exports can invalidate signatures and may lose interactive forms, annotations, bookmarks or document metadata; originals should be retained. Raster exports lose searchable text, and text export neither performs OCR nor preserves layout. Existing image layout copy warns about color profile differences. The signed-marker fixture is a visual stamp, not a cryptographically signed sample; no signature-validity claim is made.
+
+## What the comparisons establish
+
+Page-copy raster error is mean absolute RGB difference at 72 DPI, bounded by 1/255 per channel; image conversion allows 8/255 for JPEG/renderer differences. Original-size generated PNG comparison allows 2/255. These bounds catch missing content, blank output, wrong color blocks or page order without requiring identical antialiasing. Overlay output must retain source text, contain the expected overlay text on each page, and show a nonzero mean raster change below 30/255; existing overlay tests additionally compare browser previews and exports. This is not a perceptual guarantee for every font, color profile, PDF feature, device or printer.
+
+Negative verifier tests reject wrong page counts/order/rotation, blank visual content, missing overlay output, corrupt PDF bytes inside a valid ZIP and wrong text order. qpdf warnings count as failures. The validator never extracts arbitrary archive paths.
+
+Run after a production build:
 
 ```sh
-python3 scripts/validate_outputs.py --manifest /tmp/qa-outputs/manifest.json
+cd app
+npx playwright test independentOutputs.spec.ts --max-failures=1
+cd ..
+python3 -m unittest discover -s scripts -p 'test_validate_outputs.py'
 ```
 
-The manifest directory contains output files and JSON:
-
-```json
-{"outputs":[
- {"file":"merge.pdf","kind":"pdf","pages":3,"page_text_markers":["PAGE-1","PAGE-2","PAGE-3"]},
- {"file":"converted.png","kind":"png"},
- {"file":"extracted.txt","kind":"txt","text_markers":["PAGE-1"]},
- {"file":"split.zip","kind":"zip","entries":["part-001.pdf","part-002.pdf"]}
-]}
-```
-
-The validator checks two independently implemented PDF readers (PyMuPDF and qpdf), page counts/order markers, per-page geometry and rotation, rasterization, plus TXT/ZIP/JPEG/PNG format integrity. Use only synthetic fixture-derived outputs, not personal PDFs. CI tests the verifier with the corpus's 3-page fixture, wrong counts, truncation and path-traversal, but **does not yet feed browser-produced downloads into the independent validator**.
-
-## Remaining work before marking PT-QA-001 Done
-
-- Generate/download outputs from merge, split, rotate, organize, extract/delete, images-to-PDF, PDF-to-JPG/PNG, page numbering, watermark and PDF-to-text journeys; validate their contents with external readers. Inspect read-only reader and document-info against expected source fixture properties.
-- Add page-order, text preservation, font rendering, image geometry/color and visual-diff assertions for applicable tools, recording intentional losses (e.g. rasterized exports vs searchable PDFs).
-- Add a CI bridge for browser download artifacts with synthetic files, avoiding private document uploads, and check every supported corpus fixture/format.
-- Record all known intentional losses and limitations in user-facing tool copy under PT-REL-001/PT-UI-005.
-- Rerun on final exact commit, and complete independent output coverage before changing tracker state from Review to Done.
-
-This PR is the independent validation foundation and regression gate, not complete acceptance of the entire PT-QA-001 task.
+PT-QA-002 remains the cross-browser/device/accessibility/performance task. Public help pages remain PT-REL-001. Task acceptance requires the final exact-head CI run, not just committed test code.

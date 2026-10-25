@@ -61,6 +61,15 @@ jobs:
       - name: Install Chromium for page-tool interface checks
         run: npx playwright install --with-deps chromium
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install independent output readers
+        run: |
+          pip install pymupdf==1.28.0
+          sudo apt-get update && sudo apt-get install -y qpdf
+
       - name: Extract and Delete Pages browser regression checks
         run: npm run test:pages-ui -- --max-failures=1
 

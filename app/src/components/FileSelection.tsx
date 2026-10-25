@@ -205,6 +205,7 @@ export function FileSelection({
       </div>
 
       <p className="limits-line">{labelOverrides?.limits ?? limitsLine}</p>
+      {expected === 'pdf' ? <p className="panel-hint">Keep your original PDF. Exporting a modified copy can invalidate digital signatures; interactive forms, annotations, bookmarks and document metadata may not be preserved. Image exports contain pixels, not searchable text. Text export does not perform OCR or preserve page layout.</p> : null}
       {selectionError ? <p className="file-error" role="alert">{selectionError.message}</p> : null}
 
       {files.length === 0 ? (
