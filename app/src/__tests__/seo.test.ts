@@ -1,3 +1,4 @@
+import { HUBS } from '../lib/categoryHubs'
 import { describe, expect, it } from 'vitest'
 import {
   buildRobotsTxt,
@@ -48,7 +49,7 @@ describe('sitemap + robots generation (PT-UX-004)', () => {
     const xml = buildSitemapXml('2026-01-01')
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
     expect(locs[0]).toBe(CATALOG_META.canonical)
-    expect(locs).toHaveLength(TOOLS.length + 1)
+    expect(locs).toHaveLength(TOOLS.length + HUBS.length + 1)
     expect(new Set(locs).size).toBe(locs.length)
     for (const tool of TOOLS) {
       expect(locs).toContain(toolPageMeta(tool).canonical)

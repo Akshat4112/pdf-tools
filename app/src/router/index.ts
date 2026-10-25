@@ -1,3 +1,5 @@
+import { hubByPath } from '../lib/categoryHubs'
+import { hubPageMeta } from '../lib/pageMetadata'
 /**
  * Path-based router — PT-UX-004 (replaces the PT-CORE-002 interim hash router).
  *
@@ -41,6 +43,7 @@ export function routePathOf(pathname: string): string {
 export function parsePath(pathname: string): Route {
   const p = routePathOf(pathname)
   if (p === '/' || p === '') return { name: 'catalog', path: p }
+  if (hubByPath(p)) return { name: 'category', path: p }
   const tool = toolByRoute(p)
   if (tool) return { name: tool.id, path: p }
   return { name: 'not-found', path: p }
@@ -56,6 +59,8 @@ export function href(path: string): string {
 export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
+  const hub = hubByPath(route.path)
+  if (hub) return hubPageMeta(hub)
   const tool = toolByRoute(route.path)
   return tool ? toolPageMeta(tool) : NOT_FOUND_META
 }
@@ -96,7 +101,7 @@ export function usePathRoute(): [Route, (path: string) => void] {
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
       const isCatalog = path === '/' || path === ''
       const isTool = Boolean(toolByRoute(path))
-      if (!isCatalog && !isTool) return
+      if (!isCatalog && !isTool && !hubByPath(path)) return
       e.preventDefault()
       const next = `${SITE_BASE}${path === '/' ? '' : path.replace(/^\//, '')}`
       if (next !== window.location.pathname) window.history.pushState({}, '', next)

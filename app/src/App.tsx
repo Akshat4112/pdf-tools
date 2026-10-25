@@ -1,3 +1,4 @@
+import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
 import { useEffect } from 'react'
 import { ToolCatalog } from './components/ToolCatalog'
 import { ToolEntry } from './components/ToolEntry'
@@ -37,6 +38,9 @@ function App() {
       </div>
     )
   }
+
+  const hub = hubByPath(route.path)
+  if (hub) return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace category-hub" dangerouslySetInnerHTML={{ __html: categoryHubHtml(hub) }} /></div>
 
   if (route.name === 'not-found') {
     return (
@@ -103,6 +107,7 @@ function App() {
           <p>Search and browse the available tools. Every option below links to a working browser-based workflow.</p>
         </div>
         <ToolCatalog />
+        <div dangerouslySetInnerHTML={{ __html: hubDirectoryHtml() }} />
 
         <section className="fl-how" aria-labelledby="how-heading">
           <div><p className="fl-eyebrow">HOW IT WORKS</p><h2 id="how-heading">Simple by design.</h2>

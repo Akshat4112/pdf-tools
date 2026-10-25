@@ -1,3 +1,4 @@
+import { hubForTool, hubPath, publicHref } from '../lib/categoryHubs'
 import { useEffect, useRef, useState } from 'react'
 import { SITE_BASE } from '../lib/seo'
 import { CATEGORIES, TOOLS } from '../registry'
@@ -67,6 +68,7 @@ export function SiteHeader() {
               {CATEGORIES.map(category => (
                 <section key={category.id} aria-labelledby={`nav-${category.id}`}>
                   <h2 id={`nav-${category.id}`}>{category.title}</h2>
+                  <a href={publicHref(hubPath(hubForTool(TOOLS.find(t => t.category === category.id)!)))}>Explore {category.title} tools</a>
                   {TOOLS.filter(tool => tool.implemented && tool.category === category.id).map(tool => (
                     <a key={tool.id} href={href(tool.route)} aria-current={window.location.pathname.replace(/\/$/, '') === href(tool.route) ? 'page' : undefined}>{tool.title}</a>
                   ))}

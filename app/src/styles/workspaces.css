@@ -46,3 +46,16 @@
 .tool-article p { margin:10px 0; }
 .tool-article ol { padding-left:24px; }
 .tool-article li { margin:8px 0; }
+
+.hub-directory, .hub-evidence, .related-tools { margin-block:32px; padding-block:16px; border-top:1px solid var(--fl-line); }
+.hub-directory { display:flex; flex-wrap:wrap; gap:12px 24px; }
+:is(.hub-directory,.hub-evidence,.related-tools,.hub-tool-list) a { display:inline-flex; align-items:center; min-height:44px; color:var(--fl-accent); text-underline-offset:3px; overflow-wrap:anywhere; }
+.category-hub { max-width:80ch; line-height:1.65; }
+.category-hub .tool-header { margin-top:24px; }
+.hub-tool-list { list-style:none; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.hub-tool-list li { padding:16px; background:var(--fl-surface); border:1px solid var(--fl-line); border-radius:12px; }
+.hub-tool-list p { margin:4px 0; }
+.hub-evidence a { display:flex; }
+.related-tools { max-width:74ch; }
+.related-tools ul { padding-left:24px; }
+@media(max-width:600px) { .hub-tool-list { grid-template-columns:1fr; } }

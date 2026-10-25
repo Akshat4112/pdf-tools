@@ -63,7 +63,7 @@ test('working-tool navigation and shared header survive routes and history', asy
   const header = page.locator('header')
   await header.locator('summary').click()
   const links = header.locator('.folio-categories a')
-  expect(await links.count()).toBe(TOOLS.filter(tool => tool.implemented).length)
+  expect(await links.count()).toBe(TOOLS.filter(tool => tool.implemented).length + CATEGORIES.length)
   for (const tool of TOOLS.filter(tool => tool.implemented)) {
     await expect(header.getByRole('link', { name: tool.title, exact: true })).toHaveAttribute('href', `/pdf-tools${tool.route}`)
   }
