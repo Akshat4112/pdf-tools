@@ -8,7 +8,7 @@ Category counts describe the full category inventory. Result counts distinguish 
 
 The layout includes 44px active targets, visible focus, 320/390/640/768/1440px layouts, both themes, reduced motion and scoped styles. The 640px viewport approximates available CSS width at 200% zoom on a 1280px display; it is not a claim of physical-device or screen-reader certification (PT-QA-002/PT-UI-007).
 
-Validation includes task/format lookup and unavailable-card unit tests; browser checks combine search and categories, keyboard focus, empty recovery, inert query text, route navigation, registry counts, computed contrast and viewport bounds. Only empty workspaces are used. PDF engines, workers, session ownership and downloads are unchanged; the full output/privacy regressions remain required.
+Validation includes task/format lookup and unavailable-card unit tests; browser checks combine search and categories, keyboard focus, empty recovery, inert query text, route navigation, registry counts, computed text/control-boundary contrast, 3px focus and viewport bounds. Only empty workspaces are used. PDF engines, workers, session ownership and downloads are unchanged; the full output/privacy regressions remain required.
 
 Footer/help/trust content tasks retain their declared dependencies. PT-UI-004 depends only on merged PT-UI-001 and PT-BRAND-004 and is independent of security maintenance PR #58. Public help/privacy is PT-REL-001; this task does not publish those pages or claim broad browser/device validation.
 

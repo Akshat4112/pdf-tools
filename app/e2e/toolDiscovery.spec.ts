@@ -13,6 +13,7 @@ test('task discovery combines search and categories, announces results and retai
     await search.fill(query)
     await expect(catalog.getByRole('link',{name:`Open ${name}`,exact:true})).toBeVisible()
     await expect(search).toBeFocused()
+    expect(await catalog.locator('.search-box').evaluate(el=>getComputedStyle(el).outlineWidth)).toBe('3px')
   }
   await search.fill('pdf')
   const convert=categories.getByRole('button',{name:'Convert to PDF',exact:true})
@@ -57,12 +58,15 @@ test('discovery is readable and usable in both themes, narrow layouts and zoom-e
         await mkdir(process.env.PDF_TOOLS_CATALOG_VISUAL_DIR,{recursive:true})
         await catalog.screenshot({path:join(process.env.PDF_TOOLS_CATALOG_VISUAL_DIR,`catalog-${info.project.name}-${width}-${colorScheme}.png`),animations:'disabled'})
       }
-      // Relative luminance verifies actual computed text/surface colors, including dark mode.
-      expect(await catalog.locator('.tool-desc').first().evaluate(el=>{
+      // Check actual rendered colors, including the search field's required control boundary.
+      const contrast=await catalog.evaluate(root=>{
         const luminance=(color:string)=>{const values=color.match(/[\d.]+/g)!.slice(0,3).map(Number).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4});return values[0]*.2126+values[1]*.7152+values[2]*.0722}
-        const fg=luminance(getComputedStyle(el).color),bg=luminance(getComputedStyle(el.closest('.tool-card')!).backgroundColor)
-        return (Math.max(fg,bg)+.05)/(Math.min(fg,bg)+.05)
-      })).toBeGreaterThanOrEqual(4.5)
+        const ratio=(a:string,b:string)=>{const x=luminance(a),y=luminance(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+        const desc=root.querySelector('.tool-desc')!,field=getComputedStyle(root.querySelector('.search-box')!)
+        return {text:ratio(getComputedStyle(desc).color,getComputedStyle(desc.closest('.tool-card')!).backgroundColor),control:ratio(field.borderTopColor,field.backgroundColor)}
+      })
+      expect(contrast.text).toBeGreaterThanOrEqual(4.5)
+      expect(contrast.control).toBeGreaterThanOrEqual(3)
     }
   }
   for(const category of CATEGORIES) {
