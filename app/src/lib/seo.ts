@@ -11,64 +11,10 @@
  * - PT-PD-003: nothing here writes to localStorage or any storage.
  */
 
-import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry'
+import { TOOLS } from '../registry'
 
-/** Production origin + base path (PT-PD-004 §5). */
-export const SITE_ORIGIN = 'https://akshat4112.github.io'
-export const SITE_BASE = '/pdf-tools/'
-export const SITE_URL = `${SITE_ORIGIN}${SITE_BASE}`
-
-/** Static catalog-page copy (index). */
-export const SITE_TITLE = 'PDF Tools — free local PDF tools in your browser'
-export const SITE_DESCRIPTION =
-  'Merge, split, convert and inspect PDFs free in your browser. No accounts, no uploads — your files are processed entirely on your own device.'
-export const SITE_NAME = 'PDF Tools'
-
-export interface PageMeta {
-  /** <title> content */
-  title: string
-  /** meta description (<= 160 chars) */
-  description: string
-  /** absolute canonical URL including /pdf-tools/ base */
-  canonical: string
-  /** Open Graph type; 'website' for catalog, 'article' feels wrong for tools */
-  ogType: 'website'
-}
-
-/** Catalog page metadata. */
-export const CATALOG_META: PageMeta = {
-  title: SITE_TITLE,
-  description: SITE_DESCRIPTION,
-  canonical: SITE_URL,
-  ogType: 'website',
-}
-
-/**
- * Per-tool static metadata. Titles follow the pattern
- * "<Tool title> — PDF Tools"; descriptions reuse the registry copy plus the
- * local-processing promise. All content is static and derived from the
- * registry (single source of truth) — no user data can appear in meta tags.
- */
-export function toolPageMeta(tool: ToolDefinition): PageMeta {
-  return {
-    title: `${tool.title} — PDF Tools`,
-    description: `${tool.description} Runs entirely in your browser — no uploads, no accounts.`,
-    canonical: `${SITE_URL}${tool.route.replace(/^\//, '')}/`,
-    ogType: 'website',
-  }
-}
-
-export function toolMetaById(id: ToolId): PageMeta {
-  return toolPageMeta(getTool(id))
-}
-
-/** 404 page metadata (also used by 404.html). */
-export const NOT_FOUND_META: PageMeta = {
-  title: 'Page not found — PDF Tools',
-  description: 'This page does not exist. Browse the PDF Tools catalog instead.',
-  canonical: `${SITE_URL}404.html`,
-  ogType: 'website',
-}
+export * from './pageMetadata'
+import { SITE_URL, CATALOG_META, toolPageMeta, pageMetaTags, type PageMeta } from './pageMetadata'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -100,15 +46,9 @@ function upsertLink(rel: string, href: string): void {
  */
 export function applyMeta(meta: PageMeta): void {
   document.title = meta.title
-  upsertMeta('meta[name="description"]', { name: 'description', content: meta.description })
-  upsertMeta('meta[property="og:title"]', { property: 'og:title', content: meta.title })
-  upsertMeta('meta[property="og:description"]', { property: 'og:description', content: meta.description })
-  upsertMeta('meta[property="og:url"]', { property: 'og:url', content: meta.canonical })
-  upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME })
-  upsertMeta('meta[property="og:type"]', { property: 'og:type', content: meta.ogType })
-  upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary' })
-  upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: meta.title })
-  upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: meta.description })
+  for (const tag of pageMetaTags(meta)) {
+    upsertMeta(`meta[${tag.attribute}="${tag.key}"]`, { [tag.attribute]: tag.key, content: tag.content })
+  }
   upsertLink('canonical', meta.canonical)
 }
 

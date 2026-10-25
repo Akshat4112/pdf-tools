@@ -9,7 +9,7 @@ function assetPaths(directory: URL, prefix: string): string[] {
 }
 const trustedAssets = new Set([
   ...assetPaths(new URL('../dist/assets/', import.meta.url), '/pdf-tools/assets/'),
-  '/pdf-tools/favicon.svg', '/pdf-tools/brand/logo-light.svg', '/pdf-tools/brand/logo-dark.svg',
+  '/pdf-tools/brand/apple-touch-icon.png', '/pdf-tools/favicon.svg', '/pdf-tools/brand/logo-light.svg', '/pdf-tools/brand/logo-dark.svg',
 ])
 
 /** Synthetic attack fixture only: no customer documents or public exfiltration endpoints. */

@@ -70,6 +70,9 @@ jobs:
           pip install pymupdf==1.28.0
           sudo apt-get update && sudo apt-get install -y qpdf
 
+      - name: Public metadata and share-preview browser checks
+        run: npx playwright test metadata.spec.ts --max-failures=1
+
       - name: Processing and result state browser checks
         run: npx playwright test processingStates.spec.ts --max-failures=1
 
@@ -79,7 +82,7 @@ jobs:
         run: npx playwright test toolDiscovery.spec.ts --max-failures=1
 
       - name: R1 browser regression checks
-        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery|PT-UI-006'
+        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery|PT-UI-006|PT-SEO-005 metadata'
 
       # Only empty tool-catalog captures from toolDiscovery.spec.ts. No document screenshots.
       - name: Empty catalog visual review
