@@ -1,5 +1,5 @@
 /* PT-UI-004: PDF Tools discovery palette, independent of document rendering. */
-.catalog { --cd-text:#142d3a; --cd-muted:#4b606a; --cd-surface:#fff; --cd-line:#d4dfdc; --cd-subtle:#eaf7f3; --cd-accent:#08796d; --cd-control:#70838a; --cd-focus:#08796d; color:var(--cd-text); }
+.catalog { --cd-text:var(--fl-text); --cd-muted:var(--fl-muted); --cd-surface:var(--fl-surface); --cd-line:var(--fl-line); --cd-subtle:var(--fl-subtle); --cd-accent:var(--fl-accent); --cd-control:var(--fl-control); --cd-focus:var(--fl-focus); color:var(--cd-text); }
 .catalog .search-row { padding-bottom:4px; }
 .catalog-search-label { display:block; font-size:1rem; font-weight:650; margin-bottom:10px; }
 .catalog .search-box { background:var(--cd-surface); border-color:var(--cd-control); border-radius:12px; padding:6px 12px; gap:10px; transition:none; }
@@ -34,5 +34,4 @@
 .catalog :is(a.tool-card,button):focus-visible { outline:3px solid var(--cd-focus); outline-offset:3px; box-shadow:none; }
 .catalog-limits { margin-top:20px; }
 @media(max-width:420px) { .catalog .search-box kbd { display:none; } .catalog .search-box { gap:6px; padding-inline:8px; } .catalog .tool-card { padding:18px; } }
-@media(prefers-color-scheme:dark) { .catalog { --cd-text:#edf6f3; --cd-muted:#b8ccc8; --cd-surface:#192e39; --cd-line:#3c535d; --cd-subtle:#213d43; --cd-accent:#79dcc6; --cd-control:#92a9ad; --cd-focus:#a3ecda; } }
 @media(prefers-reduced-motion:reduce) { .catalog .tool-card,.catalog a.tool-card:hover,.catalog a.tool-card:focus-visible,.catalog .cat-chip,.catalog .search-box { transition:none; transform:none; } }

@@ -1,0 +1,38 @@
+/* App chrome only. PDF.js page/text/annotation layers keep their own geometry. */
+.tool-workspace { padding:24px 0 12px; min-width:0; }
+.workspace-context { display:flex; justify-content:space-between; align-items:start; gap:12px 24px; flex-wrap:wrap; }
+.workspace-breadcrumb { display:flex; align-items:center; gap:8px; flex-wrap:wrap; color:var(--fl-muted); font-size:.875rem; }
+.workspace-breadcrumb a { display:inline-flex; align-items:center; min-height:44px; color:var(--fl-accent); text-underline-offset:3px; }
+.workspace-help { max-width:440px; color:var(--fl-muted); font-size:.875rem; }
+.workspace-help summary { min-height:44px; padding:10px 0; cursor:pointer; color:var(--fl-accent); }
+.workspace-help p { line-height:1.6; margin:8px 0; }
+.tool-workspace .tool-screen { max-width:100%; padding:16px 0 32px; }
+.tool-workspace .tool-header { margin-bottom:24px; }
+.tool-workspace .tool-heading { font-size:clamp(1.75rem,3.5vw,2.4rem); line-height:1.2; letter-spacing:-.03em; font-weight:750; }
+.tool-workspace .tool-subtitle { max-width:70ch; line-height:1.6; color:var(--fl-muted); }
+.tool-workspace .dropzone { background:var(--fl-surface); border-color:var(--fl-control); border-radius:var(--fl-radius-md); padding:32px 20px; transition:none; }
+.tool-workspace .dropzone.is-active { border-color:var(--fl-accent); background:var(--fl-subtle); }
+.tool-workspace .panel { padding:24px; border-radius:var(--fl-radius-md); box-shadow:none; }
+.tool-workspace .panel.is-error { color:var(--fl-danger); border-color:var(--fl-danger); background:var(--fl-danger-bg); }
+.tool-workspace .panel.is-error :is(.panel-title,.panel-summary,.panel-hint) { color:var(--fl-danger); }
+.tool-workspace :is(.file-row,.result-row) { background:var(--fl-surface); padding:14px 16px; }
+.tool-workspace .file-row.is-error { border-color:var(--fl-danger); background:var(--fl-danger-bg); }
+.tool-workspace .file-error { color:var(--fl-danger); }
+.tool-workspace :is(input:not([type=file]):not([type=checkbox]):not([type=radio]),select,textarea):not(:where(.pdfViewer *, .textLayer *, .annotationLayer *)),
+.tool-workspace #overlay-preview-page { min-height:44px; max-width:100%; border-color:var(--fl-control); border-radius:var(--fl-radius-sm); font-family:var(--fl-font); color:var(--fl-text); background:var(--fl-surface); }
+.tool-workspace input:is([type=checkbox],[type=radio]) { accent-color:var(--fl-accent); }
+.tool-workspace .split-mode { background:var(--fl-surface); border-color:var(--fl-control); min-height:64px; }
+.tool-workspace .split-mode.is-active { background:var(--fl-subtle); border-color:var(--fl-accent); }
+.tool-workspace .page-pick { border-color:var(--fl-control); }
+.tool-workspace .page-pick.is-selected { border-color:var(--fl-accent); }
+.tool-workspace .page-pick.is-removal { border-color:var(--fl-warning); }
+.tool-workspace :is(.btn-ghost,.btn-icon) { border-color:var(--fl-control); color:var(--fl-text); background:var(--fl-surface); }
+.tool-workspace .btn-icon { width:44px; height:44px; }
+.tool-workspace .btn-primary { border-radius:var(--fl-radius-sm); }
+.tool-workspace :is(a,button,input,select,textarea,summary):focus-visible:not(:where(.pdfViewer *, .textLayer *, .annotationLayer *)) { outline:3px solid var(--fl-focus); outline-offset:3px; box-shadow:none; }
+.tool-workspace .split-mode:focus-within { outline:3px solid var(--fl-focus); outline-offset:3px; }
+.site-footer { color:var(--fl-muted); line-height:1.6; }
+.site-footer a { color:var(--fl-accent); text-underline-offset:3px; }
+@media(max-width:600px) { .tool-workspace { padding-top:16px; } .tool-workspace .panel { padding:16px; } .tool-workspace .dropzone { padding:24px 16px; } .workspace-help { width:100%; max-width:none; } }
+@media(prefers-reduced-motion:reduce) { .tool-workspace :is(.btn-primary,.progress-fill,.page-pick) { transition:none; } }
+@media(forced-colors:active) { .tool-workspace :is(.panel,.dropzone,.split-mode) { border-color:CanvasText; } .tool-workspace :focus-visible { outline-color:Highlight; } }
