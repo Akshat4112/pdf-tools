@@ -44,7 +44,7 @@ test('signature entries, visual stamps and locked documents have distinct honest
   await expect(page.getByRole('region',{name:'Document summary',exact:true})).toContainText('Unknown — not inspected')
   await expect(page.getByRole('region',{name:'Document metadata',exact:true})).toHaveCount(0)
   await choose(page,Buffer.from('%PDF-broken'),'bad.pdf');await page.getByRole('button',{name:'Inspect PDF',exact:true}).click();await expect(page.getByRole('alert')).toContainText('could not be read')
-  await page.getByRole('button',{name:'Try again',exact:true}).click();await chooseAndInspect(page)
+  await page.getByRole('button',{name:'Review settings',exact:true}).click();await chooseAndInspect(page)
 })
 test('page rows are bounded, replacement clears private metadata and reset/exit leave no retained report',async({page})=>{
   await page.goto('doc-info/');await chooseAndInspect(page,await readFile('../fixtures/pdf/F-002-plain-text-30p.pdf'),'long.pdf')

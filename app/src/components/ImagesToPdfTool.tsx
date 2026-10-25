@@ -128,8 +128,8 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
         actionLabel="Create PDF" onConfirm={run} onCancel={onExit} disabled={!canRun} disabledReason={layout.error?.message ?? 'No valid images selected yet.'} />
     </> : null}
     {phase === 'processing' ? <ProcessingPanel label="Creating your PDF" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
-    {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={reset} onReset={reset} onContinue={onExit} /> : null}
+    {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}
     {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
-    {phase === 'cancelled' ? <CancelledPanel onReset={reset} /> : null}
+    {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
   </div>
 }

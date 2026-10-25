@@ -74,7 +74,7 @@ test('German watermark supports real embedded text, all anchors and deliberate u
   if(process.env.PDF_TOOLS_VISUAL_DIR)await page.screenshot({path:`${process.env.PDF_TOOLS_VISUAL_DIR}/watermark-${info.project.name}.png`,fullPage:true})
   await page.getByRole('button',{name:'Apply watermark',exact:true}).click();const german=await inspect(page,(await download(page)).bytes)
   expect(german.every(item=>item.text.includes('Prüfung Straße €'))).toBe(true)
-  await page.getByRole('button',{name:'Run again with other files',exact:true}).click()
+  await page.getByRole('button',{name:'Adjust settings',exact:true}).click()
   await page.getByLabel('Watermark text',{exact:true}).fill('中文 😀');await expect(page.getByRole('button',{name:'Apply watermark',exact:true})).toBeDisabled()
   await expect(page.getByRole('alert')).toContainText('outside the bundled font')
   await page.getByRole('checkbox',{name:'Replace each unsupported character with a question mark (?)',exact:true}).check();await preview(page)
@@ -99,9 +99,9 @@ test('download URLs are reused and revoked when adjusting, resetting or exiting'
   await page.addInitScript(()=>{const live=new Set<string>(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL);URL.createObjectURL=blob=>{const url=create(blob);if(blob instanceof Blob&&blob.type==='application/pdf')live.add(url);return url};URL.revokeObjectURL=url=>{live.delete(url);revoke(url)};Object.assign(window,{overlayUrls:live})})
   const count=()=>page.evaluate(()=>(window as unknown as {overlayUrls:Set<string>}).overlayUrls.size)
   await page.goto('page-numbers/');await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await download(page);expect(await count()).toBe(1)
-  await page.getByRole('button',{name:'Run again with other files',exact:true}).click();expect(await count()).toBe(0);await preview(page)
+  await page.getByRole('button',{name:'Adjust settings',exact:true}).click();expect(await count()).toBe(0);await preview(page)
   await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Start over',exact:true}).click();expect(await count()).toBe(0)
-  await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Continue to another tool',exact:true}).click();expect(await count()).toBe(0)
+  await choose(page);await preview(page);await page.getByRole('button',{name:'Apply page numbers',exact:true}).click();await download(page);await page.getByRole('button',{name:'Back to all tools',exact:true}).click();expect(await count()).toBe(0)
 })
 
 test('cancelling held text work terminates workers and retries retained settings without stale output',async({page})=>{

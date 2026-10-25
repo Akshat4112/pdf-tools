@@ -7,7 +7,7 @@
  * everything (session.clearFiles) — audit zeros are asserted in tests.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import {
   CancelledPanel,
@@ -20,42 +20,57 @@ import { phaseFromJobState } from './screenPhase'
 import { startMerge, type VerifiedOutput } from '../tools/mergeFlow'
 import { FileSession } from '../session/fileSession'
 import { getTool } from '../registry'
-import type { Job, JobProgress } from '../jobs/orchestrator'
+import type { Job, JobProgress, JobState } from '../jobs/orchestrator'
 import type { ToolError } from '../registry'
 
 export function MergeTool({ onExit }: { onExit?: () => void }) {
   const tool = getTool('merge')
   const [files, setFiles] = useState<WorkspaceFile[]>([])
-  const [job, setJob] = useState<Job<never, VerifiedOutput> | null>(null)
+  const job = useRef<Job<never, VerifiedOutput> | null>(null)
+  const active = useRef(true)
+  const [state, setState] = useState<JobState | null>(null)
   const [progress, setProgress] = useState<JobProgress>({ fraction: 0 })
   const [result, setResult] = useState<VerifiedOutput[] | null>(null)
   const [error, setError] = useState<ToolError | null>(null)
 
   // one session per screen mount; dropped on unmount (memory-only)
   const session = useMemo(() => new FileSession(), [])
-  useEffect(() => () => session.resetSession(), [session])
+  useEffect(() => {
+    active.current = true
+    return () => { active.current = false; job.current = null; session.resetSession() }
+  }, [session])
 
   const valid = files.filter((f) => !f.error)
-  const phase = phaseFromJobState(job?.state ?? null)
+  const phase = phaseFromJobState(state)
 
   const run = useCallback(() => {
+    const old = job.current
+    job.current = null
+    old?.cancel()
+    session.resetSession()
     setError(null)
     setResult(null)
+    setProgress({ fraction: 0 })
     const j = startMerge(
       { files: valid.map((f) => ({ displayName: f.displayName, bytes: f.bytes })) },
-      { onProgress: setProgress },
+      {
+        onProgress: value => { if (active.current && job.current === j) setProgress(value) },
+        onState: () => { if (active.current && job.current === j) setState(j.state) },
+      },
     )
     session.jobs.track(j)
     void j.completion.then(() => {
+      if (!active.current || job.current !== j) return
       if (j.state === 'done' && j.result) setResult([j.result])
       if (j.state === 'failed' && j.error) setError(j.error)
     })
-    setJob(j as unknown as Job<never, VerifiedOutput>)
+    job.current = j as unknown as Job<never, VerifiedOutput>
+    setState(j.state)
   }, [valid, session])
 
   const download = useCallback(
     (out: VerifiedOutput) => {
-      const stored = session.addOutput(out.name, out.mimeType, out.bytes)
+      const stored = session.listOutputs().find(item => item.name === out.name) ?? session.addOutput(out.name, out.mimeType, out.bytes)
       const url = session.objectUrlFor(stored.id)
       const a = document.createElement('a')
       a.href = url
@@ -65,14 +80,21 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
     [session],
   )
 
-  const reset = useCallback(() => {
+  const adjust = useCallback(() => {
+    const old = job.current
+    job.current = null
+    old?.cancel()
     session.resetSession()
-    setFiles([])
-    setJob(null)
+    setState(null)
     setResult(null)
     setError(null)
     setProgress({ fraction: 0 })
   }, [session])
+
+  const reset = useCallback(() => {
+    adjust()
+    setFiles([])
+  }, [adjust])
 
   return (
     <div className="tool-screen">
@@ -117,24 +139,24 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
         </>
       ) : null}
 
-      {phase === 'processing' && job ? (
-        <ProcessingPanel label="Merging your PDFs" progress={progress} onCancel={() => job.cancel()} />
+      {phase === 'processing' ? (
+        <ProcessingPanel label="Merging your PDFs" progress={progress} onCancel={() => job.current?.cancel()} />
       ) : null}
 
       {phase === 'result' && result ? (
         <ResultPanel
           outputs={result}
           onDownload={download}
-          onRetry={reset}
+          onRetry={adjust} retryLabel="Adjust settings" onContinue={onExit}
           onReset={reset}
         />
       ) : null}
 
       {phase === 'failed' && error ? (
-        <FailurePanel error={error} onRetry={run} onReset={reset} />
+        <FailurePanel error={error} onRetry={adjust} onReset={reset} />
       ) : null}
 
-      {phase === 'cancelled' && job ? <CancelledPanel onReset={reset} /> : null}
+      {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={adjust} /> : null}
     </div>
   )
 }

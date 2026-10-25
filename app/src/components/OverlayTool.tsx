@@ -82,6 +82,6 @@ export function OverlayTool({mode,onExit}:{mode:OverlayMode;onExit():void}) {
     {phase==='processing'?<ProcessingPanel label="Applying and verifying text overlays" progress={progress} onCancel={()=>job.current?.cancel()}/>:null}
     {phase==='failed'&&error?<FailurePanel error={error} onRetry={adjust} onReset={reset}/>:null}
     {phase==='cancelled'?<CancelledPanel onReset={reset} onAdjust={adjust}/>:null}
-    {phase==='result'&&result?<ResultPanel outputs={[result.output]} onDownload={download} onRetry={adjust} onReset={reset} onContinue={onExit}/>:null}
+    {phase==='result'&&result?<ResultPanel outputs={[result.output]} onDownload={download} onRetry={adjust} retryLabel="Adjust settings" onReset={reset} onContinue={onExit}/>:null}
   </div>
 }

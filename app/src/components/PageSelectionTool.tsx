@@ -197,9 +197,9 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
         </>
       ) : null}
       {phase === 'processing' ? <ProcessingPanel label={deleting ? 'Removing selected pages' : 'Extracting selected pages'} progress={progress} onCancel={() => job.current?.cancel()} /> : null}
-      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={reset} onReset={reset} /> : null}
+      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}
       {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
-      {phase === 'cancelled' ? <CancelledPanel onReset={reset} /> : null}
+      {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
     </div>
   )
 }
