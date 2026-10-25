@@ -168,7 +168,8 @@ test('reader navigates, zooms, searches, selects text and retains rotated geomet
   await expect(page.getByRole('alert')).toHaveText('Choose a page from 1 to 3.')
   await page.getByLabel('Page', { exact: true }).fill('2'); await page.getByRole('button', { name: 'Go', exact: true }).click()
   await page.getByRole('combobox', { name: 'Zoom', exact: true }).selectOption('1')
-  await expect.poll(() => page.locator('.reader-viewport .page').evaluate(element => element.getBoundingClientRect().width)).toBeCloseTo(533, -1)
+  // Zoom describes document content; PDF.js adds its decorative page border outside it.
+  await expect.poll(() => page.locator('.reader-viewport .page .canvasWrapper').evaluate(element => element.getBoundingClientRect().width)).toBeCloseTo(533, -1)
   await page.getByRole('combobox', { name: 'Zoom', exact: true }).selectOption('page-fit')
   await expect(page.getByRole('button', { name: 'Previous page', exact: true })).toBeEnabled()
   expect(await page.evaluate(() => (window as unknown as { readerScriptRan?: boolean }).readerScriptRan)).toBeUndefined()
