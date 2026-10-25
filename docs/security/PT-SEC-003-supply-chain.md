@@ -26,3 +26,9 @@ Existing workflows use `actions/checkout@v4`, `actions/setup-node@v4`, `actions/
 - The script's `--self-test` exercises disallowed GPL/AGPL/unknown expressions and accepted permissive expressions; full mutation tests against a copied lockfile should be part of a follow-up gate enhancement.
 
 This is a CI technical check, not a comprehensive source-code audit, legal review, SLSA certification, or automatic confirmation of GitHub Action publisher integrity.
+
+## 2026-10-25 maintenance — Vite advisory remediation
+
+Vite is pinned to 8.3.5, replacing 8.3.0. The older build tool was flagged by the full npm audit (including the Windows launch-editor issue [GHSA-587h-7wmj-h5pm](https://github.com/advisories/GHSA-587h-7wmj-h5pm) and related editor/server advisories). This is a development/build dependency; production-only audits did not cover it. The fixed version removes the currently reported advisory group, without an audit exemption or production PDF-engine update.
+
+CI now additionally runs `npm audit --audit-level=high` across the full dependency graph. The separate production gate remains. Both audits are time-sensitive and do not establish permanent freedom from vulnerabilities. Rebuild the license inventory from the updated lockfile; validate the production build and existing output/privacy/browser suites before merging.
