@@ -1,0 +1,17 @@
+{
+  "commit": "994069b1a212426101ce7493e0dc038ab67e98ad",
+  "initialAssets": [
+    {
+      "file": "assets/index-Dpvfa8Cg.js",
+      "bytes": 808952,
+      "gzipBytes": 290351
+    },
+    {
+      "file": "assets/index-CJbFmQmJ.css",
+      "bytes": 270243,
+      "gzipBytes": 49571
+    }
+  ],
+  "initialJsBytes": 808952,
+  "initialCssBytes": 270243
+}

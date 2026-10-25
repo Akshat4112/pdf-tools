@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToPipeableStream } from 'react-dom/server'
+import { PassThrough } from 'node:stream'
+import type { ReactNode } from 'react'
 import { createElement } from 'react'
 import { deletionReviewKey, pageSelectionPlan, togglePage } from '../tools/pageSelectionPlan'
 import { getTool } from '../registry'
@@ -33,20 +35,35 @@ describe('page-selection preview contract', () => {
   })
 })
 
+// Wait for lazy workspace modules while preserving the actual rendered-control assertions.
+function renderResolved(element: ReactNode): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const output = new PassThrough()
+    let html = ''
+    output.on('data', chunk => { html += chunk.toString() })
+    output.on('end', () => resolve(html))
+    output.on('error', reject)
+    const stream = renderToPipeableStream(element, {
+      onAllReady() { stream.pipe(output) },
+      onError: reject,
+    })
+  })
+}
+
 describe('working tool entry points', () => {
-  it.each(['extract-pages', 'delete-pages'] as const)('mounts %s with a file picker and disabled initial action', (id) => {
+  it.each(['extract-pages', 'delete-pages'] as const)('mounts %s with a file picker and disabled initial action', async (id) => {
     const tool = getTool(id)
     expect(tool.implemented).toBe(true)
-    const html = renderToStaticMarkup(createElement(ToolEntry, { tool, onExit: () => {} }))
+    const html = await renderResolved(createElement(ToolEntry, { tool, onExit: () => {} }))
     expect(html).toContain('type="file"')
     expect(html).toContain('aria-label="Preview"')
     expect(html).toContain('disabled=""')
     expect(html).not.toContain('Nothing to try here yet')
   })
-  it.each(['organize', 'rotate'] as const)('mounts the working %s workspace', (id) => {
+  it.each(['organize', 'rotate'] as const)('mounts the working %s workspace', async (id) => {
     const tool = getTool(id)
     expect(tool.implemented).toBe(true)
-    const html = renderToStaticMarkup(createElement(ToolEntry, { tool, onExit: () => {} }))
+    const html = await renderResolved(createElement(ToolEntry, { tool, onExit: () => {} }))
     expect(html).toContain(id === 'organize' ? 'Create organized copy' : 'Create rotated copy')
     expect(html).not.toContain('not available yet')
   })

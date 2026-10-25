@@ -1,3 +1,5 @@
+import { lazy, Suspense } from 'react'
+import { ToolLoadBoundary, ToolLoading } from './ToolLoadBoundary'
 import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHubs'
 /**
  * Generated tool entry page — PT-UX-004.
@@ -16,16 +18,16 @@ import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHub
 import type { ToolDefinition } from '../registry'
 import { toolArticleHtml } from '../lib/toolContent'
 import { SITE_BASE } from '../lib/seo'
-import { MergeTool } from './MergeTool'
-import { SplitTool } from './SplitTool'
-import { PageSelectionTool } from './PageSelectionTool'
-import { OrganizeTool } from './OrganizeTool'
-import { ImagesToPdfTool } from './ImagesToPdfTool'
-import { PdfToImagesTool } from './PdfToImagesTool'
-import { PdfReaderTool } from './PdfReaderTool'
-import { PdfToTextTool } from './PdfToTextTool'
-import { DocumentInfoTool } from './DocumentInfoTool'
-import { OverlayTool } from './OverlayTool'
+const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: module.MergeTool })))
+const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
+const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
+const OrganizeTool = lazy(() => import('./OrganizeTool').then(module => ({ default: module.OrganizeTool })))
+const ImagesToPdfTool = lazy(() => import('./ImagesToPdfTool').then(module => ({ default: module.ImagesToPdfTool })))
+const PdfToImagesTool = lazy(() => import('./PdfToImagesTool').then(module => ({ default: module.PdfToImagesTool })))
+const PdfReaderTool = lazy(() => import('./PdfReaderTool').then(module => ({ default: module.PdfReaderTool })))
+const PdfToTextTool = lazy(() => import('./PdfToTextTool').then(module => ({ default: module.PdfToTextTool })))
+const DocumentInfoTool = lazy(() => import('./DocumentInfoTool').then(module => ({ default: module.DocumentInfoTool })))
+const OverlayTool = lazy(() => import('./OverlayTool').then(module => ({ default: module.OverlayTool })))
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
   return (
@@ -115,7 +117,11 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         <p>Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.</p>
       </details> : null}
     </div>
-    <ToolContent tool={tool} onExit={onExit} />
+    <ToolLoadBoundary key={tool.id} title={tool.title} onExit={onExit}>
+      <Suspense fallback={<ToolLoading title={tool.title} onExit={onExit} />}>
+        <ToolContent tool={tool} onExit={onExit} />
+      </Suspense>
+    </ToolLoadBoundary>
     {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) }} /> : null}
   </main>
 }

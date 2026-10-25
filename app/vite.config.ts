@@ -130,6 +130,7 @@ export default defineConfig({
   base: '/pdf-tools/',
   plugins: [react(), copyPdfjsAssets(), prerenderRoutes()],
   build: {
+    manifest: true,
     sourcemap: false,
   },
 })
