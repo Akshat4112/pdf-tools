@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * 404 screen — PT-UX-004.
  *
@@ -9,17 +10,18 @@
 import { SITE_BASE } from '../lib/seo'
 
 export function NotFound() {
+  const { t } = useLocale()
   return (
-    <section className="not-found" aria-label="Page not found">
+    <section className="not-found" aria-label={t("Page not found")}>
       <p className="nf-code">404</p>
-      <h1 className="nf-title">This page doesn't exist.</h1>
+      <h1 className="nf-title">{t("This page doesn't exist.")}</h1>
       <p className="nf-text">
         The address may be mistyped, or the page moved. Everything PDF Tools
         offers is one click away in the catalog.
       </p>
       <p>
         <a className="btn-primary" href={SITE_BASE}>
-          Back to all tools
+          {t("Back to all tools")}
         </a>
       </p>
     </section>

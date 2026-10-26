@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 import { relatedGuidesHtml } from '../lib/guideCatalog'
 import { lazy, Suspense } from 'react'
 import { ToolLoadBoundary, ToolLoading } from './ToolLoadBoundary'
@@ -31,14 +32,15 @@ const DocumentInfoTool = lazy(() => import('./DocumentInfoTool').then(module => 
 const OverlayTool = lazy(() => import('./OverlayTool').then(module => ({ default: module.OverlayTool })))
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
+  const { t } = useLocale()
   return (
-    <section className="tool-screen" aria-label={`${tool.title} preview`}>
+    <section className="tool-screen" aria-label={`${t(tool.title)} preview`}>
       <header className="tool-header">
-        <h1 className="tool-heading">{tool.title}</h1>
-        <p className="tool-subtitle">{tool.description}</p>
+        <h1 className="tool-heading">{t(tool.title)}</h1>
+        <p className="tool-subtitle">{t(tool.description)}</p>
       </header>
       <div className="panel" role="note">
-        <h2 className="panel-title">In progress — not available yet</h2>
+        <h2 className="panel-title">{t("In progress — not available yet")}</h2>
         <p className="panel-summary">
           This tool is listed in the catalog so you can see where the project
           is going. It opens as soon as its engine and interface pass
@@ -46,7 +48,7 @@ function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
         </p>
         <div className="panel-actions">
           <a className="btn-ghost" href={SITE_BASE}>
-            Back to all tools
+            {t("Back to all tools")}
           </a>
         </div>
       </div>
@@ -109,17 +111,18 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
+  const { t } = useLocale()
   return <main id="main-content" className="tool-workspace">
     <div className="workspace-context">
       <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />
       {tool.implemented ? <details className="workspace-help">
-        <summary>How to use this tool</summary>
-        <p>{TOOL_HELP[tool.id]}</p>
-        <p>Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.</p>
+        <summary>{t("How to use this tool")}</summary>
+        <p>{t(TOOL_HELP[tool.id])}</p>
+        <p>{t("Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.")}</p>
       </details> : null}
     </div>
-    <ToolLoadBoundary key={tool.id} title={tool.title} onExit={onExit}>
-      <Suspense fallback={<ToolLoading title={tool.title} onExit={onExit} />}>
+    <ToolLoadBoundary key={tool.id} title={t(tool.title)} onExit={onExit}>
+      <Suspense fallback={<ToolLoading title={t(tool.title)} onExit={onExit} />}>
         <ToolContent tool={tool} onExit={onExit} />
       </Suspense>
     </ToolLoadBoundary>

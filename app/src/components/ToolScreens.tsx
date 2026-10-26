@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * Preview, progress and result screens — PT-UX-003.
  *
@@ -18,7 +19,8 @@ import type { VerifiedOutput } from '../outputs/verify'
 import { formatBytes } from './format'
 
 export function WorkspaceCleanupNote() {
-  return <p className="panel-hint cleanup-note">Start over removes selected files and results from this workspace. Original files and downloads already saved to your device are unaffected.</p>
+  const { t } = useLocale()
+  return <p className="panel-hint cleanup-note">{t("Start over removes selected files and results from this workspace. Original files and downloads already saved to your device are unaffected.")}</p>
 }
 
 /** S4 — preview before processing. */
@@ -41,15 +43,16 @@ export function PreviewPanel({
   disabledReason?: string
   onCancel?(): void
 }) {
+  const { t } = useLocale()
   const hintId = useId()
   return (
-    <section className="panel state-panel is-preview" aria-label="Preview">
-      <h2 className="panel-title">{title}</h2>
-      <p className="panel-summary">{summary}</p>
+    <section className="panel state-panel is-preview" aria-label={t("Preview")}>
+      <h2 className="panel-title">{t(title)}</h2>
+      <p className="panel-summary">{t(summary)}</p>
       {details && details.length > 0 ? (
         <ul className="panel-details">
           {details.map((d) => (
-            <li key={d}>{d}</li>
+            <li key={t(d)}>{t(d)}</li>
           ))}
         </ul>
       ) : null}
@@ -62,17 +65,17 @@ export function PreviewPanel({
           aria-disabled={disabled}
           aria-describedby={disabled && disabledReason ? hintId : undefined}
         >
-          {actionLabel}
+          {t(actionLabel)}
         </button>
         {onCancel ? (
           <button type="button" className="btn-ghost" onClick={onCancel}>
-            Back
+            {t("Back")}
           </button>
         ) : null}
       </div>
       {disabled && disabledReason ? (
         <p id={hintId} className="panel-hint" role="note">
-          {disabledReason}
+          {disabledReason && t(disabledReason)}
         </p>
       ) : null}
     </section>
@@ -89,19 +92,20 @@ export function ProcessingPanel({
   progress: JobProgress
   onCancel(): void
 }) {
+  const { t } = useLocale()
   const heading = usePanelHeading()
   const pct = Math.max(0, Math.min(100, Math.round((Number.isFinite(progress.fraction) ? progress.fraction : 0) * 100)))
   // Unknown startup work and final checks are indeterminate; do not invent progress.
   const determinate = pct > 0 && pct < 100
   const detail = pct === 100 ? 'Finishing checks…' : progress.detail || 'Preparing and checking your files…'
   return (
-    <section className="panel state-panel is-processing" aria-label="Processing">
-      <h2 ref={heading} tabIndex={-1} className="panel-title">{label}</h2>
+    <section className="panel state-panel is-processing" aria-label={t("Processing")}>
+      <h2 ref={heading} tabIndex={-1} className="panel-title">{t(label)}</h2>
       <div
         className="progress-track"
         role="progressbar"
-        aria-label={label}
-        aria-valuetext={determinate ? `${pct}% — ${detail}` : detail}
+        aria-label={t(label)}
+        aria-valuetext={determinate ? `${pct}% — ${t(detail)}` : detail}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={determinate ? pct : undefined}
@@ -109,12 +113,12 @@ export function ProcessingPanel({
         <div className={`progress-fill${determinate ? '' : ' is-indeterminate'}`} style={{ width: determinate ? `${pct}%` : '35%' }} />
       </div>
       <p className="panel-summary">
-        {detail}{determinate ? ` · ${pct}%` : ''}
+        {t(detail)}{determinate ? ` · ${pct}%` : ''}
       </p>
-      <p className="panel-hint">Processing on your device. Downloads appear after the result passes verification.</p>
+      <p className="panel-hint">{t("Processing on your device. Downloads appear after the result passes verification.")}</p>
       <div className="panel-actions">
         <button type="button" className="btn-ghost" onClick={onCancel}>
-          Cancel
+          {t("Cancel")}
         </button>
       </div>
       <WorkspaceCleanupNote />
@@ -132,6 +136,7 @@ export function FailurePanel({
   onRetry(): void
   onReset(): void
 }) {
+  const { t } = useLocale()
   const heading = usePanelHeading()
   const recovery: Record<ToolError['recovery'], string> = {
     'show-formats': 'Choose a supported file format.',
@@ -146,17 +151,17 @@ export function FailurePanel({
     'suggest-browser': 'Try a current browser with the required features.',
   }
   return (
-    <section className="panel state-panel is-error" aria-label="Something went wrong" role="alert">
-      <h2 ref={heading} tabIndex={-1} className="panel-title">That didn't work</h2>
-      <p className="panel-summary">{error.message}</p>
-      <p className="panel-hint">{recovery[error.recovery]} No download is available from this attempt.</p>
-      <details className="error-details"><summary>Error details</summary><p>Error <code>{error.code}</code></p></details>
+    <section className="panel state-panel is-error" aria-label={t("Something went wrong")} role="alert">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">{t("That didn't work")}</h2>
+      <p className="panel-summary">{t(error.message)}</p>
+      <p className="panel-hint">{t(recovery[error.recovery])} No download is available from this attempt.</p>
+      <details className="error-details"><summary>{t("Error details")}</summary><p>{t("Error")} <code>{error.code}</code></p></details>
       <div className="panel-actions">
         <button type="button" className="btn-primary" onClick={onRetry}>
-          Review settings
+          {t("Review settings")}
         </button>
         <button type="button" className="btn-ghost" onClick={onReset}>
-          Start over
+          {t("Start over")}
         </button>
       </div>
       <WorkspaceCleanupNote />
@@ -180,12 +185,13 @@ export function ResultPanel({
   onContinue?(): void
   retryLabel?: string
 }) {
+  const { t } = useLocale()
   const heading = usePanelHeading()
   const ready = outputs.length > 0 && outputs.every(output => output.verified && output.actualBytes > 0 && output.actualBytes === output.bytes.byteLength)
-  if (!ready) return <section className="panel state-panel" aria-label="Results"><h2 ref={heading} tabIndex={-1} className="panel-title">No verified result available</h2><p>Start over and create a new result before downloading.</p><button type="button" className="btn-ghost" onClick={onReset}>Start over</button></section>
+  if (!ready) return <section className="panel state-panel" aria-label={t("Results")}><h2 ref={heading} tabIndex={-1} className="panel-title">{t("No verified result available")}</h2><p>{t("Start over and create a new result before downloading.")}</p><button type="button" className="btn-ghost" onClick={onReset}>{t("Start over")}</button></section>
   return (
-    <section className="panel state-panel is-result" aria-label="Results">
-      <h2 ref={heading} tabIndex={-1} className="panel-title">Done — your files are ready</h2>
+    <section className="panel state-panel is-result" aria-label={t("Results")}>
+      <h2 ref={heading} tabIndex={-1} className="panel-title">{t("Done — your files are ready")}</h2>
       <p className="panel-summary">
         {outputs.length === 1
           ? 'One file was generated and verified.'
@@ -205,21 +211,21 @@ export function ResultPanel({
               onClick={() => onDownload(o)}
               aria-label={`Download ${o.name} (${formatBytes(o.actualBytes)})`}
             >
-              Download
+              {t("Download")}
             </button>
           </li>
         ))}
       </ul>
       <div className="panel-actions">
         <button type="button" className="btn-ghost" onClick={onRetry}>
-          {retryLabel}
+          {t(retryLabel)}
         </button>
         <button type="button" className="btn-ghost" onClick={onReset}>
-          Start over
+          {t("Start over")}
         </button>
         {onContinue ? (
           <button type="button" className="btn-ghost" onClick={onContinue}>
-            Back to all tools
+            {t("Back to all tools")}
           </button>
         ) : null}
       </div>
@@ -230,17 +236,18 @@ export function ResultPanel({
 
 /** Cancelled state — S5 exit without partial results (PT-PD-003 §5). */
 export function CancelledPanel({ onReset, onAdjust }: { onReset(): void; onAdjust?(): void }) {
+  const { t } = useLocale()
   const heading = usePanelHeading()
   return (
-    <section className="panel state-panel is-cancelled" aria-label="Cancelled" role="status">
-      <h2 ref={heading} tabIndex={-1} className="panel-title">Cancelled</h2>
+    <section className="panel state-panel is-cancelled" aria-label={t("Cancelled")} role="status">
+      <h2 ref={heading} tabIndex={-1} className="panel-title">{t("Cancelled")}</h2>
       <p className="panel-summary">
         This attempt was cancelled. No partial result is available to download. You can adjust the settings and try again.
       </p>
       <div className="panel-actions">
-        {onAdjust ? <button type="button" className="btn-primary" onClick={onAdjust}>Adjust settings</button> : null}
+        {onAdjust ? <button type="button" className="btn-primary" onClick={onAdjust}>{t("Adjust settings")}</button> : null}
         <button type="button" className={onAdjust ? "btn-ghost" : "btn-primary"} onClick={onReset}>
-          Start over
+          {t("Start over")}
         </button>
       </div>
       <WorkspaceCleanupNote />
