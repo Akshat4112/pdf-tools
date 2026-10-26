@@ -9,6 +9,28 @@ const LICENSE = `${SOURCE}/blob/main/LICENSE`
 const AUDIT = `${SOURCE}/blob/main/docs/security/PT-SEC-002-local-processing-audit.md`
 
 const pages: Record<string, { heading: string; body: string }> = {
+  '/trust': {
+    heading: 'Trust and transparency',
+    body: `
+    <p>PDF Tools is a free, MIT-licensed collection of browser-based PDF tools. Here are the public sources behind the promises on this website, and the limits those promises do not cover.</p>
+    <section aria-labelledby="trust-source"><h2 id="trust-source">Open source, with a real license</h2>
+      <p>Inspect the <a href="${SOURCE}" rel="noopener noreferrer">public source repository</a> and its <a href="${LICENSE}" rel="noopener noreferrer">MIT license</a>. Source availability is not a claim that every third-party dependency uses the MIT license or that the software has a third-party security certification.</p>
+    </section>
+    <section aria-labelledby="trust-local"><h2 id="trust-local">Local document processing</h2>
+      <p>The currently released PDF tools process selected document contents in the browser, rather than sending them to a document-conversion server. The <a href="${AUDIT}" rel="noopener noreferrer">all-tool local-processing audit</a> documents synthetic-input browser tests for all 14 shipped tools, including network boundaries, temporary resources and reset/exit behavior. These are project-owned tests, not an independent audit or a guarantee against compromised browsers or extensions.</p>
+      <p>Opening the site still downloads code and assets from GitHub Pages, which receives standard request metadata including IP addresses. That is separate from document processing. Read <a href="/pdf-tools/privacy/">Privacy and local processing</a> for the hosting boundary and storage details.</p>
+    </section>
+    <section aria-labelledby="trust-reset"><h2 id="trust-reset">Clear and reset: what actually disappears</h2>
+      <p>Clear files and Start over release the app's references to selected files, previews, results and temporary object URLs. They do not securely overwrite operating-system memory, delete files already downloaded or erase originals, caches or printouts. See the <a href="${SOURCE}/blob/main/docs/product/PT-PD-003-data-lifecycle.md" rel="noopener noreferrer">data lifecycle specification</a> and the <a href="/pdf-tools/help/">Help and FAQ</a> for the behavior available to users.</p>
+    </section>
+    <section aria-labelledby="trust-release"><h2 id="trust-release">Current release and limitations</h2>
+      <p>The public catalog offers 14 implemented browser workflows; the <a href="/pdf-tools/">tool directory</a> reflects the available tools. See <a href="/pdf-tools/limitations/">supported features and limitations</a> for 50 MiB input limits, PDF page quotas, signature changes and unsupported OCR, permanent redaction, password unlocking or cloud features. For the history of published source changes, inspect <a href="${SOURCE}/commits/main" rel="noopener noreferrer">repository commits</a>. A published workflow is not a promise of support for every PDF or device.</p>
+    </section>
+    <section aria-labelledby="trust-feedback"><h2 id="trust-feedback">Feedback, contribution and security concerns</h2>
+      <p>Read the <a href="${SOURCE}/blob/main/docs/operations/PT-OPS-001-pr-task-workflow.md" rel="noopener noreferrer">contributor and pull-request workflow</a> to propose changes. Ordinary reproducible defects can be reported using <a href="${ISSUE}" rel="noopener noreferrer">public GitHub Issues</a>, with browser details, steps and only synthetic test files.</p>
+      <p><strong>Never attach private, personal, financial, password-protected or confidential PDFs to public issues.</strong> For suspected security vulnerabilities, check the repository's <a href="${SOURCE}/security" rel="noopener noreferrer">Security page</a> for an enabled private reporting option before sending sensitive details. Private vulnerability reporting is not guaranteed to be available; public issues are not a confidential security inbox.</p>
+    </section>`,
+  },
   '/help': {
     heading: 'Help and frequently asked questions',
     body: `

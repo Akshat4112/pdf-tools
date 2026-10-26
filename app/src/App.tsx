@@ -98,6 +98,7 @@ function App() {
           <span>{t("Open source · MIT")}</span>
           <span>{t("Files processed in your browser")}</span>
           <span>{t("No account required")}</span>
+          <a className="fl-trust-evidence-link" href="/pdf-tools/trust/">{t("View trust evidence")}</a>
         </section>
 
         <section className="fl-featured" aria-labelledby="quick-heading">

@@ -43,3 +43,8 @@
 @media(max-width:900px) { .fl-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .fl-how { grid-template-columns:1fr; } }
 @media(max-width:600px) { .fl-home { padding-inline:16px; } .fl-hero { grid-template-columns:1fr; padding:30px 0 20px; } .fl-hero-art { display:none; } .fl-trust-strip { display:grid; grid-template-columns:1fr 1fr; gap:13px; } .fl-quick-grid { grid-template-columns:1fr; } .fl-featured { padding-top:34px; } .fl-how { padding:20px; margin-top:32px; } .fl-how ol { grid-template-columns:1fr; } .fl-hero-actions .fl-cta { width:100%; justify-content:center; } }
 @media(prefers-reduced-motion:reduce) { .fl-home *, .fl-home *::before, .fl-home *::after { transition:none!important; scroll-behavior:auto!important; } }
+
+/* PT-TRUST-002: public evidence entry, styled as a link—not a certification badge. */
+.fl-trust-evidence-link { color:var(--fl-accent); font-weight:700; min-height:44px; display:inline-flex; align-items:center; gap:8px; padding:6px 2px; text-underline-offset:3px; }
+.fl-trust-evidence-link:focus-visible { outline:3px solid var(--fl-focus); outline-offset:3px; }
+@media(max-width:600px) { .fl-trust-evidence-link { grid-column:1 / -1; } }

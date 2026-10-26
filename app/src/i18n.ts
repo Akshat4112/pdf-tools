@@ -26,6 +26,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Open source · MIT": "Open Source · MIT",
   "Files processed in your browser": "Dateien werden im Browser verarbeitet",
   "No account required": "Kein Benutzerkonto nötig",
+  "View trust evidence": "Nachweise ansehen",
   "GET STARTED": "JETZT STARTEN",
   "Popular PDF tasks": "Beliebte PDF-Aufgaben",
   "View all tools": "Alle Tools ansehen",

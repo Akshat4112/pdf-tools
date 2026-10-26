@@ -3,9 +3,9 @@ import { INFO_PAGE_META, PUBLIC_PAGES, infoPageMeta } from '../lib/pageMetadata'
 import { publicInfoHtml } from '../lib/publicInfo'
 
 describe('PT-REL-001 authored public help, privacy and limitations pages', () => {
-  it('generates three unique canonical pages with document-independent text', () => {
-    expect(INFO_PAGE_META).toHaveLength(3)
-    expect(new Set(INFO_PAGE_META.map(p => `/${p.dir}`)).size).toBe(3)
+  it('generates unique canonical public information pages with document-independent text', () => {
+    expect(INFO_PAGE_META).toHaveLength(4)
+    expect(new Set(INFO_PAGE_META.map(p => `/${p.dir}`)).size).toBe(4)
     for (const p of INFO_PAGE_META) {
       const info = infoPageMeta(`/${p.dir}`)!
       expect(info.canonical).toBe(`https://akshat4112.github.io/pdf-tools/${p.dir}/`)
