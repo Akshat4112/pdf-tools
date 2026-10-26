@@ -66,7 +66,7 @@ test('PT-SEO-009 guides: responsive reading, keyboard links and SPA history stay
   await expect(page.locator('.file-row')).toHaveCount(0)
   await page.goBack(); await expect(page).toHaveTitle(guidePageMeta(GUIDES[0]).title)
   await page.goto('guides/unpublished-topic/')
-  await expect(page.getByRole('heading',{name:'Page not found',exact:true})).toBeVisible()
+  await expect(page.getByRole('heading',{name:"This page doesn't exist.",exact:true})).toBeVisible()
 })
 
 async function download(page: Page) {
