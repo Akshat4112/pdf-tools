@@ -29,7 +29,7 @@ test('PT-UX-005: EN/DE selection updates accessible labels without browser persi
 test('PT-UX-005: language control is reachable by keyboard at narrow and zoomed layouts', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('./')
-  const select = page.getByRole('combobox', { name: 'Language' })
+  const select = page.locator('.folio-language select')
   await select.focus()
   await expect(select).toBeFocused()
   await select.press('d')
