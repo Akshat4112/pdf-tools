@@ -6,7 +6,7 @@ test('shared branded footer is present once on every public route and the 404', 
     await page.goto(path)
     const footer = page.getByRole('contentinfo')
     await expect(footer).toHaveCount(1)
-    await expect(footer.getByRole('link', { name: 'PDF Tools' })).toHaveAttribute('href','/pdf-tools/')
+    await expect(footer.getByRole('link', { name: 'PDF Tools', exact: true })).toHaveAttribute('href','/pdf-tools/')
     await expect(footer.getByRole('link',{name:'Privacy notice'})).toHaveAttribute('href','/pdf-tools/privacy/')
     await expect(footer.getByRole('link',{name:'About and trust evidence'})).toHaveAttribute('href','/pdf-tools/trust/')
     await expect(footer.getByRole('link',{name:'MIT license'})).toHaveAttribute('href',/\/blob\/main\/LICENSE$/)
