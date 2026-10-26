@@ -1,8 +1,10 @@
 import { useLocale } from './i18n'
+import { infoPageMeta } from './lib/pageMetadata'
 import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
 import { lazy, Suspense, useEffect } from 'react'
 import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog'
 import { ToolLoadBoundary, ToolLoading } from './components/ToolLoadBoundary'
+const InfoPage = lazy(() => import('./components/InfoPage').then(module => ({ default: module.InfoPage })))
 const GuidePage = lazy(() => import('./components/GuidePage').then(module => ({ default: module.GuidePage })))
 import { ToolCatalog } from './components/ToolCatalog'
 import { ToolEntry } from './components/ToolEntry'
@@ -42,6 +44,14 @@ function App() {
         <ToolEntry tool={activeTool} onExit={() => navigate('/')} />
       </div>
     )
+  }
+
+  if (infoPageMeta(route.path)) {
+    return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace guide-page info-page">
+      <ToolLoadBoundary key={route.path} title={infoPageMeta(route.path)!.title} subject="guide" onExit={() => navigate('/')}>
+        <Suspense fallback={<ToolLoading title={infoPageMeta(route.path)!.title} subject="guide" onExit={() => navigate('/')} />}><InfoPage path={route.path} /></Suspense>
+      </ToolLoadBoundary>
+    </main></div>
   }
 
   if (isGuidePath(route.path)) {

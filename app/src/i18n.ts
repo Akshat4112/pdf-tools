@@ -6,6 +6,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Menu": "Menü",
   "Close": "Schließen",
   "All tools": "Alle Tools",
+  "Help": "Hilfe",
   "Categories": "Kategorien",
   "Guides": "Anleitungen",
   "Privacy": "Datenschutz",

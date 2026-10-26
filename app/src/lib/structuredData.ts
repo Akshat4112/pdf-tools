@@ -1,4 +1,4 @@
-import { PUBLIC_PAGES, SITE_URL, SITE_NAME, SITE_DESCRIPTION, toolPageMeta, hubPageMeta, GUIDE_INDEX_META, guidePageMeta } from './pageMetadata'
+import { PUBLIC_PAGES, SITE_URL, SITE_NAME, SITE_DESCRIPTION, toolPageMeta, hubPageMeta, GUIDE_INDEX_META, guidePageMeta, INFO_PAGE_META } from './pageMetadata'
 import { TOOLS } from '../registry'
 import { HUBS, hubForTool } from './categoryHubs'
 import { GUIDES } from './guideCatalog'
@@ -23,9 +23,10 @@ export function pageStructuredData(canonical: string): { '@context': string; '@g
     const tool = TOOLS.find(tool => tool.implemented && toolPageMeta(tool).canonical === canonical)
     const hub = tool ? hubForTool(tool) : HUBS.find(h => hubPageMeta(h).canonical === canonical)
     const guide = GUIDES.find(g => guidePageMeta(g).canonical === canonical)
+    const info = INFO_PAGE_META.find(p => `${SITE_URL}${p.dir}/` === canonical)
     const trail = [
       { name: 'All PDF tools', item: SITE_URL },
-      hub ? { name: hub.title, item: hubPageMeta(hub).canonical } : { name: 'Guides', item: GUIDE_INDEX_META.canonical },
+      info ? { name: info.title, item: canonical } : hub ? { name: hub.title, item: hubPageMeta(hub).canonical } : { name: 'Guides', item: GUIDE_INDEX_META.canonical },
       ...(tool ? [{ name: tool.title, item: canonical }] : guide ? [{ name: guide.title, item: canonical }] : []),
     ]
     graph.push({ '@type': 'BreadcrumbList', '@id': `${canonical}#breadcrumb`,
