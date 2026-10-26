@@ -1,3 +1,4 @@
+import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
 import { createGuideExamples } from './src/lib/guideExamples.ts'
@@ -54,7 +55,7 @@ function copyPdfjsAssets(): Plugin {
 function prerenderRoutes(): Plugin {
   return {
     name: 'prerender-routes',
-    transformIndexHtml: html => withPageMetadata(html, CATALOG_META),
+    transformIndexHtml: html => withPageMetadata(html, CATALOG_META).replace('</head>', `${structuredDataScript(CATALOG_META.canonical)}\n</head>`),
     async closeBundle() {
       const dist = resolve(process.cwd(), 'dist')
       const indexPath = resolve(dist, 'index.html')
@@ -66,6 +67,8 @@ function prerenderRoutes(): Plugin {
       const metaFor = (dir: string, title: string, description: string, ogType: PageMeta['ogType'] = 'website'): string => {
         const canonical = dir === '.' ? ORIGIN : dir === '404' ? NOT_FOUND_META.canonical : `${ORIGIN}${dir}/`
         let html = withPageMetadata(indexHtml, { title, description, canonical, ogType })
+        html = html.replace(/<script\b[^>]*id=["']public-structured-data["'][^>]*>[\s\S]*?<\/script>/gi, '')
+          .replace('</head>', `${structuredDataScript(canonical)}\n</head>`)
         // Crawlable, truthful no-JS navigation and description. Interactive
         // processing still requires JavaScript, and no document inputs leak
         // into the static source. This remains present without hydration.

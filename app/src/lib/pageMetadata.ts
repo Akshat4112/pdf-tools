@@ -128,7 +128,9 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
   const clean = html
     .replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(meta.title)}</title>`)
     .replace(/\s*<meta\b[^>]*(?:name|property)=["'](?:description|og:[\w:]+|twitter:[\w:]+)["'][^>]*>/gi, '')
+    .replace(/<script\b[^>]*id=["']public-structured-data["'][^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/\s*<link\b[^>]*rel=["']canonical["'][^>]*>/gi, '')
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
   return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
 }
+

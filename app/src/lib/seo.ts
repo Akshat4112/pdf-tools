@@ -43,12 +43,32 @@ function upsertLink(rel: string, href: string): void {
  * the same tags server-side (prerendered); this keeps an SPA-navigated
  * document in sync (acceptance: "accurate titles" on every route).
  */
+let schemaGeneration = 0
 export function applyMeta(meta: PageMeta): void {
   document.title = meta.title
   for (const tag of pageMetaTags(meta)) {
     upsertMeta(`meta[${tag.attribute}="${tag.key}"]`, { [tag.attribute]: tag.key, content: tag.content })
   }
+  const previousCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href
   upsertLink('canonical', meta.canonical)
+  const desired = meta.canonical
+  const generation = ++schemaGeneration
+  // Prerendered HTML already has the correct public JSON-LD. Do not request
+  // another JavaScript chunk on cold homepage/tool/guide loads.
+  const existing = document.getElementById('public-structured-data')?.textContent ?? ''
+  if (previousCanonical === desired &&
+      (existing.includes(desired) || (desired.endsWith('/404.html') && !existing))) return
+  void import('./structuredData').then(({ pageStructuredData, serializeStructuredData, STRUCTURED_DATA_ID }) => {
+    if (generation !== schemaGeneration || document.querySelector('link[rel="canonical"]')?.getAttribute('href') !== desired) return
+    const data = pageStructuredData(desired)
+    let script = document.getElementById(STRUCTURED_DATA_ID) as HTMLScriptElement | null
+    if (!data) { script?.remove(); return }
+    if (!script) {
+      script = document.createElement('script'); script.id = STRUCTURED_DATA_ID
+      script.type = 'application/ld+json'; document.head.appendChild(script)
+    }
+    script.textContent = serializeStructuredData(data)
+  })
 }
 
 // ---------------------------------------------------------------------------
