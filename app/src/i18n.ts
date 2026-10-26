@@ -29,6 +29,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Popular PDF tasks": "Beliebte PDF-Aufgaben",
   "View all tools": "Alle Tools ansehen",
   "Open tool": "Tool öffnen",
+  "Open": "Öffnen",
   "YOUR TOOLBOX": "DEINE WERKZEUGE",
   "Find the right PDF tool": "Das passende PDF-Tool finden",
   "Search and browse the available tools. Every option below links to a working browser-based workflow.": "Durchsuche die verfügbaren Tools. Jede Option führt zu einer funktionierenden Anwendung im Browser.",

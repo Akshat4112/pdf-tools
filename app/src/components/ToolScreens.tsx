@@ -209,7 +209,7 @@ export function ResultPanel({
               type="button"
               className="btn-primary btn-download"
               onClick={() => onDownload(o)}
-              aria-label={`${t('Download')}: ${o.name} (${formatBytes(o.actualBytes)})`}
+              aria-label={`${t('Download')} ${o.name} (${formatBytes(o.actualBytes)})`}
             >
               {t("Download")}
             </button>

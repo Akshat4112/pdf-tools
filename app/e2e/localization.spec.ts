@@ -8,10 +8,10 @@ test('PT-UX-005: EN/DE selection updates accessible labels without browser persi
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF-Tools, die direkt im Browser funktionieren.' })).toBeVisible()
   await expect(page.getByRole('searchbox', { name: 'Tools suchen' })).toBeVisible()
-  await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: /Öffnen PDF zusammenfügen/ }).first()).toBeVisible()
   await page.getByRole('searchbox', { name: 'Tools suchen' }).fill('zusammenfügen')
-  await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
-  await page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first().click()
+  await expect(page.getByRole('link', { name: /Öffnen PDF zusammenfügen/ }).first()).toBeVisible()
+  await page.getByRole('link', { name: /Öffnen PDF zusammenfügen/ }).first().click()
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await page.goto('merge/')
   // A full page reload resets the in-memory language preference.
