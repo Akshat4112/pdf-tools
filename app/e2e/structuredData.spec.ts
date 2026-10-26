@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
-import { PUBLIC_PAGES, pageStructuredData, STRUCTURED_DATA_ID, NOT_FOUND_META } from '../src/lib/pageMetadata'
+import { PUBLIC_PAGES, NOT_FOUND_META } from '../src/lib/pageMetadata'
+import { pageStructuredData, STRUCTURED_DATA_ID } from '../src/lib/structuredData'
 
 test('PT-SEO-006 schema: static and client graphs match all visible public routes', async ({ request, page }) => {
   test.setTimeout(120_000)

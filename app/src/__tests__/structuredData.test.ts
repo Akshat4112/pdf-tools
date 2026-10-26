@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { PUBLIC_PAGES, SITE_URL, NOT_FOUND_META, pageStructuredData, serializeStructuredData, withPageMetadata } from '../lib/pageMetadata'
+import { PUBLIC_PAGES, SITE_URL, NOT_FOUND_META, withPageMetadata } from '../lib/pageMetadata'
+import { pageStructuredData, serializeStructuredData, structuredDataScript } from '../lib/structuredData'
 
 describe('public structured data', () => {
   it('allows exact public canonicals only, never file/query/fragment state', () => {
@@ -30,11 +31,11 @@ describe('public structured data', () => {
   })
   it('replaces stale schema and excludes caller-supplied titles from public JSON', () => {
     const meta = { ...PUBLIC_PAGES[0], title: 'private-canary.pdf' }
-    const once = withPageMetadata('<head><title>Old</title></head>', meta)
-    const twice = withPageMetadata(once, meta)
+    const once = withPageMetadata('<head><title>Old</title></head>', meta).replace('</head>', `${structuredDataScript(meta.canonical)}\n</head>`)
+    const twice = withPageMetadata(once, meta).replace('</head>', `${structuredDataScript(meta.canonical)}\n</head>`)
     expect(twice.match(/id="public-structured-data"/g)).toHaveLength(1)
     const json = twice.match(/type="application\/ld\+json">(.*?)<\/script>/)![1]
     expect(json).not.toContain('private-canary')
-    expect(withPageMetadata(twice, NOT_FOUND_META)).not.toContain('public-structured-data')
+    expect(withPageMetadata(twice, NOT_FOUND_META).replace(/<script[^>]+id="public-structured-data"[^>]*>[\s\S]*?<\/script>/, '')).not.toContain('public-structured-data')
   })
 })

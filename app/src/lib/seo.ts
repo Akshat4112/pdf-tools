@@ -13,7 +13,7 @@
 
 
 export * from './pageMetadata'
-import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, pageStructuredData, serializeStructuredData, STRUCTURED_DATA_ID, type PageMeta } from './pageMetadata'
+import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -43,20 +43,26 @@ function upsertLink(rel: string, href: string): void {
  * the same tags server-side (prerendered); this keeps an SPA-navigated
  * document in sync (acceptance: "accurate titles" on every route).
  */
+let schemaGeneration = 0
 export function applyMeta(meta: PageMeta): void {
   document.title = meta.title
   for (const tag of pageMetaTags(meta)) {
     upsertMeta(`meta[${tag.attribute}="${tag.key}"]`, { [tag.attribute]: tag.key, content: tag.content })
   }
   upsertLink('canonical', meta.canonical)
-  const data = pageStructuredData(meta.canonical)
-  let script = document.getElementById(STRUCTURED_DATA_ID) as HTMLScriptElement | null
-  if (!data) { script?.remove(); return }
-  if (!script) {
-    script = document.createElement('script'); script.id = STRUCTURED_DATA_ID
-    script.type = 'application/ld+json'; document.head.appendChild(script)
-  }
-  script.textContent = serializeStructuredData(data)
+  const desired = meta.canonical
+  const generation = ++schemaGeneration
+  void import('./structuredData').then(({ pageStructuredData, serializeStructuredData, STRUCTURED_DATA_ID }) => {
+    if (generation !== schemaGeneration || document.querySelector('link[rel="canonical"]')?.getAttribute('href') !== desired) return
+    const data = pageStructuredData(desired)
+    let script = document.getElementById(STRUCTURED_DATA_ID) as HTMLScriptElement | null
+    if (!data) { script?.remove(); return }
+    if (!script) {
+      script = document.createElement('script'); script.id = STRUCTURED_DATA_ID
+      script.type = 'application/ld+json'; document.head.appendChild(script)
+    }
+    script.textContent = serializeStructuredData(data)
+  })
 }
 
 // ---------------------------------------------------------------------------
