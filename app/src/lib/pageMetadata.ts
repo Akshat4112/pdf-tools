@@ -86,6 +86,7 @@ export const INFO_PAGE_META = [
   { dir: 'help', title: 'Help and frequently asked questions', description: 'Learn PDF tasks, common questions and safe issue reporting.' },
   { dir: 'privacy', title: 'Privacy and local processing', description: 'Understand local processing, hosting requests, downloads and data limits.' },
   { dir: 'limitations', title: 'Supported features and limitations', description: 'See PDF formats, limits, signature warnings and unsupported features.' },
+  { dir: 'trust', title: 'Trust and transparency', description: 'Verify PDF Tools source, MIT license, local processing evidence, release limits and safe contribution channels.' },
 ] as const
 export const infoPageMeta = (path: string): PageMeta | undefined => {
   const page = INFO_PAGE_META.find(p => `/${p.dir}` === path)

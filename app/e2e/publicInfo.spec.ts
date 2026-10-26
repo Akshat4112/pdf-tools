@@ -19,7 +19,7 @@ test('PT-REL-001: real static help/privacy/limitations pages with useful canonic
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://akshat4112.github.io/pdf-tools/${info.dir}/`)
     expect(await page.locator('main').locator('script').count()).toBe(0)
   }
-  expect(PUBLIC_PAGES.filter(p => INFO_PAGE_META.some(info => p.dir === info.dir))).toHaveLength(3)
+  expect(PUBLIC_PAGES.filter(p => INFO_PAGE_META.some(info => p.dir === info.dir))).toHaveLength(INFO_PAGE_META.length)
 })
 
 test('PT-REL-001: help navigation resolves to the shipped catalog/tools, safe issue guidance and privacy notice', async ({ page }) => {
