@@ -20,3 +20,9 @@ Status: **Implementation review, not a full accessibility certification.** Scope
 
 ## Release decision
 Do not mark PT-UI-007 Done or claim WCAG compliance until the above meaningful manual/axe acceptance is conducted and any failures are fixed or separately recorded as blockers. A green implementation PR confirms only the checks actually run.
+
+## CI reproducibility
+
+- Run `npm run build` inside `app/`, then `npx playwright test accessibilityRelease.spec.ts` against the preview configuration used by CI.
+- The accessibility suite uses public paths and empty workspaces, and its results are limited to browser-observable DOM/CSS and interaction contracts.
+- This PR is stacked on PT-UI-003 #75 until the footer is merged; do not merge out of dependency order or treat review as sign-off for physical hardware or assistive technology.
