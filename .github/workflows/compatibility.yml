@@ -19,6 +19,10 @@ jobs:
   compatibility:
     name: Chromium Firefox WebKit compatibility smoke
     runs-on: ubuntu-latest
+    # Official Playwright image supplies all three browser engines and system
+    # libraries; avoids lengthy apt/browser downloads on each CI run.
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
     defaults:
       run:
         working-directory: app
@@ -33,7 +37,5 @@ jobs:
         run: npm ci
       - name: Build exact commit
         run: npm run build
-      - name: Install browser engines and system dependencies
-        run: npx playwright install --with-deps chromium firefox webkit
       - name: Compatibility smoke — no private fixtures/artifacts
         run: npx playwright test --config playwright.compat.config.ts --max-failures=1
