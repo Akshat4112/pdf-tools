@@ -1,3 +1,4 @@
+import { GUIDES, guidePath, type Guide } from './guideCatalog.ts'
 import { HUBS, hubPath, hubForTool, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
@@ -21,7 +22,7 @@ export interface PageMeta {
   /** absolute canonical URL including /pdf-tools/ base */
   canonical: string
   /** Open Graph type; 'website' for catalog, 'article' feels wrong for tools */
-  ogType: 'website'
+  ogType: 'website' | 'article'
 }
 
 /** Catalog page metadata. */
@@ -76,9 +77,14 @@ export const NOT_FOUND_META: PageMeta = {
 }
 
 
-/** Only implemented tool routes may be advertised in generated entry pages. */
+export const GUIDE_INDEX_META: PageMeta = { title: 'Practical PDF guides — PDF Tools', description: 'Work through everyday PDF tasks with small synthetic examples, step-by-step checks and clear limits.', canonical: `${SITE_URL}guides/`, ogType: 'website' }
+export const guidePageMeta = (guide: Guide): PageMeta => ({ title: `${guide.title} — PDF Tools`, description: guide.description, canonical: `${SITE_URL}${guidePath(guide).slice(1)}/`, ogType: 'article' })
+
+/** Only shipped tools, hubs and published guides are indexable. */
 export const PUBLIC_PAGES = [
   { dir: '.', ...CATALOG_META },
+  { dir: 'guides', ...GUIDE_INDEX_META },
+  ...GUIDES.map(guide => ({ dir: guidePath(guide).slice(1), ...guidePageMeta(guide) })),
   ...HUBS.map(hub => ({ dir: hubPath(hub).slice(1), ...hubPageMeta(hub) })),
   ...TOOLS.filter(tool => tool.implemented).map(tool => ({ dir: tool.route.slice(1), ...toolPageMeta(tool) })),
 ]
@@ -128,7 +134,6 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
   return clean.replace('</head>', `${tags}\n${structuredDataScript(meta.canonical)}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
 }
 
-
 export const STRUCTURED_DATA_ID = 'public-structured-data'
 export type SchemaNode = { '@type': string; '@id': string; [key: string]: unknown }
 /** An exact public canonical allowlist prevents query/file state from entering JSON-LD. */
@@ -149,16 +154,21 @@ export function pageStructuredData(canonical: string): { '@context': string; '@g
     graph.push(application(SITE_URL, SITE_NAME, SITE_DESCRIPTION))
   } else {
     const tool = TOOLS.find(tool => tool.implemented && toolPageMeta(tool).canonical === canonical)
-    const hub = tool ? hubForTool(tool) : HUBS.find(hub => hubPageMeta(hub).canonical === canonical)!
-    const trail = [{ name: 'All PDF tools', item: SITE_URL }, { name: hub.title, item: hubPageMeta(hub).canonical }]
-    if (tool) trail.push({ name: tool.title, item: canonical })
-    const breadcrumb = { '@id': `${canonical}#breadcrumb` }
-    graph.push({ '@type': tool ? 'WebPage' : 'CollectionPage', '@id': `${canonical}#webpage`, url: canonical,
-      name: tool ? tool.title : hub.title, description: page.description, inLanguage: 'en', isPartOf: site, breadcrumb,
+    const hub = tool ? hubForTool(tool) : HUBS.find(hub => hubPageMeta(hub).canonical === canonical)
+    const guide = GUIDES.find(guide => guidePageMeta(guide).canonical === canonical)
+    const isGuideIndex = canonical === GUIDE_INDEX_META.canonical
+    const crumb = { '@id': `${canonical}#breadcrumb` }
+    const root = { name: 'All PDF tools', item: SITE_URL }
+    const trail = tool || hub
+      ? [root, { name: (hub ?? hubForTool(tool!)).title, item: hubPageMeta(hub ?? hubForTool(tool!)).canonical }, ...(tool ? [{ name: tool.title, item: canonical }] : [])]
+      : [root, { name: 'Guides', item: GUIDE_INDEX_META.canonical }, ...(guide ? [{ name: guide.title, item: canonical }] : [])]
+    const name = tool?.title ?? hub?.title ?? guide?.title ?? (isGuideIndex ? 'Practical PDF guides' : page.title)
+    graph.push({ '@type': tool || guide ? 'WebPage' : 'CollectionPage', '@id': `${canonical}#webpage`, url: canonical,
+      name, description: page.description, inLanguage: 'en', isPartOf: site, breadcrumb: crumb,
       ...(tool ? { mainEntity: { '@id': `${canonical}#application` } } : {}),
     })
     if (tool) graph.push(application(canonical, tool.title, page.description))
-    graph.push({ '@type': 'BreadcrumbList', ...breadcrumb, itemListElement: trail.map((entry, index) => ({ '@type': 'ListItem', position: index + 1, ...entry })) })
+    graph.push({ '@type': 'BreadcrumbList', ...crumb, itemListElement: trail.map((entry, index) => ({ '@type': 'ListItem', position: index + 1, ...entry })) })
   }
   return { '@context': 'https://schema.org', '@graph': graph }
 }

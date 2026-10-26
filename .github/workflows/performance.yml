@@ -1,0 +1,51 @@
+name: startup performance
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: startup-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  startup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+        working-directory: app
+      - run: npx playwright install --with-deps chromium
+        working-directory: app
+      - name: Build pinned pre-optimization baseline
+        shell: bash
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/startup-baseline" 994069b1a212426101ce7493e0dc038ab67e98ad
+          ln -s "$GITHUB_WORKSPACE/app/node_modules" "$RUNNER_TEMP/startup-baseline/app/node_modules"
+          npm --prefix "$RUNNER_TEMP/startup-baseline/app" run build -- --manifest
+      - name: Build candidate
+        run: npm run build
+        working-directory: app
+      - name: Lazy workspace request and recovery checks
+        run: npx playwright test startupPerformance.spec.ts
+        working-directory: app
+      - name: Compare cold mobile startup on the same runner
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/startup-reports"
+          node scripts/measure_startup.mjs "$RUNNER_TEMP/startup-baseline/app/dist" "$RUNNER_TEMP/startup-reports/baseline.json" baseline
+          node scripts/measure_startup.mjs app/dist "$RUNNER_TEMP/startup-reports/candidate.json" candidate
+          node scripts/compare_startup.mjs "$RUNNER_TEMP/startup-reports/baseline.json" "$RUNNER_TEMP/startup-reports/candidate.json" "$RUNNER_TEMP/startup-reports/comparison.json"
+      # Public empty pages only; no documents, traces, screenshots or session content.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: startup-lab-${{ github.sha }}
+          path: ${{ runner.temp }}/startup-reports/*.json
+          retention-days: 7
+          if-no-files-found: error

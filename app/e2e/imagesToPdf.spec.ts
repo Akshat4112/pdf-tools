@@ -170,6 +170,7 @@ test('file-size guards skip reads, and clear/exit discard pending file reads',as
     }
   })
   await page.reload()
+  await expect(page.locator('input[type=file]')).toHaveCount(1)
   await page.evaluate(()=>{
     const transfer=new DataTransfer(),file=new File(['small payload'],'too-large.png')
     Object.defineProperty(file,'size',{value:50*1024*1024+1});transfer.items.add(file)

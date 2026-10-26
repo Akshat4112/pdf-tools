@@ -10,7 +10,7 @@
  * (PT-PD-002 §3: "Preserve the original input and create a separately named output").
  */
 
-import { PDFDocument, degrees } from 'pdf-lib'
+import type { PDFDocument } from 'pdf-lib'
 import { QUOTAS, toOffsetZeroU8, toolError } from '../registry'
 
 export async function loadWritable(data: Uint8Array | ArrayBuffer): Promise<PDFDocument> {
@@ -26,6 +26,7 @@ export async function loadWritable(data: Uint8Array | ArrayBuffer): Promise<PDFD
     )
   }
   try {
+    const { PDFDocument } = await import('pdf-lib')
     return await PDFDocument.load(bytes, { ignoreEncryption: false })
   } catch (err) {
     const msg = String((err as Error).message ?? err)
@@ -45,6 +46,7 @@ export async function mergePdfs(sources: Array<Uint8Array | ArrayBuffer>): Promi
   if (sources.length === 0) {
     throw toolError('E-INPUT-05', 'Select at least one file to continue.', 'focus-picker')
   }
+  const { PDFDocument } = await import('pdf-lib')
   const out = await PDFDocument.create()
   for (const src of sources) {
     const doc = await loadWritable(src)
@@ -71,6 +73,7 @@ export async function splitPdf(
     throw toolError('E-INPUT-05', 'Select at least one range to continue.', 'focus-picker')
   }
   const src = await loadWritable(source)
+  const { PDFDocument } = await import('pdf-lib')
   const outputs: Uint8Array[] = []
   for (const group of groups) {
     if (group.length === 0) {
@@ -107,6 +110,7 @@ export async function rotatePdf(
   if (pages.length === 0) {
     throw toolError('E-INPUT-05', 'Select at least one page to continue.', 'focus-picker')
   }
+  const { degrees } = await import('pdf-lib')
   const all = doc.getPages()
   for (const n of pages) {
     if (n < 1 || n > all.length) {
@@ -172,6 +176,7 @@ export async function extractPages(
       throw toolError('E-CONFIG-01', `Page ${n} is not valid for a ${total}-page document.`, 'fix-field')
     }
   }
+  const { PDFDocument } = await import('pdf-lib')
   const out = await PDFDocument.create()
   const copied = await out.copyPages(src, pages.map((n) => n - 1))
   copied.forEach((p) => out.addPage(p))
@@ -211,6 +216,7 @@ export async function organizePdf(
       'show-limits',
     )
   }
+  const { PDFDocument, degrees } = await import('pdf-lib')
   const out = await PDFDocument.create()
   const copied = await out.copyPages(src, plan.map((e) => e.sourcePage - 1))
   copied.forEach((page, i) => {
@@ -237,6 +243,7 @@ export async function imagesToPdf(images: ImagePageSpec[]): Promise<Uint8Array> 
   if (images.length === 0) {
     throw toolError('E-INPUT-05', 'Select at least one image to continue.', 'focus-picker')
   }
+  const { PDFDocument } = await import('pdf-lib')
   const out = await PDFDocument.create()
   for (const spec of images) {
     if (spec.bytes.byteLength > QUOTAS.maxInputBytes) {

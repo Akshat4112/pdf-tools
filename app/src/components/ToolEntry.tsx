@@ -1,3 +1,7 @@
+import { useLocale } from '../i18n'
+import { relatedGuidesHtml } from '../lib/guideCatalog'
+import { lazy, Suspense } from 'react'
+import { ToolLoadBoundary, ToolLoading } from './ToolLoadBoundary'
 import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHubs'
 /**
  * Generated tool entry page — PT-UX-004.
@@ -16,26 +20,27 @@ import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHub
 import type { ToolDefinition } from '../registry'
 import { toolArticleHtml } from '../lib/toolContent'
 import { SITE_BASE } from '../lib/seo'
-import { MergeTool } from './MergeTool'
-import { SplitTool } from './SplitTool'
-import { PageSelectionTool } from './PageSelectionTool'
-import { OrganizeTool } from './OrganizeTool'
-import { ImagesToPdfTool } from './ImagesToPdfTool'
-import { PdfToImagesTool } from './PdfToImagesTool'
-import { PdfReaderTool } from './PdfReaderTool'
-import { PdfToTextTool } from './PdfToTextTool'
-import { DocumentInfoTool } from './DocumentInfoTool'
-import { OverlayTool } from './OverlayTool'
+const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: module.MergeTool })))
+const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
+const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
+const OrganizeTool = lazy(() => import('./OrganizeTool').then(module => ({ default: module.OrganizeTool })))
+const ImagesToPdfTool = lazy(() => import('./ImagesToPdfTool').then(module => ({ default: module.ImagesToPdfTool })))
+const PdfToImagesTool = lazy(() => import('./PdfToImagesTool').then(module => ({ default: module.PdfToImagesTool })))
+const PdfReaderTool = lazy(() => import('./PdfReaderTool').then(module => ({ default: module.PdfReaderTool })))
+const PdfToTextTool = lazy(() => import('./PdfToTextTool').then(module => ({ default: module.PdfToTextTool })))
+const DocumentInfoTool = lazy(() => import('./DocumentInfoTool').then(module => ({ default: module.DocumentInfoTool })))
+const OverlayTool = lazy(() => import('./OverlayTool').then(module => ({ default: module.OverlayTool })))
 
 function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
+  const { t } = useLocale()
   return (
-    <section className="tool-screen" aria-label={`${tool.title} preview`}>
+    <section className="tool-screen" aria-label={`${t(tool.title)} preview`}>
       <header className="tool-header">
-        <h1 className="tool-heading">{tool.title}</h1>
-        <p className="tool-subtitle">{tool.description}</p>
+        <h1 className="tool-heading">{t(tool.title)}</h1>
+        <p className="tool-subtitle">{t(tool.description)}</p>
       </header>
       <div className="panel" role="note">
-        <h2 className="panel-title">In progress — not available yet</h2>
+        <h2 className="panel-title">{t("In progress — not available yet")}</h2>
         <p className="panel-summary">
           This tool is listed in the catalog so you can see where the project
           is going. It opens as soon as its engine and interface pass
@@ -43,7 +48,7 @@ function ToolWorkInProgress({ tool }: { tool: ToolDefinition }) {
         </p>
         <div className="panel-actions">
           <a className="btn-ghost" href={SITE_BASE}>
-            Back to all tools
+            {t("Back to all tools")}
           </a>
         </div>
       </div>
@@ -106,16 +111,21 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
+  const { t } = useLocale()
   return <main id="main-content" className="tool-workspace">
     <div className="workspace-context">
       <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />
       {tool.implemented ? <details className="workspace-help">
-        <summary>How to use this tool</summary>
-        <p>{TOOL_HELP[tool.id]}</p>
-        <p>Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.</p>
+        <summary>{t("How to use this tool")}</summary>
+        <p>{t(TOOL_HELP[tool.id])}</p>
+        <p>{t("Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.")}</p>
       </details> : null}
     </div>
-    <ToolContent tool={tool} onExit={onExit} />
-    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) }} /> : null}
+    <ToolLoadBoundary key={tool.id} title={t(tool.title)} onExit={onExit}>
+      <Suspense fallback={<ToolLoading title={t(tool.title)} onExit={onExit} />}>
+        <ToolContent tool={tool} onExit={onExit} />
+      </Suspense>
+    </ToolLoadBoundary>
+    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) }} /> : null}
   </main>
 }
