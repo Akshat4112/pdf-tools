@@ -3,7 +3,7 @@ import { readFile, mkdir } from 'node:fs/promises'
 import { resolve, join } from 'node:path'
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs'
 import { PDFDocument } from 'pdf-lib'
-import { GUIDES, guidePath } from '../src/lib/guideCatalog'
+import { GUIDES, guidePath, guideByPath } from '../src/lib/guideCatalog'
 import { guideHtml } from '../src/lib/guideContent'
 import { guidePageMeta, GUIDE_INDEX_META } from '../src/lib/pageMetadata'
 
@@ -14,6 +14,8 @@ test('PT-SEO-009 guides: complete static articles and examples work without Java
     expect(response.ok()).toBe(true)
     expect(html).toContain(guideHtml(path))
     expect(html.match(/rel="canonical"/g)).toHaveLength(1)
+    const meta = path === '/guides' ? GUIDE_INDEX_META : guidePageMeta(guideByPath(path)!)
+    expect(html).toContain(`<meta property="og:type" content="${meta.ogType}"`)
     await page.goto(`http://127.0.0.1:4178${route}`)
     await expect(page.getByRole('main')).toHaveCount(1)
     await expect(page.getByRole('heading', { name: title, exact: true, level: 1 })).toBeVisible()

@@ -4,7 +4,7 @@ import { createGuideExamples } from './src/lib/guideExamples.ts'
 import { hubByPath, categoryHubHtml, hubDirectoryHtml, breadcrumbHtml, hubForTool, relatedToolsHtml } from './src/lib/categoryHubs.ts'
 import { TOOLS } from './src/registry.ts'
 import { toolArticleHtml } from './src/lib/toolContent.ts'
-import { CATALOG_META, NOT_FOUND_META, PUBLIC_PAGES, SITE_URL, withPageMetadata } from './src/lib/pageMetadata.ts'
+import { CATALOG_META, NOT_FOUND_META, PUBLIC_PAGES, SITE_URL, withPageMetadata, type PageMeta } from './src/lib/pageMetadata.ts'
 import react from '@vitejs/plugin-react'
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -63,9 +63,9 @@ function prerenderRoutes(): Plugin {
 
       const ROUTES = PUBLIC_PAGES
       const ORIGIN = SITE_URL
-      const metaFor = (dir: string, title: string, description: string): string => {
+      const metaFor = (dir: string, title: string, description: string, ogType: PageMeta['ogType'] = 'website'): string => {
         const canonical = dir === '.' ? ORIGIN : dir === '404' ? NOT_FOUND_META.canonical : `${ORIGIN}${dir}/`
-        let html = withPageMetadata(indexHtml, { title, description, canonical, ogType: 'website' })
+        let html = withPageMetadata(indexHtml, { title, description, canonical, ogType })
         // Crawlable, truthful no-JS navigation and description. Interactive
         // processing still requires JavaScript, and no document inputs leak
         // into the static source. This remains present without hydration.
@@ -86,7 +86,7 @@ function prerenderRoutes(): Plugin {
       }
 
       for (const route of ROUTES) {
-        const html = metaFor(route.dir, route.title, route.description)
+        const html = metaFor(route.dir, route.title, route.description, route.ogType)
         if (route.dir === '.') {
           writeFileSync(indexPath, html)
         } else {
