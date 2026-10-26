@@ -83,18 +83,18 @@ export const guidePageMeta = (guide: Guide): PageMeta => ({ title: `${guide.titl
 /** Only shipped tools, hubs and published guides are indexable. */
 /** PT-REL-001 — English-language public help, privacy and limitations routes. */
 export const INFO_PAGE_META = [
-  { path: '/help', dir: 'help', title: 'Help and frequently asked questions', description: 'Learn to merge, split, read and convert PDFs locally, choose correct tools and report issues safely.' },
-  { path: '/privacy', dir: 'privacy', title: 'Privacy and local processing', description: 'Understand on-device PDF processing, GitHub Pages hosting requests, temporary memory, downloads and privacy limits.' },
-  { path: '/limitations', dir: 'limitations', title: 'Supported features and limitations', description: 'PDF Tools formats, browser limits, digital signatures, OCR limitations, page deletion and safe handling guidance.' },
+  { dir: 'help', title: 'Help and frequently asked questions', description: 'Learn PDF tasks, common questions and safe issue reporting.' },
+  { dir: 'privacy', title: 'Privacy and local processing', description: 'Understand local processing, hosting requests, downloads and data limits.' },
+  { dir: 'limitations', title: 'Supported features and limitations', description: 'See PDF formats, limits, signature warnings and unsupported features.' },
 ] as const
 export const infoPageMeta = (path: string): PageMeta | undefined => {
-  const page = INFO_PAGE_META.find(p => p.path === path)
+  const page = INFO_PAGE_META.find(p => `/${p.dir}` === path)
   return page && { title: `${page.title} — PDF Tools`, description: page.description, canonical: `${SITE_URL}${page.dir}/`, ogType: 'website' }
 }
 
 export const PUBLIC_PAGES = [
   { dir: '.', ...CATALOG_META },
-  ...INFO_PAGE_META.map(page => ({ dir: page.dir, ...infoPageMeta(page.path)! })),
+  ...INFO_PAGE_META.map(page => ({ dir: page.dir, ...infoPageMeta(`/${page.dir}`)! })),
   { dir: 'guides', ...GUIDE_INDEX_META },
   ...GUIDES.map(guide => ({ dir: guidePath(guide).slice(1), ...guidePageMeta(guide) })),
   ...HUBS.map(hub => ({ dir: hubPath(hub).slice(1), ...hubPageMeta(hub) })),
