@@ -1,0 +1,43 @@
+name: PT-QA-002 browser compatibility
+
+# Separate from the full Chromium R1 regression suite. No PDF data, screenshots,
+# traces or downloads leave the ephemeral CI runner.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pt-qa-002-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    name: Chromium Firefox WebKit compatibility smoke
+    runs-on: ubuntu-latest
+    # Official Playwright image supplies all three browser engines and system
+    # libraries; avoids lengthy apt/browser downloads on each CI run.
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
+    env:
+      HOME: /root
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: app/package.json
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build exact commit
+        run: npm run build
+      - name: Compatibility smoke — no private fixtures/artifacts
+        run: npx playwright test --config playwright.compat.config.ts --max-failures=1
