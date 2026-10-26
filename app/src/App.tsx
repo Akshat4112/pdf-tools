@@ -48,7 +48,7 @@ function App() {
 
   if (isGuidePath(route.path) || infoPageMeta(route.path)) {
     const title = guideByPath(route.path)?.title ?? infoPageMeta(route.path)?.title ?? 'Practical PDF guides'
-    return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace guide-page">
+    return <div className="shell"><SiteHeader key={route.path} /><main tabIndex={-1} id="main-content" className="tool-workspace guide-page">
       <ToolLoadBoundary key={route.path} title={title} subject="guide" onExit={() => navigate('/')}>
         <Suspense fallback={<ToolLoading title={title} subject="guide" onExit={() => navigate('/')} />}><GuidePage path={route.path} /></Suspense>
       </ToolLoadBoundary>
@@ -56,13 +56,13 @@ function App() {
   }
 
   const hub = hubByPath(route.path)
-  if (hub) return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace category-hub" dangerouslySetInnerHTML={{ __html: categoryHubHtml(hub) }} /></div>
+  if (hub) return <div className="shell"><SiteHeader key={route.path} /><main tabIndex={-1} id="main-content" className="tool-workspace category-hub" dangerouslySetInnerHTML={{ __html: categoryHubHtml(hub) }} /></div>
 
   if (route.name === 'not-found') {
     return (
       <div className="shell">
         <SiteHeader key={route.path} />
-        <NotFound />
+        <main tabIndex={-1} id="main-content"><NotFound /></main>
       </div>
     )
   }
@@ -74,7 +74,7 @@ function App() {
   return (
     <div className="shell fl-home">
       <SiteHeader key={route.path} />
-      <main id="main-content">
+      <main tabIndex={-1} id="main-content">
         <section className="fl-hero" aria-labelledby="home-heading">
           <div className="fl-hero-copy">
             <p className="fl-eyebrow">{t("FREE FOREVER · OPEN SOURCE")}</p>

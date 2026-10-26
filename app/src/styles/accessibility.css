@@ -1,0 +1,15 @@
+/* PT-UI-007: keyboard-only skip navigation, honoring current locale, theme and reduced motion. */
+html:not(:lang(de)) .fl-skip-de, html:lang(de) .fl-skip-en { display:none; }
+.fl-skip-link {
+  position:absolute; top:-10000px; left:12px; z-index:100;
+  display:inline-flex; align-items:center; min-height:44px;
+  padding:10px 16px; border-radius:var(--fl-radius-sm);
+  font-size:1rem; font-weight:700; color:var(--fl-text);
+  background:var(--fl-surface); border:2px solid var(--fl-focus);
+  text-decoration:underline; text-underline-offset:3px;
+}
+.fl-skip-link:focus-visible { position:fixed; top:12px; outline:3px solid var(--fl-focus); outline-offset:3px; }
+#main-content:focus { outline:none; } /* Keyboard focus was already signposted by the skip link. */
+@media(forced-colors:active) {
+  .fl-skip-link:focus-visible { border:2px solid CanvasText; outline:3px solid Highlight; }
+}

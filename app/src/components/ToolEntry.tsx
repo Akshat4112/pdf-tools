@@ -112,7 +112,7 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t } = useLocale()
-  return <main id="main-content" className="tool-workspace">
+  return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
       <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />
       {tool.implemented ? <details className="workspace-help">
