@@ -144,8 +144,7 @@ export function pageStructuredData(canonical: string): { '@context': string; '@g
   const site = { '@id': `${SITE_URL}#website` }
   const application = (url: string, name: string, description: string): SchemaNode => ({
     '@type': 'WebApplication', '@id': `${url}#application`, url, name, description,
-    applicationCategory: 'UtilitiesApplication', applicationSuite: SITE_NAME,
-    browserRequirements: 'Requires JavaScript and a modern web browser.',
+    applicationCategory: 'UtilitiesApplication',
     isAccessibleForFree: true, license, offers: { '@type': 'Offer', price: 0 },
   })
   const graph: SchemaNode[] = []
@@ -154,21 +153,17 @@ export function pageStructuredData(canonical: string): { '@context': string; '@g
     graph.push(application(SITE_URL, SITE_NAME, SITE_DESCRIPTION))
   } else {
     const tool = TOOLS.find(tool => tool.implemented && toolPageMeta(tool).canonical === canonical)
-    const hub = tool ? hubForTool(tool) : HUBS.find(hub => hubPageMeta(hub).canonical === canonical)
-    const guide = GUIDES.find(guide => guidePageMeta(guide).canonical === canonical)
-    const isGuideIndex = canonical === GUIDE_INDEX_META.canonical
-    const crumb = { '@id': `${canonical}#breadcrumb` }
-    const root = { name: 'All PDF tools', item: SITE_URL }
-    const trail = tool || hub
-      ? [root, { name: (hub ?? hubForTool(tool!)).title, item: hubPageMeta(hub ?? hubForTool(tool!)).canonical }, ...(tool ? [{ name: tool.title, item: canonical }] : [])]
-      : [root, { name: 'Guides', item: GUIDE_INDEX_META.canonical }, ...(guide ? [{ name: guide.title, item: canonical }] : [])]
-    const name = tool?.title ?? hub?.title ?? guide?.title ?? (isGuideIndex ? 'Practical PDF guides' : page.title)
-    graph.push({ '@type': tool || guide ? 'WebPage' : 'CollectionPage', '@id': `${canonical}#webpage`, url: canonical,
-      name, description: page.description, inLanguage: 'en', isPartOf: site, breadcrumb: crumb,
-      ...(tool ? { mainEntity: { '@id': `${canonical}#application` } } : {}),
+    const hub = tool ? hubForTool(tool) : HUBS.find(h => hubPageMeta(h).canonical === canonical)
+    const guide = GUIDES.find(g => guidePageMeta(g).canonical === canonical)
+    const trail = [
+      { name: 'All PDF tools', item: SITE_URL },
+      hub ? { name: hub.title, item: hubPageMeta(hub).canonical } : { name: 'Guides', item: GUIDE_INDEX_META.canonical },
+      ...(tool ? [{ name: tool.title, item: canonical }] : guide ? [{ name: guide.title, item: canonical }] : []),
+    ]
+    graph.push({ '@type': 'BreadcrumbList', '@id': `${canonical}#breadcrumb`,
+      itemListElement: trail.map((entry, index) => ({ '@type': 'ListItem', position: index + 1, ...entry })),
     })
     if (tool) graph.push(application(canonical, tool.title, page.description))
-    graph.push({ '@type': 'BreadcrumbList', ...crumb, itemListElement: trail.map((entry, index) => ({ '@type': 'ListItem', position: index + 1, ...entry })) })
   }
   return { '@context': 'https://schema.org', '@graph': graph }
 }
