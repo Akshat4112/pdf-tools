@@ -1,3 +1,4 @@
+import { relatedGuidesHtml } from '../lib/guideCatalog'
 import { lazy, Suspense } from 'react'
 import { ToolLoadBoundary, ToolLoading } from './ToolLoadBoundary'
 import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHubs'
@@ -122,6 +123,6 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         <ToolContent tool={tool} onExit={onExit} />
       </Suspense>
     </ToolLoadBoundary>
-    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) }} /> : null}
+    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) }} /> : null}
   </main>
 }

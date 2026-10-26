@@ -1,5 +1,8 @@
 import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
+import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog'
+import { ToolLoadBoundary, ToolLoading } from './components/ToolLoadBoundary'
+const GuidePage = lazy(() => import('./components/GuidePage').then(module => ({ default: module.GuidePage })))
 import { ToolCatalog } from './components/ToolCatalog'
 import { ToolEntry } from './components/ToolEntry'
 import { NotFound } from './components/NotFound'
@@ -37,6 +40,15 @@ function App() {
         <ToolEntry tool={activeTool} onExit={() => navigate('/')} />
       </div>
     )
+  }
+
+  if (isGuidePath(route.path)) {
+    const title = guideByPath(route.path)?.title ?? 'Practical PDF guides'
+    return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace guide-page">
+      <ToolLoadBoundary key={route.path} title={title} subject="guide" onExit={() => navigate('/')}>
+        <Suspense fallback={<ToolLoading title={title} subject="guide" onExit={() => navigate('/')} />}><GuidePage path={route.path} /></Suspense>
+      </ToolLoadBoundary>
+    </main></div>
   }
 
   const hub = hubByPath(route.path)
@@ -107,7 +119,7 @@ function App() {
           <p>Search and browse the available tools. Every option below links to a working browser-based workflow.</p>
         </div>
         <ToolCatalog />
-        <div dangerouslySetInnerHTML={{ __html: hubDirectoryHtml() }} />
+        <div dangerouslySetInnerHTML={{ __html: hubDirectoryHtml() + guideDirectoryHtml() }} />
 
         <section className="fl-how" aria-labelledby="how-heading">
           <div><p className="fl-eyebrow">HOW IT WORKS</p><h2 id="how-heading">Simple by design.</h2>

@@ -1,3 +1,6 @@
+import { guideHtml } from './src/lib/guideContent.ts'
+import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
+import { createGuideExamples } from './src/lib/guideExamples.ts'
 import { hubByPath, categoryHubHtml, hubDirectoryHtml, breadcrumbHtml, hubForTool, relatedToolsHtml } from './src/lib/categoryHubs.ts'
 import { TOOLS } from './src/registry.ts'
 import { toolArticleHtml } from './src/lib/toolContent.ts'
@@ -52,7 +55,7 @@ function prerenderRoutes(): Plugin {
   return {
     name: 'prerender-routes',
     transformIndexHtml: html => withPageMetadata(html, CATALOG_META),
-    closeBundle() {
+    async closeBundle() {
       const dist = resolve(process.cwd(), 'dist')
       const indexPath = resolve(dist, 'index.html')
       if (!existsSync(indexPath)) throw new Error('prerender: dist/index.html missing')
@@ -66,17 +69,18 @@ function prerenderRoutes(): Plugin {
         // Crawlable, truthful no-JS navigation and description. Interactive
         // processing still requires JavaScript, and no document inputs leak
         // into the static source. This remains present without hydration.
-        const routeLinks = ROUTES.filter(r => r.dir !== '.').map(r =>
+        const routeLinks = ROUTES.filter(r => r.dir !== '.' && !r.dir.startsWith('guides')).map(r =>
           `<li><a href="${ORIGIN}${r.dir}/">${r.title.split(' — ')[0]}</a></li>`
         ).join('')
         const hub = hubByPath(`/${dir}`)
-        const noJs = hub ? categoryHubHtml(hub) : dir === '404'
+        const guide = guideHtml(`/${dir}`)
+        const noJs = guide ?? (hub ? categoryHubHtml(hub) : dir === '404'
           ? `<h1>Page not found</h1><p>This page does not exist. <a href="${ORIGIN}">Browse PDF tools</a>.</p>`
           : dir === '.'
-            ? `<h1>Free PDF tools in your browser</h1><p>PDF Tools provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>${hubDirectoryHtml()}`
-            : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`
+            ? `<h1>Free PDF tools in your browser</h1><p>PDF Tools provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>${hubDirectoryHtml()}${guideDirectoryHtml()}`
+            : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`)
         const tool = TOOLS.find(tool => tool.implemented && tool.route.slice(1) === dir)
-        const article = tool ? breadcrumbHtml(hubForTool(tool), tool) + toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) : ''
+        const article = tool ? breadcrumbHtml(hubForTool(tool), tool) + toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) : ''
         html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main>${noJs}${article}</main></noscript>`)
         return html
       }
@@ -91,6 +95,11 @@ function prerenderRoutes(): Plugin {
           writeFileSync(resolve(dir, 'index.html'), html)
         }
       }
+
+      // Invented public inputs only, generated at build time; no user documents.
+      const examplesDir = resolve(dist, 'examples')
+      mkdirSync(examplesDir, { recursive: true })
+      for (const [name, bytes] of Object.entries(await createGuideExamples())) writeFileSync(resolve(examplesDir, name), bytes)
 
       // 404.html: static not-found (GH Pages serves this for unknown paths).
       const nfHtml = metaFor(
