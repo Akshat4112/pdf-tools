@@ -1,5 +1,5 @@
 import { GUIDES, guidePath, type Guide } from './guideCatalog.ts'
-import { HUBS, hubPath, hubForTool, type CategoryHub } from './categoryHubs.ts'
+import { HUBS, hubPath, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
 
@@ -128,6 +128,7 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
   const clean = html
     .replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(meta.title)}</title>`)
     .replace(/\s*<meta\b[^>]*(?:name|property)=["'](?:description|og:[\w:]+|twitter:[\w:]+)["'][^>]*>/gi, '')
+    .replace(/<script\b[^>]*id=["']public-structured-data["'][^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/\s*<link\b[^>]*rel=["']canonical["'][^>]*>/gi, '')
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
   return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
