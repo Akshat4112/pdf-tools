@@ -26,6 +26,7 @@ test('PT-UI-005 workspaces: all shipped tools share responsive chrome, help and 
       await page.goto(`${tool.route.slice(1)}/`)
       const main = page.getByRole('main'), crumb = main.getByRole('navigation', { name: 'Breadcrumb', exact: true })
       await expect(main).toHaveCount(1)
+      await expect(main.locator('input[type=file]')).toHaveCount(1)
       await expect(main.getByRole('heading', { name: tool.title, level: 1, exact: true })).toBeVisible()
       await expect(crumb.locator('[aria-current="page"]')).toHaveText(tool.title)
       await expect(crumb.getByRole('link', { name: 'All PDF tools', exact: true })).toHaveAttribute('href', '/pdf-tools/')

@@ -59,3 +59,5 @@
 .related-tools { max-width:74ch; }
 .related-tools ul { padding-left:24px; }
 @media(max-width:600px) { .hub-tool-list { grid-template-columns:1fr; } }
+/* Reserve the primary workspace while its component arrives. */
+.tool-workspace .workspace-loading { min-height:520px; }
