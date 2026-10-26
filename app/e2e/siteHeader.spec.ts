@@ -82,7 +82,7 @@ test('working-tool navigation and shared header survive routes and history', asy
   await expect(header.locator('details')).not.toHaveAttribute('open')
   await page.goto('missing-header-test')
   await expect(header.getByRole('link', { name: 'PDF Tools home' })).toBeVisible()
-  await expect(header.getByRole('link', { name: /Privacy/ })).toHaveAttribute('href', /PT-PD-003-data-lifecycle.md$/)
+  await expect(header.getByRole('link', { name: /Privacy/ })).toHaveAttribute('href', '/pdf-tools/privacy/')
   await expect(header.getByRole('link', { name: /Source/ })).toHaveAttribute('href', 'https://github.com/Akshat4112/pdf-tools')
 })
 
