@@ -1,3 +1,4 @@
+import { publicInfoHtml } from './src/lib/publicInfo.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -77,14 +78,15 @@ function prerenderRoutes(): Plugin {
         ).join('')
         const hub = hubByPath(`/${dir}`)
         const guide = guideHtml(`/${dir}`)
-        const noJs = guide ?? (hub ? categoryHubHtml(hub) : dir === '404'
+        const info = publicInfoHtml(`/${dir}`)
+        const noJs = info ?? guide ?? (hub ? categoryHubHtml(hub) : dir === '404'
           ? `<h1>Page not found</h1><p>This page does not exist. <a href="${ORIGIN}">Browse PDF tools</a>.</p>`
           : dir === '.'
             ? `<h1>Free PDF tools in your browser</h1><p>PDF Tools provides free, open-source PDF utilities processed on your device. JavaScript is required to use the tools.</p><nav aria-label="Available PDF tools"><ul>${routeLinks}</ul></nav>${hubDirectoryHtml()}${guideDirectoryHtml()}`
             : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`)
         const tool = TOOLS.find(tool => tool.implemented && tool.route.slice(1) === dir)
         const article = tool ? breadcrumbHtml(hubForTool(tool), tool) + toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) : ''
-        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main${guide ? ' class="tool-workspace guide-page"' : ''}>${noJs}${article}</main></noscript>`)
+        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main${guide || info ? ' class="tool-workspace guide-page"' : ''}>${noJs}${article}</main></noscript>`)
         return html
       }
 

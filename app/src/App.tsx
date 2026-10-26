@@ -1,4 +1,5 @@
 import { useLocale } from './i18n'
+import { infoPageMeta } from './lib/pageMetadata'
 import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
 import { lazy, Suspense, useEffect } from 'react'
 import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog'
@@ -44,8 +45,9 @@ function App() {
     )
   }
 
-  if (isGuidePath(route.path)) {
-    const title = guideByPath(route.path)?.title ?? 'Practical PDF guides'
+
+  if (isGuidePath(route.path) || infoPageMeta(route.path)) {
+    const title = guideByPath(route.path)?.title ?? infoPageMeta(route.path)?.title ?? 'Practical PDF guides'
     return <div className="shell"><SiteHeader key={route.path} /><main id="main-content" className="tool-workspace guide-page">
       <ToolLoadBoundary key={route.path} title={title} subject="guide" onExit={() => navigate('/')}>
         <Suspense fallback={<ToolLoading title={title} subject="guide" onExit={() => navigate('/')} />}><GuidePage path={route.path} /></Suspense>

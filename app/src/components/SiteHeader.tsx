@@ -79,7 +79,8 @@ export function SiteHeader() {
             </div>
           </details>
           <a href={`${SITE_BASE}guides/`} aria-current={window.location.pathname.replace(/\/$/, '') === `${SITE_BASE}guides` ? 'page' : undefined}>{t("Guides")}</a>
-          <a href={`${SOURCE}/blob/main/docs/product/PT-PD-003-data-lifecycle.md`}>{t("Privacy")} <span>↗<span className="visually-hidden"> {t('(on GitHub)')}</span></span></a>
+          <a href={`${SITE_BASE}help/`}>{t("Help")}</a>
+          <a href={`${SITE_BASE}privacy/`}>{t("Privacy")}</a>
           <a href={SOURCE}>{t("Source")} <span>↗<span className="visually-hidden"> (on GitHub)</span></span></a>
         </nav>
         <label className="folio-language">

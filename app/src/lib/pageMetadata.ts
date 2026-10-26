@@ -81,8 +81,20 @@ export const GUIDE_INDEX_META: PageMeta = { title: 'Practical PDF guides — PDF
 export const guidePageMeta = (guide: Guide): PageMeta => ({ title: `${guide.title} — PDF Tools`, description: guide.description, canonical: `${SITE_URL}${guidePath(guide).slice(1)}/`, ogType: 'article' })
 
 /** Only shipped tools, hubs and published guides are indexable. */
+/** PT-REL-001 — English-language public help, privacy and limitations routes. */
+export const INFO_PAGE_META = [
+  { dir: 'help', title: 'Help and frequently asked questions', description: 'Learn PDF tasks, common questions and safe issue reporting.' },
+  { dir: 'privacy', title: 'Privacy and local processing', description: 'Understand local processing, hosting requests, downloads and data limits.' },
+  { dir: 'limitations', title: 'Supported features and limitations', description: 'See PDF formats, limits, signature warnings and unsupported features.' },
+] as const
+export const infoPageMeta = (path: string): PageMeta | undefined => {
+  const page = INFO_PAGE_META.find(p => `/${p.dir}` === path)
+  return page && { title: `${page.title} — PDF Tools`, description: page.description, canonical: `${SITE_URL}${page.dir}/`, ogType: 'website' }
+}
+
 export const PUBLIC_PAGES = [
   { dir: '.', ...CATALOG_META },
+  ...INFO_PAGE_META.map(page => ({ dir: page.dir, ...infoPageMeta(`/${page.dir}`)! })),
   { dir: 'guides', ...GUIDE_INDEX_META },
   ...GUIDES.map(guide => ({ dir: guidePath(guide).slice(1), ...guidePageMeta(guide) })),
   ...HUBS.map(hub => ({ dir: hubPath(hub).slice(1), ...hubPageMeta(hub) })),

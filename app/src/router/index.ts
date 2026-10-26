@@ -1,5 +1,5 @@
 import { guideByPath, isGuidePath } from '../lib/guideCatalog'
-import { GUIDE_INDEX_META, guidePageMeta } from '../lib/pageMetadata'
+import { GUIDE_INDEX_META, guidePageMeta, infoPageMeta } from '../lib/pageMetadata'
 import { hubByPath } from '../lib/categoryHubs'
 import { hubPageMeta } from '../lib/pageMetadata'
 /**
@@ -45,7 +45,7 @@ export function routePathOf(pathname: string): string {
 export function parsePath(pathname: string): Route {
   const p = routePathOf(pathname)
   if (p === '/' || p === '') return { name: 'catalog', path: p }
-  if (isGuidePath(p)) return { name: 'guide', path: p }
+  if (isGuidePath(p) || infoPageMeta(p)) return { name: 'guide', path: p }
   if (hubByPath(p)) return { name: 'category', path: p }
   const tool = toolByRoute(p)
   if (tool) return { name: tool.id, path: p }
@@ -62,6 +62,8 @@ export function href(path: string): string {
 export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
+  const info = infoPageMeta(route.path)
+  if (info) return info
   if (route.path === '/guides') return GUIDE_INDEX_META
   const guide = guideByPath(route.path)
   if (guide) return guidePageMeta(guide)
@@ -107,7 +109,7 @@ export function usePathRoute(): [Route, (path: string) => void] {
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
       const isCatalog = path === '/' || path === ''
       const isTool = Boolean(toolByRoute(path))
-      if (!isCatalog && !isTool && !hubByPath(path) && !isGuidePath(path)) return
+      if (!isCatalog && !isTool && !hubByPath(path) && !isGuidePath(path) && !infoPageMeta(path)) return
       e.preventDefault()
       const next = `${SITE_BASE}${path === '/' ? '' : path.replace(/^\//, '')}`
       if (next !== window.location.pathname) window.history.pushState({}, '', next)
