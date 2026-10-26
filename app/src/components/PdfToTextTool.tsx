@@ -47,7 +47,7 @@ export function PdfToTextTool({ onExit }: { onExit(): void }) {
     const anchor = document.createElement('a'); anchor.href = session.objectUrlFor(stored.id); anchor.download = stored.name; anchor.click()
   }
   return <div className="tool-screen pdf-to-text-tool">
-    <header className="tool-header"><h1 className="tool-heading">{t("PDF to text")}</h1><p className="tool-subtitle">Download the existing text layer as a UTF-8 text file, entirely on your device.</p></header>
+    <header className="tool-header"><h1 className="tool-heading">{t("PDF to text")}</h1><p className="tool-subtitle">{t("Download the existing text layer as a UTF-8 text file, entirely on your device.")}</p></header>
     <p className="panel-hint">Text follows the PDF's stored order. Columns, tables, ligatures and unusual fonts can affect reading order or characters. This preserves available text; it does not reconstruct the page layout. Pages are separated by a form-feed character (\f), which some editors display as a page break.</p>
     {phase === 'configure' ? <><FileSelection expected="pdf" multiple={false} files={files} onChange={changeFiles} labels={{ limits: 'PDF up to 50 MB / 300 pages · text output up to 50 MB · processed locally' }} /><PreviewPanel title="Export available text" summary="All pages will be checked. Pages without text are reported, and their places are retained in the file. Image-only PDFs need OCR, which is planned for a later release." actionLabel="Export text" onConfirm={run} onCancel={onExit} disabled={!selected} disabledReason="Choose a valid PDF first." /></> : null}
     {phase === 'processing' ? <ProcessingPanel label="Extracting PDF text" progress={progress} onCancel={() => job.current?.cancel()} /> : null}

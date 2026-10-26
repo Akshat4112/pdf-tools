@@ -11,8 +11,10 @@ test('PT-UX-005: EN/DE selection updates accessible labels without browser persi
   await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
   await page.getByRole('searchbox', { name: 'Tools suchen' }).fill('zusammenfügen')
   await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
+  await page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first().click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await page.goto('merge/')
-  // PT-UX-005 intentionally does not persist language in any browser storage.
+  // A full page reload resets the in-memory language preference.
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF zusammenfügen' })).toBeVisible()

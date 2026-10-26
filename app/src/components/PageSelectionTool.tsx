@@ -193,7 +193,7 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
           {deleting && valid ? (
             <label className="page-delete-confirmation">
               <input type="checkbox" checked={confirmed === reviewKey} onChange={(e) => setConfirmed(e.target.checked ? reviewKey : null)} />
-              <span>I reviewed the pages to remove and the output order. Create a new copy without those pages.</span>
+              <span>{t("I reviewed the pages to remove and the output order. Create a new copy without those pages.")}</span>
             </label>
           ) : null}
         </>

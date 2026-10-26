@@ -122,7 +122,7 @@ export function PdfToImagesTool({ mode, onExit }: { mode: 'pdf-to-jpg' | 'pdf-to
   const start = Math.min(viewStart, Math.max(0, Math.floor(((doc?.numPages ?? 1) - 1) / 8) * 8))
 
   return <div className="tool-screen pdf-to-images-tool">
-    <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">Render PDF pages as images, with no uploads. Your original PDF stays untouched.</p></header>
+    <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">{t("Render PDF pages as images, with no uploads. Your original PDF stays untouched.")}</p></header>
     {phase === 'configure' ? <>
       <FileSelection expected="pdf" multiple={false} files={files} onChange={changeFiles} labels={{ limits: 'PDF up to 50 MB / 300 pages · 8192 px per side / 16 million pixels per image · 50 MB total encoded images · processed locally' }} />
       {selected ? <section className="panel" aria-label="PDF image settings">

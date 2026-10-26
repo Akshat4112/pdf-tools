@@ -183,7 +183,7 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
             </div>
             <p className="panel-hint">{pages.length} output pages · {selectedIds.length} selected · undo keeps the last {UNDO_LIMIT} changes. Keep at least one page; limit {QUOTAS.maxPages} pages.</p>
             {organizing ? <div className="organize-move-field">
-              <label htmlFor="organize-position">Move one selected page to position</label>
+              <label htmlFor="organize-position">{t("Move one selected page to position")}</label>
               <input id="organize-position" type="number" min="1" max={pages.length} value={destination} onChange={e => setDestination(e.target.value)} aria-invalid={!validDestination} />
               <button type="button" className="btn-ghost" disabled={selectedIds.length !== 1 || !validDestination} onClick={() => move(selectedIds[0], Number(destination) - 1)}>{t("Move selected page")}</button>
             </div> : null}
@@ -238,7 +238,7 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
           details={doc ? [`Output source order: ${pages.map(p => p.sourcePage).join(', ')}`, `Final rotations: ${pages.map(p => `${p.rotation}°`).join(', ')}`, ...(removed.length ? [`Source pages to remove: ${removed.join(', ')}`] : []), 'A new copy is created. Your original stays untouched; changes can invalidate digital signatures. Document-level forms and bookmarks may not be preserved.'] : undefined}
           actionLabel={organizing ? 'Create organized copy' : 'Create rotated copy'} onConfirm={run} disabled={!canRun}
           disabledReason={!doc ? 'Choose a readable PDF first.' : !dirty ? 'Make at least one change above.' : 'Review and confirm the removed source pages below.'} onCancel={onExit} />
-        {removed.length ? <label className="page-delete-confirmation"><input type="checkbox" checked={confirmed === reviewKey} onChange={e => setConfirmed(e.target.checked ? reviewKey : null)} /><span>I reviewed the output order and source pages to remove. Create a new copy without those pages.</span></label> : null}
+        {removed.length ? <label className="page-delete-confirmation"><input type="checkbox" checked={confirmed === reviewKey} onChange={e => setConfirmed(e.target.checked ? reviewKey : null)} /><span>{t("I reviewed the output order and source pages to remove. Create a new copy without those pages.")}</span></label> : null}
       </> : null}
       {phase === 'processing' ? <ProcessingPanel label="Creating and verifying your new copy" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
       {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}

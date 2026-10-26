@@ -27,7 +27,7 @@ export function PdfReaderTool({ onExit }: { onExit(): void }) {
   const [files, setFiles] = useState<WorkspaceFile[]>([])
   const selected = files.find(file => !file.error)
   return <div className="tool-screen pdf-reader-tool">
-    <header className="tool-header"><h1 className="tool-heading">{t("PDF reader")}</h1><p className="tool-subtitle">Read, search, select text and print in your browser. Your PDF stays on this device.</p></header>
+    <header className="tool-header"><h1 className="tool-heading">{t("PDF reader")}</h1><p className="tool-subtitle">{t("Read, search, select text and print in your browser. Your PDF stays on this device.")}</p></header>
     <FileSelection expected="pdf" multiple={false} files={files} onChange={setFiles} />
     {selected ? <ReaderWorkspace key={selected.id} file={selected} /> : null}
     <div className="panel-actions"><button className="btn-ghost" onClick={() => setFiles([])}>{t("Start over")}</button><button className="btn-ghost" onClick={onExit}>{t("Back to all tools")}</button></div>
@@ -170,7 +170,7 @@ function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
     {error ? <p role="alert">{error.message}</p> : <>
       <div className="reader-toolbar" aria-label="Reader controls">
         <button className="btn-ghost" disabled={!ready || page <= 1} onClick={() => navigate(page - 1)}>{t("Previous page")}</button>
-        <form onSubmit={event => { event.preventDefault(); navigate(pageText.trim() ? Number(pageText) : NaN) }}><label htmlFor="reader-page">{t("Page")}</label><input id="reader-page" inputMode="numeric" value={pageText} disabled={!ready} onChange={event => setPageText(event.target.value)} /><span>of {count || '…'}</span><button className="btn-ghost" disabled={!ready}>Go</button></form>
+        <form onSubmit={event => { event.preventDefault(); navigate(pageText.trim() ? Number(pageText) : NaN) }}><label htmlFor="reader-page">{t("Page")}</label><input id="reader-page" inputMode="numeric" value={pageText} disabled={!ready} onChange={event => setPageText(event.target.value)} /><span>of {count || '…'}</span><button className="btn-ghost" disabled={!ready}>{t("Go")}</button></form>
         <button className="btn-ghost" disabled={!ready || page >= count} onClick={() => navigate(page + 1)}>{t("Next page")}</button>
         <label htmlFor="reader-zoom">{t("Zoom")}<select id="reader-zoom" disabled={!ready} value={zoom} onChange={event => changeZoom(event.target.value)}><option value="page-width">{t("Fit width")}</option><option value="page-fit">{t("Fit page")}</option>{[0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4].map(scale => <option key={scale} value={scale}>{scale * 100}%</option>)}</select></label>
       </div>

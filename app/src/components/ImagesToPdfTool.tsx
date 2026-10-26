@@ -98,7 +98,7 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
         <p className="panel-summary">{t("One image per page, in the order above. Use the arrows to move images earlier or later.")}</p>
         <div className="image-settings-grid">
           <label htmlFor="image-page-size">{t("Page size")}<select id="image-page-size" value={options.pageSize} onChange={e => updateOptions({ pageSize: e.target.value as ImagePdfOptions['pageSize'], ...(e.target.value === 'original' ? { orientation: 'auto' as const } : {}) })}>
-            <option value="a4">A4</option><option value="letter">Letter</option><option value="original">{t("Original image size")}</option>
+            <option value="a4">A4</option><option value="letter">{t("Letter")}</option><option value="original">{t("Original image size")}</option>
           </select></label>
           <label htmlFor="image-orientation">{t("Page orientation")}<select id="image-orientation" value={options.orientation} disabled={options.pageSize === 'original'} onChange={e => updateOptions({ orientation: e.target.value as ImagePdfOptions['orientation'] })}>
             <option value="auto">{t("Auto — match each image")}</option><option value="portrait">{t("Portrait")}</option><option value="landscape">{t("Landscape")}</option>
@@ -112,12 +112,12 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
           </select></label> : null}
         </div>
         <p id="image-layout-help" className="panel-hint">72 points = 1 inch. Auto orientation honors camera rotation. Original size uses the selected DPI plus margins. Fit keeps the whole image; Fill crops the center to the area inside the margins.</p>
-        <p className="panel-hint">Transparent areas and page margins are white. Color profiles may look different in the PDF.</p>
+        <p className="panel-hint">{t("Transparent areas and page margins are white. Color profiles may look different in the PDF.")}</p>
         <p id="image-layout-status" className="page-selection-status" role={layout.error ? 'alert' : 'status'}>{layout.error ? layout.error.message : `${layout.count} image${layout.count === 1 ? '' : 's'} → ${layout.count} page${layout.count === 1 ? '' : 's'}`}</p>
       </section> : null}
       {visible.length ? <section className="panel" aria-label="Page layout previews">
         <h2 className="panel-title">{t("Page layout preview")}</h2>
-        <p className="panel-summary">The preview uses your page size, margins, fit and image orientation. Review every page before creating your PDF.</p>
+        <p className="panel-summary">{t("The preview uses your page size, margins, fit and image orientation. Review every page before creating your PDF.")}</p>
         <ImageLayoutPreviews key={previewKey} items={visible} onError={previewError} />
         <nav className="page-pagination" aria-label="Image preview pages">
           <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - PER_VIEW)}>{t("Previous images")}</button>
