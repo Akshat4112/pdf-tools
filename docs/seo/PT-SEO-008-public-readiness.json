@@ -1,0 +1,477 @@
+{
+  "observedAtUtc": "2026-10-26T11:13:42.988822+00:00",
+  "property": "https://akshat4112.github.io/pdf-tools/",
+  "sitemap": "https://akshat4112.github.io/pdf-tools/sitemap.xml",
+  "localPages": [
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/organize/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/organize/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/organize/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/convert/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/convert/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/convert/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/read/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/read/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/read/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/markup/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/markup/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/markup/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/merge/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/merge/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/merge/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/split/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/split/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/split/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/rotate/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/delete-pages/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/extract-pages/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/organize/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/organize/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/organize/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/images-to-pdf/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-png/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/reader/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/reader/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/reader/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/page-numbers/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/watermark/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-text/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/doc-info/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    }
+  ],
+  "searchConsole": {
+    "ownership": "pending owner-account readback",
+    "sitemapSubmission": "pending owner-account readback",
+    "urlInspection": "pending owner-account readback"
+  },
+  "note": "HTTP, declared canonicals and crawl permissions are prerequisites, not proof of Google indexing or Google-selected canonicals.",
+  "livePages": [
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/organize/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/organize/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/organize/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/convert/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/convert/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/convert/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/read/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/read/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/read/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/tools/markup/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/markup/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/tools/markup/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/merge/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/merge/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/merge/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/split/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/split/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/split/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/rotate/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/rotate/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/delete-pages/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/delete-pages/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/extract-pages/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/extract-pages/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/organize/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/organize/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/organize/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/images-to-pdf/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/images-to-pdf/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-png/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-png/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/reader/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/reader/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/reader/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/page-numbers/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/page-numbers/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/watermark/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/watermark/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-text/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/pdf-to-text/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    },
+    {
+      "url": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "httpStatus": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/doc-info/",
+      "declaredCanonicals": [
+        "https://akshat4112.github.io/pdf-tools/doc-info/"
+      ],
+      "robotsDirectives": [
+        ""
+      ],
+      "issues": []
+    }
+  ],
+  "originRobots": {
+    "url": "https://akshat4112.github.io/robots.txt",
+    "httpStatus": 200,
+    "note": "The /pdf-tools/robots.txt file does not govern this shared origin."
+  },
+  "passed": true
+}
