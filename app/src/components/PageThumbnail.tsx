@@ -1,4 +1,3 @@
-import { useLocale } from '../i18n'
 import { useEffect, useRef, useState } from 'react'
 import type { PdfjsDocument, PdfjsPage } from '../engines/pdfjs'
 
@@ -16,7 +15,6 @@ export function PageThumbnail({ doc, pageNumber, selected, deleting, onToggle, r
   detail?: string
   background?: 'white' | 'transparent'
 }) {
-  const { t } = useLocale()
   const canvas = useRef<HTMLCanvasElement>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading')
 

@@ -265,7 +265,43 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Preparing preview…": "Vorschau wird vorbereitet …",
   "Preview unavailable": "Vorschau nicht verfügbar",
   "Pages": "Seiten",
-  "Merge PDFs": "PDFs zusammenfügen"
+  "Merge PDFs": "PDFs zusammenfügen",
+  "Delete pages": "Seiten löschen",
+  "Page numbers": "Seitenzahlen",
+  "Text watermark": "Textwasserzeichen",
+  "JPG/PNG to PDF": "JPG/PNG zu PDF",
+  "Remove selected pages into a new copy.": "Entferne ausgewählte Seiten aus einer neuen Kopie.",
+  "Pull selected pages into a new PDF, in the order you choose.": "Extrahiere ausgewählte Seiten in deiner Reihenfolge in ein neues PDF.",
+  "Reorder, rotate, duplicate and delete pages with undo.": "Seiten sortieren, drehen, duplizieren und löschen – mit Rückgängig-Funktion.",
+  "Turn JPG or PNG images into one PDF with size and margin options.": "JPG- oder PNG-Bilder mit Größen- und Randoptionen in ein PDF umwandeln.",
+  "Render pages to JPG images at a chosen DPI.": "PDF-Seiten mit gewählter Auflösung als JPG-Bilder exportieren.",
+  "Render pages to PNG images with an explicit background choice.": "PDF-Seiten als PNG-Bilder mit wählbarem Hintergrund exportieren.",
+  "Read, search, copy and print — entirely locally.": "Lokal lesen, durchsuchen, kopieren und drucken.",
+  "Add page numbers with start, position and page selection.": "Seitenzahlen mit Startwert, Position und Seitenauswahl hinzufügen.",
+  "Stamp a text watermark with position, opacity and page selection.": "Textwasserzeichen mit Position, Deckkraft und Seitenauswahl einfügen.",
+  "Export the text layer of a PDF as a UTF-8 .txt file.": "Textebene eines PDFs als UTF-8-TXT exportieren.",
+  "Inspect page count, dimensions, metadata and indicators.": "Seitenzahl, Abmessungen, Metadaten und Hinweise prüfen.",
+  "e.g. 1-5, 8, 12-30 — one PDF per range": "z. B. 1–5, 8, 12–30 – ein PDF pro Bereich",
+  "fixed-size chunks covering the whole document": "Abschnitte fester Größe für das gesamte Dokument",
+  "every page becomes its own PDF": "Jede Seite wird zu einer eigenen PDF-Datei",
+  "At most": "Höchstens",
+  "(on GitHub)": "(auf GitHub)",
+  "Go": "Los",
+  "of": "von",
+  "Print status": "Druckstatus",
+  "Opening PDF…": "PDF wird geöffnet …",
+  "Searching…": "Wird gesucht …",
+  "Cancel print preparation": "Druckvorbereitung abbrechen",
+  "Clear print copy": "Druckkopie löschen",
+  "Search results": "Suchergebnisse",
+  "Search match list": "Liste der Suchtreffer",
+  "Reader controls": "Reader-Steuerung",
+  "PDF reader workspace": "PDF-Reader-Arbeitsbereich",
+  "PDF pages": "PDF-Seiten",
+  "This browser could not open the print dialog. Try printing from a desktop browser.": "Der Druckdialog konnte nicht geöffnet werden. Versuche es mit einem Desktop-Browser.",
+  "Print copy cleared. Your PDF and reader settings are retained.": "Druckkopie entfernt. PDF und Reader-Einstellungen bleiben erhalten.",
+  "Print preparation failed. Try fewer pages.": "Druckvorbereitung fehlgeschlagen. Versuche es mit weniger Seiten.",
+  "Up to 50 MB per file · 300 pages · processed locally": "Bis zu 50 MB pro Datei · 300 Seiten · lokal verarbeitet"
 }
 
 const STORE_KEY = 'pdf-tools-ui-language'
@@ -289,7 +325,12 @@ export function setLocale(next: Locale) {
 
 /** Exact UI messages only: no fuzzy matching or document-derived HTML. */
 export function translate(message: string, language: Locale = activeLocale): string {
-  return language === 'de' ? TRANSLATIONS[message] ?? message : message
+  if (language !== 'de') return message
+  const fileLimit = /^Up to (\d+) MB per file · (\d+) pages · processed locally$/.exec(message)
+  if (fileLimit) return `Bis zu ${fileLimit[1]} MB pro Datei · ${fileLimit[2]} Seiten · lokal verarbeitet`
+  const count = /^(\d+) files were generated and verified\.$/.exec(message)
+  if (count) return `${count[1]} Dateien wurden erstellt und geprüft.`
+  return TRANSLATIONS[message] ?? message
 }
 
 export function useLocale() {

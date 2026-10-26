@@ -52,7 +52,7 @@ export function PreviewPanel({
       {details && details.length > 0 ? (
         <ul className="panel-details">
           {details.map((d) => (
-            <li key={t(d)}>{t(d)}</li>
+            <li key={d}>{t(d)}</li>
           ))}
         </ul>
       ) : null}
@@ -105,7 +105,7 @@ export function ProcessingPanel({
         className="progress-track"
         role="progressbar"
         aria-label={t(label)}
-        aria-valuetext={determinate ? `${pct}% — ${t(detail)}` : detail}
+        aria-valuetext={determinate ? `${pct}% — ${t(detail)}` : t(detail)}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={determinate ? pct : undefined}
@@ -194,8 +194,8 @@ export function ResultPanel({
       <h2 ref={heading} tabIndex={-1} className="panel-title">{t("Done — your files are ready")}</h2>
       <p className="panel-summary">
         {outputs.length === 1
-          ? 'One file was generated and verified.'
-          : `${outputs.length} files were generated and verified.`}
+          ? t('One file was generated and verified.')
+          : t(`${outputs.length} files were generated and verified.`)}
       </p>
       <p className="panel-hint" role="status">Ready to download · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} total. Sizes are the actual generated files, not estimates.</p>
       <ul className="result-list">
@@ -209,7 +209,7 @@ export function ResultPanel({
               type="button"
               className="btn-primary btn-download"
               onClick={() => onDownload(o)}
-              aria-label={`Download ${o.name} (${formatBytes(o.actualBytes)})`}
+              aria-label={`${t('Download')}: ${o.name} (${formatBytes(o.actualBytes)})`}
             >
               {t("Download")}
             </button>

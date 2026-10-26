@@ -10,9 +10,8 @@ const SOURCE = 'https://github.com/Akshat4112/pdf-tools'
 
 /** Shared navigation never holds document or job state. */
 export function SiteHeader() {
-  const { t } = useLocale()
+  const { t, locale, setLocale } = useLocale()
   const [open, setOpen] = useState(false)
-  const { locale, setLocale } = useLocale()
   const root = useRef<HTMLElement>(null)
   const toggle = useRef<HTMLButtonElement>(null)
   useEffect(() => {
@@ -55,7 +54,7 @@ export function SiteHeader() {
         </a>
         <button className="folio-menu-toggle" type="button" ref={toggle} aria-expanded={open}
           aria-controls="folio-navigation" onClick={() => setOpen(!open)}>
-          {open ? 'Close' : 'Menu'} <span aria-hidden="true">{open ? '×' : '☰'}</span>
+          {t(open ? 'Close' : 'Menu')} <span aria-hidden="true">{open ? '×' : '☰'}</span>
         </button>
         <nav id="folio-navigation" className={`folio-navigation${open ? ' is-open' : ''}`} aria-label={t("Main navigation")}
           onClick={event => {
@@ -80,7 +79,7 @@ export function SiteHeader() {
             </div>
           </details>
           <a href={`${SITE_BASE}guides/`} aria-current={window.location.pathname.replace(/\/$/, '') === `${SITE_BASE}guides` ? 'page' : undefined}>{t("Guides")}</a>
-          <a href={`${SOURCE}/blob/main/docs/product/PT-PD-003-data-lifecycle.md`}>{t("Privacy")} <span>↗<span className="visually-hidden"> (on GitHub)</span></span></a>
+          <a href={`${SOURCE}/blob/main/docs/product/PT-PD-003-data-lifecycle.md`}>{t("Privacy")} <span>↗<span className="visually-hidden"> {t('(on GitHub)')}</span></span></a>
           <a href={SOURCE}>{t("Source")} <span>↗<span className="visually-hidden"> (on GitHub)</span></span></a>
         </nav>
         <label className="folio-language">

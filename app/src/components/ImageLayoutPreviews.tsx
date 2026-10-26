@@ -1,4 +1,3 @@
-import { useLocale } from '../i18n'
 import { useEffect, useRef, useState } from 'react'
 import { imagePreviewBytes } from '../engines/imagePreviewBytes'
 import type { ImageMetadata } from '../engines/imageMetadata'
@@ -11,7 +10,6 @@ export interface ImagePreviewItem {
 
 /** Eight bounded canvases; image decoding runs sequentially and every bitmap is closed. */
 export function ImageLayoutPreviews({ items, onError }: { items: ImagePreviewItem[]; onError(id: number, error: ToolError): void }) {
-  const { t } = useLocale()
   const canvases = useRef(new Map<number, HTMLCanvasElement>())
   const [rendered, setRendered] = useState<{ items: ImagePreviewItem[]; ids: number[] } | null>(null)
   const ready = rendered?.items === items ? rendered.ids : []

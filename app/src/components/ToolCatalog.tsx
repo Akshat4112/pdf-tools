@@ -145,7 +145,7 @@ export function ToolCard({ tool }: { tool: ToolDefinition }) {
   if (!tool.implemented) classes.push('is-disabled')
   if (tool.implemented) {
     return (
-      <a className={classes.join(' ')} href={href(tool.route)} aria-label={`Open ${t(tool.title)}`}>
+      <a className={classes.join(' ')} href={href(tool.route)} aria-label={`${t('Open tool')}: ${t(tool.title)}`}>
         <span className="tool-icon">
           <ToolIcon tool={tool} />
         </span>

@@ -20,7 +20,7 @@ export class ToolLoadBoundary extends Component<{ title: string; onExit: () => v
       <header className="tool-header"><h1 className="tool-heading">{translate(this.props.title)}</h1></header>
       <p role="alert">{translate(this.props.subject === 'guide' ? 'This guide could not open. Check your connection and try again.' : 'This tool could not open. Check your connection and try again. Reloading clears this tool’s working files.')}</p>
       <div className="panel-actions"><button className="btn-primary" onClick={() => window.location.reload()}>{translate(this.props.subject === 'guide' ? 'Reload guide' : 'Reload tool')}</button>
-        <button className="btn-ghost" onClick={this.props.onExit}>{t("Back to all tools")}</button></div>
+        <button className="btn-ghost" onClick={this.props.onExit}>{translate('Back to all tools')}</button></div>
     </section>
   }
 }

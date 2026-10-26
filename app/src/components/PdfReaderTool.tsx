@@ -35,6 +35,7 @@ export function PdfReaderTool({ onExit }: { onExit(): void }) {
 }
 
 function ReaderWorkspace({ file }: { file: WorkspaceFile }) {
+  const { t } = useLocale()
   const container = useRef<HTMLDivElement>(null), pages = useRef<HTMLDivElement>(null)
   const viewer = useRef<PDFViewer | null>(null), bus = useRef<EventBus | null>(null), documentRef = useRef<PdfjsDocument | null>(null)
   const printRef = useRef<{ frame: HTMLIFrameElement; controller: AbortController } | null>(null)
