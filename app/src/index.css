@@ -2,6 +2,7 @@
    system.css (PT-UX-001, PR #19) is the canonical visual system; keep it first. */
 @import './styles/system.css';
 @import './styles/home.css';
+@import './styles/footer.css';
 @import './styles/workspaces.css';
 
 /* PT-UX-004: client 404 screen (NotFound.tsx + static 404.html) */
