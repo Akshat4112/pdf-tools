@@ -49,9 +49,15 @@ export function applyMeta(meta: PageMeta): void {
   for (const tag of pageMetaTags(meta)) {
     upsertMeta(`meta[${tag.attribute}="${tag.key}"]`, { [tag.attribute]: tag.key, content: tag.content })
   }
+  const previousCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href
   upsertLink('canonical', meta.canonical)
   const desired = meta.canonical
   const generation = ++schemaGeneration
+  // Prerendered HTML already has the correct public JSON-LD. Do not request
+  // another JavaScript chunk on cold homepage/tool/guide loads.
+  const existing = document.getElementById('public-structured-data')?.textContent ?? ''
+  if (previousCanonical === desired &&
+      (existing.includes(desired) || (desired.endsWith('/404.html') && !existing))) return
   void import('./structuredData').then(({ pageStructuredData, serializeStructuredData, STRUCTURED_DATA_ID }) => {
     if (generation !== schemaGeneration || document.querySelector('link[rel="canonical"]')?.getAttribute('href') !== desired) return
     const data = pageStructuredData(desired)
