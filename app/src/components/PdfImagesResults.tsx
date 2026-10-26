@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PdfToImagesOutcome, VerifiedPageImage } from '../tools/pdfToImagesFlow'
 import type { VerifiedOutput } from '../outputs/verify'
@@ -38,12 +39,13 @@ function EncodedPreview({ image, schedule }: { image: VerifiedPageImage; schedul
 export function PdfImagesResults({ outcome, onDownload, onAdjust, onReset, onExit }: {
   outcome: PdfToImagesOutcome; onDownload(output: VerifiedOutput): void; onAdjust(): void; onReset(): void; onExit?: () => void
 }) {
+  const { t } = useLocale()
   const heading = usePanelHeading()
   const [start, setStart] = useState(0)
   const queue = useRef(Promise.resolve())
   const schedule = useCallback((work: () => Promise<void>) => { queue.current = queue.current.then(work).catch(() => {}) }, [])
   const images = outcome.images.slice(start, start + 8)
-  return <section className="panel state-panel is-result pdf-images-results" aria-label="Results">
+  return <section className="panel state-panel is-result pdf-images-results" aria-label={t("Results")}>
     <h2 ref={heading} tabIndex={-1} className="panel-title">Done — your images are ready</h2>
     <p className="panel-summary">{outcome.images.length} image{outcome.images.length === 1 ? '' : 's'} and the ZIP were generated and verified. Sizes below are the actual download sizes.</p>
     <p className="panel-hint" role="status">Your result is ready to download. Image previews load separately and are not required for downloading.</p>
@@ -60,14 +62,14 @@ export function PdfImagesResults({ outcome, onDownload, onAdjust, onReset, onExi
       </article>)}
     </div>
     <nav className="page-pagination" aria-label="Result image pages">
-      <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setStart(current => current - 8)}>Previous images</button>
+      <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setStart(current => current - 8)}>{t("Previous images")}</button>
       <span>Images {start + 1}–{Math.min(start + 8, outcome.images.length)} of {outcome.images.length}</span>
-      <button type="button" className="btn-ghost" disabled={start + 8 >= outcome.images.length} onClick={() => setStart(current => current + 8)}>Next images</button>
+      <button type="button" className="btn-ghost" disabled={start + 8 >= outcome.images.length} onClick={() => setStart(current => current + 8)}>{t("Next images")}</button>
     </nav>
     <div className="panel-actions">
-      <button type="button" className="btn-ghost" onClick={onAdjust}>Adjust settings</button>
-      <button type="button" className="btn-ghost" onClick={onReset}>Start over</button>
-      {onExit ? <button type="button" className="btn-ghost" onClick={onExit}>Back to all tools</button> : null}
+      <button type="button" className="btn-ghost" onClick={onAdjust}>{t("Adjust settings")}</button>
+      <button type="button" className="btn-ghost" onClick={onReset}>{t("Start over")}</button>
+      {onExit ? <button type="button" className="btn-ghost" onClick={onExit}>{t("Back to all tools")}</button> : null}
     </div>
     <WorkspaceCleanupNote />
   </section>

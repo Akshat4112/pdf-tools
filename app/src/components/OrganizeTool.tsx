@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 import { useCallback, useEffect, useReducer, useRef, useState, type PointerEvent } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import { PageThumbnail } from './PageThumbnail'
@@ -15,6 +16,7 @@ const VIEW_SIZE = 8
 interface DocumentState { fileId: number; doc?: PdfjsDocument; rotations?: number[]; error?: ToolError }
 
 export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' | 'rotate'; onExit?: () => void }) {
+  const { t } = useLocale()
   const tool = getTool(mode)
   const organizing = mode === 'organize'
   const [files, setFiles] = useState<WorkspaceFile[]>([])
@@ -163,7 +165,7 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
 
   return (
     <div className="tool-screen organize-tool">
-      <header className="tool-header"><h1 className="tool-heading">{tool.title}</h1><p className="tool-subtitle">{tool.description}</p></header>
+      <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">{t(tool.description)}</p></header>
       {phase === 'configure' ? <>
         <FileSelection expected="pdf" multiple={false} files={files} onChange={changeFiles} />
         {selected ? <section className="panel" aria-label="Page workspace">
@@ -171,19 +173,19 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
           <p className="panel-summary">{organizing ? 'Drag a handle to another page, or use Move earlier/later with touch or keyboard. Thumbnails show the exact output order and orientation.' : 'Select pages, then rotate left or right. Existing rotations are included in the preview.'}</p>
           {doc ? <>
             <div className="panel-actions organize-toolbar">
-              <button type="button" className="btn-ghost" onClick={() => setPicked(pages.map(p => p.id))}>Select all pages</button>
-              <button type="button" className="btn-ghost" onClick={() => setPicked([])}>Clear selection</button>
-              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: -90 }, 'Selected pages rotated left.')}>Rotate selected left</button>
-              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: 90 }, 'Selected pages rotated right.')}>Rotate selected right</button>
-              {organizing ? <button type="button" className="btn-ghost" disabled={!selectedIds.length || selectedIds.length === pages.length} onClick={() => edit({ type: 'delete', ids: selectedIds }, 'Selected pages removed from the new copy. Undo restores them.')}>Delete selected pages</button> : null}
-              <button type="button" className="btn-ghost" disabled={!editor.history.length} onClick={() => edit({ type: 'undo' }, 'Last change undone.')}>Undo</button>
-              <button type="button" className="btn-ghost" disabled={!dirty} onClick={() => edit({ type: 'restore', rotations }, 'Original pages and rotations restored.')}>Restore original pages</button>
+              <button type="button" className="btn-ghost" onClick={() => setPicked(pages.map(p => p.id))}>{t("Select all pages")}</button>
+              <button type="button" className="btn-ghost" onClick={() => setPicked([])}>{t("Clear selection")}</button>
+              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: -90 }, 'Selected pages rotated left.')}>{t("Rotate selected left")}</button>
+              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: 90 }, 'Selected pages rotated right.')}>{t("Rotate selected right")}</button>
+              {organizing ? <button type="button" className="btn-ghost" disabled={!selectedIds.length || selectedIds.length === pages.length} onClick={() => edit({ type: 'delete', ids: selectedIds }, 'Selected pages removed from the new copy. Undo restores them.')}>{t("Delete selected pages")}</button> : null}
+              <button type="button" className="btn-ghost" disabled={!editor.history.length} onClick={() => edit({ type: 'undo' }, 'Last change undone.')}>{t("Undo")}</button>
+              <button type="button" className="btn-ghost" disabled={!dirty} onClick={() => edit({ type: 'restore', rotations }, 'Original pages and rotations restored.')}>{t("Restore original pages")}</button>
             </div>
             <p className="panel-hint">{pages.length} output pages · {selectedIds.length} selected · undo keeps the last {UNDO_LIMIT} changes. Keep at least one page; limit {QUOTAS.maxPages} pages.</p>
             {organizing ? <div className="organize-move-field">
               <label htmlFor="organize-position">Move one selected page to position</label>
               <input id="organize-position" type="number" min="1" max={pages.length} value={destination} onChange={e => setDestination(e.target.value)} aria-invalid={!validDestination} />
-              <button type="button" className="btn-ghost" disabled={selectedIds.length !== 1 || !validDestination} onClick={() => move(selectedIds[0], Number(destination) - 1)}>Move selected page</button>
+              <button type="button" className="btn-ghost" disabled={selectedIds.length !== 1 || !validDestination} onClick={() => move(selectedIds[0], Number(destination) - 1)}>{t("Move selected page")}</button>
             </div> : null}
             <div className="organize-grid" role="group" aria-label="Output page order">
               {pages.slice(start, start + VIEW_SIZE).map((page, offset) => {
@@ -211,23 +213,23 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
                           dragging.current = null
                           setDropPosition(null)
                         }}
-                        onPointerCancel={e => { if (e.isPrimary) { if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); dragging.current = null; setDropPosition(null) } }}>Drag</span>
-                      <button type="button" className="btn-ghost" aria-label={`Move earlier at position ${position}`} disabled={index === 0} onClick={() => move(page.id, index - 1)}>Earlier</button>
-                      <button type="button" className="btn-ghost" aria-label={`Move later at position ${position}`} disabled={position === pages.length} onClick={() => move(page.id, index + 1)}>Later</button>
+                        onPointerCancel={e => { if (e.isPrimary) { if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId); dragging.current = null; setDropPosition(null) } }}>{t("Drag")}</span>
+                      <button type="button" className="btn-ghost" aria-label={`Move earlier at position ${position}`} disabled={index === 0} onClick={() => move(page.id, index - 1)}>{t("Earlier")}</button>
+                      <button type="button" className="btn-ghost" aria-label={`Move later at position ${position}`} disabled={position === pages.length} onClick={() => move(page.id, index + 1)}>{t("Later")}</button>
                     </> : null}
-                    <button type="button" className="btn-ghost" aria-label={`Rotate right at position ${position}`} onClick={() => edit({ type: 'rotate', ids: [page.id], delta: 90 }, `Output page ${position} rotated right.`)}>Rotate ↻</button>
+                    <button type="button" className="btn-ghost" aria-label={`Rotate right at position ${position}`} onClick={() => edit({ type: 'rotate', ids: [page.id], delta: 90 }, `Output page ${position} rotated right.`)}>{t("Rotate ↻")}</button>
                     {organizing ? <>
-                      <button type="button" className="btn-ghost" aria-label={`Duplicate at position ${position}`} disabled={pages.length >= QUOTAS.maxPages} onClick={() => edit({ type: 'duplicate', id: page.id }, `Output page ${position} duplicated. Copies can be edited independently.`)}>Duplicate</button>
-                      <button type="button" className="btn-ghost" aria-label={`Delete at position ${position}`} disabled={pages.length === 1} onClick={() => edit({ type: 'delete', ids: [page.id] }, `Output page ${position} removed. Undo restores it.`)}>Delete</button>
+                      <button type="button" className="btn-ghost" aria-label={`Duplicate at position ${position}`} disabled={pages.length >= QUOTAS.maxPages} onClick={() => edit({ type: 'duplicate', id: page.id }, `Output page ${position} duplicated. Copies can be edited independently.`)}>{t("Duplicate")}</button>
+                      <button type="button" className="btn-ghost" aria-label={`Delete at position ${position}`} disabled={pages.length === 1} onClick={() => edit({ type: 'delete', ids: [page.id] }, `Output page ${position} removed. Undo restores it.`)}>{t("Delete")}</button>
                     </> : null}
                   </div>
                 </div>
               })}
             </div>
             <nav className="page-pagination" aria-label="Output thumbnails">
-              <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - VIEW_SIZE)}>Previous pages</button>
+              <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - VIEW_SIZE)}>{t("Previous pages")}</button>
               <span>Output pages {start + 1}–{Math.min(start + VIEW_SIZE, pages.length)} of {pages.length}</span>
-              <button type="button" className="btn-ghost" disabled={start + VIEW_SIZE >= pages.length} onClick={() => setViewStart(start + VIEW_SIZE)}>Next pages</button>
+              <button type="button" className="btn-ghost" disabled={start + VIEW_SIZE >= pages.length} onClick={() => setViewStart(start + VIEW_SIZE)}>{t("Next pages")}</button>
             </nav>
           </> : null}
           <p className="page-selection-status" role={current?.error ? 'alert' : 'status'}>{current?.error ? current.error.message : !doc ? 'Reading the document…' : message || 'Select pages or use the controls below each thumbnail.'}</p>

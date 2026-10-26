@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import { PageThumbnail } from './PageThumbnail'
@@ -16,6 +17,7 @@ import type { VerifiedOutput } from '../outputs/verify'
 const THUMBNAILS_PER_VIEW = 8
 
 export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; onExit?: () => void }) {
+  const { t } = useLocale()
   const tool = getTool(mode)
   const deleting = mode === 'delete-pages'
   const [files, setFiles] = useState<WorkspaceFile[]>([])
@@ -137,8 +139,8 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
   return (
     <div className="tool-screen page-selection-tool">
       <header className="tool-header">
-        <h1 className="tool-heading">{tool.title}</h1>
-        <p className="tool-subtitle">{tool.description}</p>
+        <h1 className="tool-heading">{t(tool.title)}</h1>
+        <p className="tool-subtitle">{t(tool.description)}</p>
       </header>
       {phase === 'configure' ? (
         <>
@@ -152,13 +154,13 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
                 <input id="page-selection" type="text" inputMode="text" value={expression} placeholder="3, 1, 5-8"
                   onChange={(e) => updateExpression(e.target.value)} disabled={!doc}
                   aria-invalid={Boolean(selection.error && expression.trim())} aria-describedby="page-selection-help page-selection-status" />
-                <p id="page-selection-help" className="panel-hint">Use page numbers and ranges, separated by commas. Repeated pages are included once.</p>
+                <p id="page-selection-help" className="panel-hint">{t("Use page numbers and ranges, separated by commas. Repeated pages are included once.")}</p>
               </div>
               {doc ? (
                 <>
                   <div className="panel-actions">
-                    <button type="button" className="btn-ghost" onClick={() => updateExpression(`1-${doc.numPages}`)}>Select all pages</button>
-                    <button type="button" className="btn-ghost" onClick={() => updateExpression('')}>Clear page selection</button>
+                    <button type="button" className="btn-ghost" onClick={() => updateExpression(`1-${doc.numPages}`)}>{t("Select all pages")}</button>
+                    <button type="button" className="btn-ghost" onClick={() => updateExpression('')}>{t("Clear page selection")}</button>
                   </div>
                   <div className="page-grid" role="group" aria-label={deleting ? 'Pages to remove' : 'Pages to extract'}>
                     {Array.from({ length: Math.min(THUMBNAILS_PER_VIEW, doc.numPages - viewStart) }, (_, i) => viewStart + i + 1).map((page) => (
@@ -166,10 +168,10 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
                         onToggle={() => updateExpression(togglePage(expression, page, doc.numPages))} />
                     ))}
                   </div>
-                  <nav className="page-pagination" aria-label="Thumbnail pages">
-                    <button type="button" className="btn-ghost" disabled={viewStart === 0} onClick={() => setViewStart((p) => p - THUMBNAILS_PER_VIEW)}>Previous pages</button>
+                  <nav className="page-pagination" aria-label={t("Thumbnail pages")}>
+                    <button type="button" className="btn-ghost" disabled={viewStart === 0} onClick={() => setViewStart((p) => p - THUMBNAILS_PER_VIEW)}>{t("Previous pages")}</button>
                     <span>Pages {viewStart + 1}–{Math.min(viewStart + THUMBNAILS_PER_VIEW, doc.numPages)} of {doc.numPages}</span>
-                    <button type="button" className="btn-ghost" disabled={viewStart + THUMBNAILS_PER_VIEW >= doc.numPages} onClick={() => setViewStart((p) => p + THUMBNAILS_PER_VIEW)}>Next pages</button>
+                    <button type="button" className="btn-ghost" disabled={viewStart + THUMBNAILS_PER_VIEW >= doc.numPages} onClick={() => setViewStart((p) => p + THUMBNAILS_PER_VIEW)}>{t("Next pages")}</button>
                   </nav>
                 </>
               ) : null}

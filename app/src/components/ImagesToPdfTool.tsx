@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { FileSelection, type WorkspaceFile } from './FileSelection'
 import { ImageLayoutPreviews, type ImagePreviewItem } from './ImageLayoutPreviews'
@@ -16,6 +17,7 @@ const PER_VIEW = 8
 const IMAGE_LABELS = { browse: 'Choose images', dropzone: 'Drop JPG or PNG images here', emptyHint: 'No images selected yet.', limits: 'Static JPG/PNG only · 300 images · 50 MB total · 16 million pixels per image · 25.6 million pixels total · processed locally' }
 
 export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
+  const { t } = useLocale()
   const tool = getTool('images-to-pdf')
   const [files, setFiles] = useState<ImageFile[]>([])
   const [options, setOptions] = useState<ImagePdfOptions>({ ...DEFAULT_IMAGE_OPTIONS })
@@ -88,24 +90,24 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
   }
 
   return <div className="tool-screen images-to-pdf-tool">
-    <header className="tool-header"><h1 className="tool-heading">{tool.title}</h1><p className="tool-subtitle">{tool.description}</p></header>
+    <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">{t(tool.description)}</p></header>
     {phase === 'configure' ? <>
       <FileSelection expected="jpeg" multiple files={files} onChange={changeFiles} labels={IMAGE_LABELS} maxFiles={QUOTAS.maxPages} maxTotalBytes={IMAGE_LIMITS.totalBytes} />
       {layout.count ? <section className="panel" aria-label="Image page settings">
-        <h2 className="panel-title">Set up your pages</h2>
-        <p className="panel-summary">One image per page, in the order above. Use the arrows to move images earlier or later.</p>
+        <h2 className="panel-title">{t("Set up your pages")}</h2>
+        <p className="panel-summary">{t("One image per page, in the order above. Use the arrows to move images earlier or later.")}</p>
         <div className="image-settings-grid">
-          <label htmlFor="image-page-size">Page size<select id="image-page-size" value={options.pageSize} onChange={e => updateOptions({ pageSize: e.target.value as ImagePdfOptions['pageSize'], ...(e.target.value === 'original' ? { orientation: 'auto' as const } : {}) })}>
-            <option value="a4">A4</option><option value="letter">Letter</option><option value="original">Original image size</option>
+          <label htmlFor="image-page-size">{t("Page size")}<select id="image-page-size" value={options.pageSize} onChange={e => updateOptions({ pageSize: e.target.value as ImagePdfOptions['pageSize'], ...(e.target.value === 'original' ? { orientation: 'auto' as const } : {}) })}>
+            <option value="a4">A4</option><option value="letter">Letter</option><option value="original">{t("Original image size")}</option>
           </select></label>
-          <label htmlFor="image-orientation">Page orientation<select id="image-orientation" value={options.orientation} disabled={options.pageSize === 'original'} onChange={e => updateOptions({ orientation: e.target.value as ImagePdfOptions['orientation'] })}>
-            <option value="auto">Auto — match each image</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option>
+          <label htmlFor="image-orientation">{t("Page orientation")}<select id="image-orientation" value={options.orientation} disabled={options.pageSize === 'original'} onChange={e => updateOptions({ orientation: e.target.value as ImagePdfOptions['orientation'] })}>
+            <option value="auto">{t("Auto — match each image")}</option><option value="portrait">{t("Portrait")}</option><option value="landscape">{t("Landscape")}</option>
           </select></label>
-          <label htmlFor="image-fit">Image fit<select id="image-fit" value={options.fit} onChange={e => updateOptions({ fit: e.target.value as ImagePdfOptions['fit'] })}>
-            <option value="contain">Fit entire image</option><option value="cover">Fill page — crop edges</option>
+          <label htmlFor="image-fit">{t("Image fit")}<select id="image-fit" value={options.fit} onChange={e => updateOptions({ fit: e.target.value as ImagePdfOptions['fit'] })}>
+            <option value="contain">{t("Fit entire image")}</option><option value="cover">{t("Fill page — crop edges")}</option>
           </select></label>
-          <label htmlFor="image-margin">Margins (points)<input id="image-margin" type="number" inputMode="decimal" min="0" step="any" value={marginText} aria-invalid={Boolean(layout.error?.code === 'E-CONFIG-01')} aria-describedby="image-layout-help image-layout-status" onChange={e => { setMarginText(e.target.value); updateOptions({ marginPt: e.target.value.trim() ? Number(e.target.value) : NaN }) }} /></label>
-          {options.pageSize === 'original' ? <label htmlFor="image-dpi">Original size DPI<select id="image-dpi" value={options.dpi} onChange={e => updateOptions({ dpi: Number(e.target.value) as ImagePdfOptions['dpi'] })}>
+          <label htmlFor="image-margin">{t("Margins (points)")}<input id="image-margin" type="number" inputMode="decimal" min="0" step="any" value={marginText} aria-invalid={Boolean(layout.error?.code === 'E-CONFIG-01')} aria-describedby="image-layout-help image-layout-status" onChange={e => { setMarginText(e.target.value); updateOptions({ marginPt: e.target.value.trim() ? Number(e.target.value) : NaN }) }} /></label>
+          {options.pageSize === 'original' ? <label htmlFor="image-dpi">{t("Original size DPI")}<select id="image-dpi" value={options.dpi} onChange={e => updateOptions({ dpi: Number(e.target.value) as ImagePdfOptions['dpi'] })}>
             {QUOTAS.renderDpis.map(dpi => <option key={dpi} value={dpi}>{dpi} DPI</option>)}
           </select></label> : null}
         </div>
@@ -114,13 +116,13 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
         <p id="image-layout-status" className="page-selection-status" role={layout.error ? 'alert' : 'status'}>{layout.error ? layout.error.message : `${layout.count} image${layout.count === 1 ? '' : 's'} → ${layout.count} page${layout.count === 1 ? '' : 's'}`}</p>
       </section> : null}
       {visible.length ? <section className="panel" aria-label="Page layout previews">
-        <h2 className="panel-title">Page layout preview</h2>
+        <h2 className="panel-title">{t("Page layout preview")}</h2>
         <p className="panel-summary">The preview uses your page size, margins, fit and image orientation. Review every page before creating your PDF.</p>
         <ImageLayoutPreviews key={previewKey} items={visible} onError={previewError} />
         <nav className="page-pagination" aria-label="Image preview pages">
-          <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - PER_VIEW)}>Previous images</button>
+          <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - PER_VIEW)}>{t("Previous images")}</button>
           <span>Pages {start + 1}–{Math.min(start + PER_VIEW, layout.items.length)} of {layout.items.length}</span>
-          <button type="button" className="btn-ghost" disabled={start + PER_VIEW >= layout.items.length} onClick={() => setViewStart(start + PER_VIEW)}>Next images</button>
+          <button type="button" className="btn-ghost" disabled={start + PER_VIEW >= layout.items.length} onClick={() => setViewStart(start + PER_VIEW)}>{t("Next images")}</button>
         </nav>
       </section> : null}
       <PreviewPanel title="Create your PDF" summary={canRun ? `${layout.count} image${layout.count === 1 ? '' : 's'} will become one ${layout.count}-page PDF.` : 'Choose JPG or PNG images and valid page settings to continue.'}

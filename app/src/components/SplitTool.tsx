@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * Split PDF tool screen — PT-CORE-005.
  *
@@ -33,6 +34,7 @@ const MODES: Array<{ id: SplitMode; label: string; hint: string }> = [
 ]
 
 export function SplitTool({ onExit }: { onExit?: () => void }) {
+  const { t } = useLocale()
   const tool = getTool('split')
   const [files, setFiles] = useState<WorkspaceFile[]>([])
   const [mode, setMode] = useState<SplitMode>('ranges')
@@ -168,8 +170,8 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
   return (
     <div className="tool-screen">
       <header className="tool-header">
-        <h1 className="tool-heading">{tool.title}</h1>
-        <p className="tool-subtitle">{tool.description}</p>
+        <h1 className="tool-heading">{t(tool.title)}</h1>
+        <p className="tool-subtitle">{t(tool.description)}</p>
       </header>
 
       {phase === 'configure' || phase === 'preview' ? (
@@ -183,7 +185,7 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
 
           {selected ? (
             <section className="panel" aria-label="Split configuration">
-              <h2 className="panel-title">How should it be split?</h2>
+              <h2 className="panel-title">{t("How should it be split?")}</h2>
               <div className="split-modes" role="radiogroup" aria-label="Split mode">
                 {MODES.map((m) => (
                   <label key={m.id} className={`split-mode${mode === m.id ? ' is-active' : ''}`}>
@@ -194,15 +196,15 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
                       checked={mode === m.id}
                       onChange={() => setMode(m.id)}
                     />
-                    <span>{m.label}</span>
-                    <small>{m.hint}</small>
+                    <span>{t(m.label)}</span>
+                    <small>{t(m.hint)}</small>
                   </label>
                 ))}
               </div>
 
               {mode === 'ranges' ? (
                 <div className="split-field">
-                  <label htmlFor="split-ranges">Ranges (comma separated)</label>
+                  <label htmlFor="split-ranges">{t("Ranges (comma separated)")}</label>
                   <input
                     id="split-ranges"
                     type="text"
@@ -217,7 +219,7 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
 
               {mode === 'every' ? (
                 <div className="split-field">
-                  <label htmlFor="split-every">Pages per file</label>
+                  <label htmlFor="split-every">{t("Pages per file")}</label>
                   <input
                     id="split-every"
                     type="number"
@@ -232,7 +234,7 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
           ) : null}
 
           <PreviewPanel
-            title="Split preview"
+            title={t("Split preview")}
             summary={
               !selected
                 ? 'Select a PDF to split. It is processed entirely on your device.'
