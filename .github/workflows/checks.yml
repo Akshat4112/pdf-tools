@@ -52,6 +52,11 @@ jobs:
       - name: Build (tsc -b && vite build)
         run: npm run build
 
+      - name: Search Console public readiness prerequisites
+        run: |
+          python3 -B -m unittest discover -s ../scripts -p test_search_console_readiness.py
+          python3 -B ../scripts/check_search_console_readiness.py --dist dist
+
       - name: R1 privacy surface guard
         run: node ../scripts/check_privacy_surface.mjs
 
