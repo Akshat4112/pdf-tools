@@ -5,12 +5,12 @@ import { publicInfoHtml } from '../lib/publicInfo'
 describe('PT-REL-001 authored public help, privacy and limitations pages', () => {
   it('generates three unique canonical pages with document-independent text', () => {
     expect(INFO_PAGE_META).toHaveLength(3)
-    expect(new Set(INFO_PAGE_META.map(p => p.path)).size).toBe(3)
+    expect(new Set(INFO_PAGE_META.map(p => `/${p.dir}`)).size).toBe(3)
     for (const p of INFO_PAGE_META) {
-      const info = infoPageMeta(p.path)!
+      const info = infoPageMeta(`/${p.dir}`)!
       expect(info.canonical).toBe(`https://akshat4112.github.io/pdf-tools/${p.dir}/`)
       expect(PUBLIC_PAGES.some(page => page.canonical === info.canonical)).toBe(true)
-      const html = publicInfoHtml(p.path)!
+      const html = publicInfoHtml(`/${p.dir}`)!
       expect(html).toContain(`<h1>${p.title}</h1>`)
       expect(html).not.toContain('<form')
       expect(html).not.toContain('private-file-canary.pdf')
