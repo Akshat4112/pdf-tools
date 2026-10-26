@@ -23,6 +23,8 @@ jobs:
     # libraries; avoids lengthy apt/browser downloads on each CI run.
     container:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
+    env:
+      HOME: /root
     defaults:
       run:
         working-directory: app
