@@ -35,6 +35,7 @@ test('PT-SEO-006 schema: SPA, history, selected files and unknown routes stay is
   await page.goto('./')
   const schema = page.locator(`#${STRUCTURED_DATA_ID}`)
   await page.locator('.fl-quick-card').filter({ hasText: 'Merge PDF' }).click()
+  await expect.poll(() => schema.textContent()).toContain('Merge PDF')
   const before = await schema.textContent()
   await page.locator('input[type=file]').setInputFiles({ name: 'private-schema-canary.pdf', mimeType: 'application/pdf', buffer: await readFile('../fixtures/pdf/F-001-plain-text-3p.pdf') })
   await expect(page.locator('.file-row')).toHaveCount(1)
