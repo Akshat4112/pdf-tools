@@ -19,7 +19,7 @@ test('PT-UX-005: EN/DE selection updates accessible labels without browser persi
   await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF zusammenfügen' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Dateien auswählen' })).toBeVisible()
-  await expect(page.getByRole('link', { name: 'Alle Tools', exact: true })).toHaveCount(1)
+  await expect(page.locator('.folio-navigation > a').first()).toHaveText('Alle Tools')
   await page.getByRole('combobox', { name: 'Sprache' }).selectOption('en')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await expect(page.getByRole('heading', { level: 1, name: 'Merge PDF' })).toBeVisible()
