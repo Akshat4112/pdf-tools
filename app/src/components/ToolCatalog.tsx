@@ -179,9 +179,14 @@ export function ToolCatalog() {
   const [category, setCategory] = useState<ToolCategory | 'all'>('all')
 
   const searchInput = useRef<HTMLInputElement>(null)
-  const filtered = useMemo(() => TOOLS.filter(tool =>
-    (category === 'all' || tool.category === category) && matchesTool(tool, query),
-  ), [query, category])
+  const filtered = useMemo(() => TOOLS.filter(tool => {
+    if (category !== 'all' && tool.category !== category) return false
+    if (matchesTool(tool, query)) return true
+    if (locale !== 'de' || !query.trim()) return false
+    const normalize = (value: string) => value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
+    const text = normalize(`${t(tool.title)} ${t(tool.description)}`)
+    return normalize(query).split(/\s+/).filter(Boolean).every(word => text.includes(word))
+  }), [query, category, locale, t])
   const availableCount = filtered.filter(tool => tool.implemented).length
   const selectedCategory = CATEGORIES.find(item => item.id === category)
   const isFiltered = Boolean(query || category !== 'all')

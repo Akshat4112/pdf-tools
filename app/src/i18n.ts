@@ -304,12 +304,8 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Up to 50 MB per file · 300 pages · processed locally": "Bis zu 50 MB pro Datei · 300 Seiten · lokal verarbeitet"
 }
 
-const STORE_KEY = 'pdf-tools-ui-language'
-function initialLocale(): Locale {
-  try { return typeof sessionStorage !== 'undefined' && sessionStorage.getItem(STORE_KEY) === 'de' ? 'de' : 'en' }
-  catch { return 'en' }
-}
-let activeLocale: Locale = initialLocale()
+// Keep preferences in memory: PT-PD-003 prohibits web storage for the frontend.
+let activeLocale: Locale = 'en'
 const listeners = new Set<() => void>()
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener) } }
 const getSnapshot = () => activeLocale
@@ -319,7 +315,6 @@ export function setLocale(next: Locale) {
   if (next !== 'en' && next !== 'de') return
   activeLocale = next
   if (typeof document !== 'undefined') document.documentElement.lang = next
-  try { if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(STORE_KEY, next) } catch { /* storage may be disabled */ }
   listeners.forEach(listener => listener())
 }
 

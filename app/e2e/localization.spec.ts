@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test('PT-UX-005: EN/DE selection updates navigation and persists only the tab language', async ({ page }) => {
+test('PT-UX-005: EN/DE selection updates accessible labels without browser persistence', async ({ page }) => {
   await page.goto('./')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   const language = page.getByRole('combobox', { name: 'Language' })
@@ -9,15 +9,19 @@ test('PT-UX-005: EN/DE selection updates navigation and persists only the tab la
   await expect(page.getByRole('heading', { level: 1, name: 'PDF-Tools, die direkt im Browser funktionieren.' })).toBeVisible()
   await expect(page.getByRole('searchbox', { name: 'Tools suchen' })).toBeVisible()
   await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
+  await page.getByRole('searchbox', { name: 'Tools suchen' }).fill('zusammenfügen')
+  await expect(page.getByRole('link', { name: /Tool öffnen: PDF zusammenfügen/ }).first()).toBeVisible()
   await page.goto('merge/')
-  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  // PT-UX-005 intentionally does not persist language in any browser storage.
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF zusammenfügen' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Dateien auswählen' })).toBeVisible()
   await expect(page.getByRole('link', { name: 'Alle Tools', exact: true })).toHaveCount(1)
   await page.getByRole('combobox', { name: 'Sprache' }).selectOption('en')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await expect(page.getByRole('heading', { level: 1, name: 'Merge PDF' })).toBeVisible()
-  expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual(['pdf-tools-ui-language'])
+  expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual([])
 })
 
 test('PT-UX-005: language control is reachable by keyboard at narrow and zoomed layouts', async ({ page }) => {
