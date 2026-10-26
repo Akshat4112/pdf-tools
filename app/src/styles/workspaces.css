@@ -31,8 +31,6 @@
 .tool-workspace .btn-primary { border-radius:var(--fl-radius-sm); }
 .tool-workspace :is(a,button,input,select,textarea,summary):focus-visible:not(:where(.pdfViewer *, .textLayer *, .annotationLayer *)) { outline:3px solid var(--fl-focus); outline-offset:3px; box-shadow:none; }
 .tool-workspace .split-mode:focus-within { outline:3px solid var(--fl-focus); outline-offset:3px; }
-.site-footer { color:var(--fl-muted); line-height:1.6; }
-.site-footer a { color:var(--fl-accent); text-underline-offset:3px; }
 @media(max-width:600px) { .tool-workspace { padding-top:16px; } .tool-workspace .panel { padding:16px; } .tool-workspace .dropzone { padding:24px 16px; } .workspace-help { width:100%; max-width:none; } }
 @media(prefers-reduced-motion:reduce) { .tool-workspace :is(.btn-primary,.progress-fill,.page-pick) { transition:none; } }
 @media(forced-colors:active) { .tool-workspace :is(.panel,.dropzone,.split-mode) { border-color:CanvasText; } .tool-workspace :focus-visible { outline-color:Highlight; } }

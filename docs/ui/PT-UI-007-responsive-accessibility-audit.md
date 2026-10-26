@@ -26,3 +26,5 @@ Do not mark PT-UI-007 Done or claim WCAG compliance until the above meaningful m
 - Run `npm run build` inside `app/`, then `npx playwright test accessibilityRelease.spec.ts` against the preview configuration used by CI.
 - The accessibility suite uses public paths and empty workspaces, and its results are limited to browser-observable DOM/CSS and interaction contracts.
 - This PR is stacked on PT-UI-003 #75 until the footer is merged; do not merge out of dependency order or treat review as sign-off for physical hardware or assistive technology.
+
+**Startup CSS guard:** Retired the superseded home-only `.site-footer` rules (the shared PT-UI-003 footer uses `.fl-site-footer`) and simplified skip-link styling. The CSS budget stays at the existing 45,000-byte raw threshold; no budget relaxation.
