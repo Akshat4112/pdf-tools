@@ -1,7 +1,7 @@
-import { PUBLIC_PAGES, SITE_URL, SITE_NAME, SITE_DESCRIPTION, toolPageMeta, hubPageMeta, GUIDE_INDEX_META, guidePageMeta, INFO_PAGE_META } from './pageMetadata'
-import { TOOLS } from '../registry'
-import { HUBS, hubForTool } from './categoryHubs'
-import { GUIDES } from './guideCatalog'
+import { PUBLIC_PAGES, SITE_URL, SITE_NAME, SITE_DESCRIPTION, toolPageMeta, hubPageMeta, GUIDE_INDEX_META, guidePageMeta, INFO_PAGE_META } from './pageMetadata.ts'
+import { TOOLS } from '../registry.ts'
+import { HUBS, hubForTool } from './categoryHubs.ts'
+import { GUIDES } from './guideCatalog.ts'
 export const STRUCTURED_DATA_ID = 'public-structured-data'
 export type SchemaNode = { '@type': string; '@id': string; [key: string]: unknown }
 /** An exact public canonical allowlist prevents query/file state from entering JSON-LD. */
