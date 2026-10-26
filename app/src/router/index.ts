@@ -45,8 +45,7 @@ export function routePathOf(pathname: string): string {
 export function parsePath(pathname: string): Route {
   const p = routePathOf(pathname)
   if (p === '/' || p === '') return { name: 'catalog', path: p }
-  if (infoPageMeta(p)) return { name: 'info', path: p }
-  if (isGuidePath(p)) return { name: 'guide', path: p }
+  if (isGuidePath(p) || infoPageMeta(p)) return { name: 'guide', path: p }
   if (hubByPath(p)) return { name: 'category', path: p }
   const tool = toolByRoute(p)
   if (tool) return { name: tool.id, path: p }
