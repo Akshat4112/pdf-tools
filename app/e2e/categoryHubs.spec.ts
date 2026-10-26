@@ -16,6 +16,13 @@ test('PT-SEO-004 hubs: static link graph has no orphaned or broken public routes
     for (const [, raw] of html.matchAll(/href="([^"]+)"/g)) {
       const url = new URL(raw, new URL(path, SITE_URL))
       if (url.origin !== new URL(SITE_URL).origin || !url.pathname.startsWith('/pdf-tools/') || /\.[a-z0-9]+$/i.test(url.pathname)) continue
+      // The shared accessibility skip link is a valid same-page fragment,
+      // not a crawlable route edge; require its static target to exist.
+      if (url.hash === '#main-content') {
+        expect(url.pathname).toBe(path)
+        expect(html).toContain('id="main-content"')
+        continue
+      }
       expect(url.search).toBe(''); expect(url.hash).toBe('')
       expect(paths.has(url.pathname), `${path} links to ${url.pathname}`).toBe(true)
       links.push(url.pathname)
