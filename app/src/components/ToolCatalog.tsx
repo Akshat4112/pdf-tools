@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * Tool catalog — PT-UX-001.
  *
@@ -139,18 +140,19 @@ function ToolIcon({ tool }: { tool: ToolDefinition }) {
 }
 
 export function ToolCard({ tool }: { tool: ToolDefinition }) {
+  const { t } = useLocale()
   const classes = ['tool-card']
   if (!tool.implemented) classes.push('is-disabled')
   if (tool.implemented) {
     return (
-      <a className={classes.join(' ')} href={href(tool.route)} aria-label={`Open ${tool.title}`}>
+      <a className={classes.join(' ')} href={href(tool.route)} aria-label={`${t('Open')} ${t(tool.title)}`}>
         <span className="tool-icon">
           <ToolIcon tool={tool} />
         </span>
-        <h3 className="tool-title">{tool.title}</h3>
-        <p className="tool-desc">{tool.description}</p>
+        <h3 className="tool-title">{t(tool.title)}</h3>
+        <p className="tool-desc">{t(tool.description)}</p>
         <span className="tool-meta">
-          <span className="badge badge-live">Open tool</span>
+          <span className="badge badge-live">{t("Open tool")}</span>
           <span>{formatCue(tool)}</span>
         </span>
       </a>
@@ -161,10 +163,10 @@ export function ToolCard({ tool }: { tool: ToolDefinition }) {
       <span className="tool-icon">
         <ToolIcon tool={tool} />
       </span>
-      <h3 className="tool-title">{tool.title}</h3>
-      <p className="tool-desc">{tool.description}</p>
+      <h3 className="tool-title">{t(tool.title)}</h3>
+      <p className="tool-desc">{t(tool.description)}</p>
       <span className="tool-meta">
-        <span className="badge badge-soon">Not available yet</span>
+        <span className="badge badge-soon">{t("Not available yet")}</span>
         <span>{formatCue(tool)}</span>
       </span>
     </div>
@@ -172,13 +174,19 @@ export function ToolCard({ tool }: { tool: ToolDefinition }) {
 }
 
 export function ToolCatalog() {
+  const { t, locale } = useLocale()
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState<ToolCategory | 'all'>('all')
 
   const searchInput = useRef<HTMLInputElement>(null)
-  const filtered = useMemo(() => TOOLS.filter(tool =>
-    (category === 'all' || tool.category === category) && matchesTool(tool, query),
-  ), [query, category])
+  const filtered = useMemo(() => TOOLS.filter(tool => {
+    if (category !== 'all' && tool.category !== category) return false
+    if (matchesTool(tool, query)) return true
+    if (locale !== 'de' || !query.trim()) return false
+    const normalize = (value: string) => value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
+    const text = normalize(`${t(tool.title)} ${t(tool.description)}`)
+    return normalize(query).split(/\s+/).filter(Boolean).every(word => text.includes(word))
+  }), [query, category, locale, t])
   const availableCount = filtered.filter(tool => tool.implemented).length
   const selectedCategory = CATEGORIES.find(item => item.id === category)
   const isFiltered = Boolean(query || category !== 'all')
@@ -186,9 +194,9 @@ export function ToolCatalog() {
   const reset = () => { setQuery(''); setCategory('all'); searchInput.current?.focus() }
 
   return (
-    <section aria-label="Tool catalog" className="catalog">
+    <section aria-label={t("Tool catalog")} className="catalog">
       <div className="search-row">
-        <label className="catalog-search-label" htmlFor="catalog-search">Search tools</label>
+        <label className="catalog-search-label" htmlFor="catalog-search">{t("Search tools")}</label>
         <div className="search-box">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <circle cx="11" cy="11" r="7" /><path d="M20 20l-3.5-3.5" />
@@ -196,41 +204,41 @@ export function ToolCatalog() {
           <input ref={searchInput} id="catalog-search" type="search" value={query} maxLength={100}
             onChange={event => setQuery(event.target.value)}
             onKeyDown={event => { if (event.key === 'Escape') clearSearch() }}
-            placeholder="Try merge, rotate or JPG…" aria-label="Search tools"
+            placeholder={t("Try merge, rotate or JPG…")} aria-label={t("Search tools")}
             aria-describedby="catalog-search-help" aria-controls="catalog-results" />
-          <button type="button" className="catalog-clear" onClick={clearSearch} disabled={!query} aria-label="Clear search">Clear</button>
+          <button type="button" className="catalog-clear" onClick={clearSearch} disabled={!query} aria-label={t("Clear search")}>{t("Clear")}</button>
           <kbd aria-hidden="true">/</kbd>
         </div>
-        <p id="catalog-search-help" className="catalog-search-help">Search by task or format. Press / to search, or Escape to clear your search.</p>
+        <p id="catalog-search-help" className="catalog-search-help">{t("Search by task or format. Press / to search, or Escape to clear your search.")}</p>
       </div>
-      <div className="category-row" role="group" aria-label="Filter by category">
+      <div className="category-row" role="group" aria-label={t("Filter by category")}>
         <button type="button" className="cat-chip" aria-pressed={category === 'all'} onClick={() => setCategory('all')}>
-          All tools <span className="catalog-chip-count" aria-hidden="true">{TOOLS.length}</span>
+          {t("All tools")} <span className="catalog-chip-count" aria-hidden="true">{TOOLS.length}</span>
         </button>
         {CATEGORIES.map(item => (
           <button type="button" className="cat-chip" key={item.id} aria-pressed={category === item.id}
-            onClick={() => setCategory(item.id)} title={item.description}>
-            {item.title} <span className="catalog-chip-count" aria-hidden="true">{TOOLS.filter(tool => tool.category === item.id).length}</span>
+            onClick={() => setCategory(item.id)} title={t(item.description)}>
+            {t(item.title)} <span className="catalog-chip-count" aria-hidden="true">{TOOLS.filter(tool => tool.category === item.id).length}</span>
           </button>
         ))}
       </div>
       <div className="catalog-results-heading">
-        <p role="status" aria-live="polite" aria-atomic="true">{filtered.length} {filtered.length === 1 ? 'tool' : 'tools'} {isFiltered ? 'found' : 'in your toolbox'} · {availableCount} ready to use</p>
-        <button type="button" className="catalog-reset" disabled={!isFiltered} onClick={reset}>Reset filters</button>
+        <p role="status" aria-live="polite" aria-atomic="true">{filtered.length} {t(filtered.length === 1 ? 'tool' : 'tools')} {t(isFiltered ? 'found' : 'in your toolbox')} · {availableCount} {t('ready to use')}</p>
+        <button type="button" className="catalog-reset" disabled={!isFiltered} onClick={reset}>{t("Reset filters")}</button>
       </div>
-      {selectedCategory ? <p className="catalog-category-help">{selectedCategory.description}</p> : null}
+      {selectedCategory ? <p className="catalog-category-help">{t(selectedCategory.description)}</p> : null}
       <div id="catalog-results">
         {filtered.length === 0 ? (
           <div className="empty-state">
-            <h3>No matching tools</h3>
-            <p>{query.trim() ? `No tools match “${query.trim()}”${selectedCategory ? ` in ${selectedCategory.title}` : ''}.` : 'There are no tools in this category yet.'}</p>
-            <p>Try a shorter task name, choose another category, or reset the filters to see the full toolbox.</p>
+            <h3>{t("No matching tools")}</h3>
+            <p>{query.trim() ? (locale === 'de' ? `Keine Tools für „${query.trim()}“${selectedCategory ? ` in ${t(selectedCategory.title)}` : ''} gefunden.` : `No tools match “${query.trim()}”${selectedCategory ? ` in ${selectedCategory.title}` : ''}.`) : t('There are no tools in this category yet.')}</p>
+            <p>{t("Try a shorter task name, choose another category, or reset the filters to see the full toolbox.")}</p>
           </div>
         ) : (
           <ul className="tool-grid">{filtered.map(tool => <li key={tool.id}><ToolCard tool={tool} /></li>)}</ul>
         )}
       </div>
-      <p className="catalog-limits">Files up to {QUOTAS.maxInputBytes / (1024 * 1024)} MiB each. Page, output and device-memory limits vary by tool; check the limits before processing.</p>
+      <p className="catalog-limits">{locale === 'de' ? 'Dateien bis zu' : 'Files up to'} {QUOTAS.maxInputBytes / (1024 * 1024)} MiB {locale === 'de' ? 'je Datei. Seiten-, Ausgabe- und Speicherlimits variieren je Tool; prüfe die Grenzen vor der Verarbeitung.' : 'each. Page, output and device-memory limits vary by tool; check the limits before processing.'}</p>
     </section>
   )
 }

@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * File selection workspace — PT-UX-002.
  *
@@ -82,6 +83,7 @@ export function FileSelection({
   maxFiles,
   maxTotalBytes,
 }: FileSelectionProps) {
+  const { t, locale } = useLocale()
   const labels = { ...DEFAULT_LABELS, ...labelOverrides }
   const [dragActive, setDragActive] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -121,7 +123,7 @@ export function FileSelection({
     const token = ++generation.current
     setSelectionError(null)
     if (maxFiles && list.length + files.length > maxFiles) {
-      setSelectionError(toolError('E-INPUT-04', `Choose at most ${maxFiles} files. Remove files or choose a smaller batch.`, 'show-limits'))
+      setSelectionError(toolError('E-INPUT-04', locale === 'de' ? `Wähle höchstens ${maxFiles} Dateien. Entferne Dateien oder wähle eine kleinere Auswahl.` : `Choose at most ${maxFiles} files. Remove files or choose a smaller batch.`, 'show-limits'))
       return
     }
     const readable = list.filter(f => f.size <= QUOTAS.maxInputBytes)
@@ -169,7 +171,7 @@ export function FileSelection({
   return (
     <section
       className="workspace"
-      aria-label="File selection"
+      aria-label={t("File selection")}
       onDragOver={(e) => {
         e.preventDefault()
         setDragActive(true)
@@ -182,13 +184,13 @@ export function FileSelection({
           <path d="M12 16V4m0 0l-4 4m4-4l4 4" />
           <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
         </svg>
-        <p className="dropzone-hint">{labels.dropzone}</p>
+        <p className="dropzone-hint">{t(labels.dropzone)}</p>
         <button
           type="button"
           className="btn-primary"
           onClick={() => inputRef.current?.click()}
         >
-          {labels.browse}
+          {t(labels.browse)}
         </button>
         <input
           ref={inputRef}
@@ -200,21 +202,21 @@ export function FileSelection({
           // accept built from expected kind (registry contract)
           accept={expected === 'pdf' ? 'application/pdf,.pdf' : 'image/jpeg,image/png,.jpg,.jpeg,.png'}
           onChange={onInputChange}
-          aria-label={labels.browse}
+          aria-label={t(labels.browse)}
         />
       </div>
 
-      <p className="limits-line">{labelOverrides?.limits ?? limitsLine}</p>
-      {expected === 'pdf' ? <p className="panel-hint">Keep your original PDF. Exporting a modified copy can invalidate digital signatures; interactive forms, annotations, bookmarks and document metadata may not be preserved. Image exports contain pixels, not searchable text. Text export does not perform OCR or preserve page layout.</p> : null}
-      {selectionError ? <p className="file-error" role="alert">{selectionError.message}</p> : null}
+      <p className="limits-line">{t(labelOverrides?.limits ?? limitsLine)}</p>
+      {expected === 'pdf' ? <p className="panel-hint">{t("Keep your original PDF. Exporting a modified copy can invalidate digital signatures; interactive forms, annotations, bookmarks and document metadata may not be preserved. Image exports contain pixels, not searchable text. Text export does not perform OCR or preserve page layout.")}</p> : null}
+      {selectionError ? <p className="file-error" role="alert">{t(selectionError.message)}</p> : null}
 
       {files.length === 0 ? (
-        <p className="workspace-empty" role="status">{labels.emptyHint}</p>
+        <p className="workspace-empty" role="status">{t(labels.emptyHint)}</p>
       ) : (
         <>
           <p className="workspace-count" role="status">
-            {validCount} of {files.length} file{files.length === 1 ? '' : 's'} ready
-            {hasErrors ? ' — remove files marked with errors' : ''}
+            {validCount} {locale === 'de' ? 'von' : 'of'} {files.length} {locale === 'de' ? (files.length === 1 ? 'Datei bereit' : 'Dateien bereit') : `file${files.length === 1 ? '' : 's'} ready`}
+            {hasErrors ? t(' — remove files marked with errors') : ''}
           </p>
           <ul className="file-list">
             {files.map((f, i) => (
@@ -224,7 +226,7 @@ export function FileSelection({
                 <span className="file-size">{f.sizeLabel}</span>
                 {f.error ? (
                   <span className="file-error" role="alert">
-                    {f.error.message}
+                    {t(f.error.message)}
                   </span>
                 ) : null}
                 <span className="file-actions">
@@ -233,7 +235,7 @@ export function FileSelection({
                       <button
                         type="button"
                         className="btn-icon"
-                        aria-label={`${labels.moveUp}: ${f.displayName}`}
+                        aria-label={`${t(labels.moveUp)}: ${f.displayName}`}
                         disabled={i === 0}
                         onClick={() => move(i, -1)}
                       >
@@ -242,7 +244,7 @@ export function FileSelection({
                       <button
                         type="button"
                         className="btn-icon"
-                        aria-label={`${labels.moveDown}: ${f.displayName}`}
+                        aria-label={`${t(labels.moveDown)}: ${f.displayName}`}
                         disabled={i === files.length - 1}
                         onClick={() => move(i, 1)}
                       >
@@ -253,7 +255,7 @@ export function FileSelection({
                   <button
                     type="button"
                     className="btn-icon"
-                    aria-label={`${labels.remove}: ${f.displayName}`}
+                    aria-label={`${t(labels.remove)}: ${f.displayName}`}
                     onClick={() => remove(f.id)}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
@@ -263,7 +265,7 @@ export function FileSelection({
             ))}
           </ul>
           <button type="button" className="btn-ghost" onClick={() => change([])}>
-            {labels.clear}
+            {t(labels.clear)}
           </button>
         </>
       )}

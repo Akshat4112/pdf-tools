@@ -1,3 +1,4 @@
+import { useLocale } from '../i18n'
 /**
  * Merge PDF tool screen — PT-CORE-002.
  *
@@ -24,6 +25,7 @@ import type { Job, JobProgress, JobState } from '../jobs/orchestrator'
 import type { ToolError } from '../registry'
 
 export function MergeTool({ onExit }: { onExit?: () => void }) {
+  const { t } = useLocale()
   const tool = getTool('merge')
   const [files, setFiles] = useState<WorkspaceFile[]>([])
   const job = useRef<Job<never, VerifiedOutput> | null>(null)
@@ -99,8 +101,8 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
   return (
     <div className="tool-screen">
       <header className="tool-header">
-        <h1 className="tool-heading">{tool.title}</h1>
-        <p className="tool-subtitle">{tool.description}</p>
+        <h1 className="tool-heading">{t(tool.title)}</h1>
+        <p className="tool-subtitle">{t(tool.description)}</p>
       </header>
 
       {phase === 'configure' || phase === 'preview' ? (

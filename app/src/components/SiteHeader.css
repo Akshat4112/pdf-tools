@@ -37,3 +37,9 @@
   .folio-header, .folio-categories { border-color: CanvasText; }
   .folio-header :is(a, summary, button):focus-visible { outline-color: Highlight; }
 }
+
+/* PT-UX-005: always-available language control, 44px targets and 200% zoom. */
+.folio-language { margin-left: auto; display: inline-flex; align-items: center; min-height: 44px; }
+.folio-language select { min-height: 44px; min-width: 62px; padding: 8px 7px; border: 1px solid var(--fh-line); border-radius: 8px; color: var(--fh-text); background: var(--fh-surface); font: inherit; font-size: 14px; cursor: pointer; }
+.folio-language select:focus-visible { outline: 3px solid var(--fl-focus); outline-offset: 3px; }
+@media (max-width: 800px) { .folio-language { order: 1; margin-left: auto; } .folio-navigation { order: 2; } }
