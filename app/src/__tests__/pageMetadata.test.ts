@@ -1,12 +1,12 @@
 import { GUIDES } from '../lib/guideCatalog'
 import { HUBS } from '../lib/categoryHubs'
 import { describe, expect, it } from 'vitest'
-import { CATALOG_META, NOT_FOUND_META, PUBLIC_PAGES, SHARE_IMAGE, pageMetaTags, toolPageMeta, withPageMetadata } from '../lib/pageMetadata'
+import { CATALOG_META, INFO_PAGE_META, NOT_FOUND_META, PUBLIC_PAGES, SHARE_IMAGE, pageMetaTags, toolPageMeta, withPageMetadata } from '../lib/pageMetadata'
 import { TOOLS } from '../registry'
 
 describe('PT-SEO-005 public metadata', () => {
   it('covers only shipped routes with distinct useful copy', () => {
-    expect(PUBLIC_PAGES).toHaveLength(TOOLS.filter(tool => tool.implemented).length + HUBS.length + GUIDES.length + 2)
+    expect(PUBLIC_PAGES).toHaveLength(TOOLS.filter(tool => tool.implemented).length + HUBS.length + GUIDES.length + INFO_PAGE_META.length + 2)
     expect(new Set(PUBLIC_PAGES.map(page => page.title)).size).toBe(PUBLIC_PAGES.length)
     expect(new Set(PUBLIC_PAGES.map(page => page.description)).size).toBe(PUBLIC_PAGES.length)
     for (const page of PUBLIC_PAGES) {
