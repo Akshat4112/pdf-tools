@@ -93,6 +93,9 @@ test('PT-QA-002: selection quota and two-tab isolation', async ({ page, context 
     await writeFile(oversizedPath, tooLarge)
     await page.locator('input[type=file]').setInputFiles(oversizedPath)
     await expect(page.getByRole('alert').first()).toContainText('exceeds 50 MB')
+    // Rejected files remain visible for recovery; explicitly clear the list.
+    await page.getByRole('button', { name: 'Clear files' }).click()
+    await expect(page.locator('.file-row')).toHaveCount(0)
   } finally {
     await page.locator('input[type=file]').setInputFiles([])
     await rm(directory, { recursive: true, force: true })
