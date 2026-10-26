@@ -3,6 +3,7 @@
 @import './styles/system.css';
 @import './styles/home.css';
 @import './styles/footer.css';
+@import './styles/accessibility.css';
 @import './styles/workspaces.css';
 
 /* PT-UX-004: client 404 screen (NotFound.tsx + static 404.html) */

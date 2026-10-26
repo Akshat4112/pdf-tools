@@ -37,7 +37,6 @@
 .fl-how li { counter-increment:step; display:flex; flex-direction:column; gap:10px; font-size:.875rem; color:var(--fl-muted); }
 .fl-how li::before { content:counter(step); width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--fl-control); border-radius:50%; color:var(--fl-teal); background:var(--fl-surface); font-weight:800; }
 .fl-how li strong { color:var(--fl-text); }
-.fl-home-footer { flex-wrap:wrap; gap:14px; }
 .fl-home a:focus-visible { outline:3px solid var(--fl-focus); outline-offset:3px; }
 @media(hover:hover) { .fl-quick-card:hover { border-color:var(--fl-teal); } .fl-cta:hover { background:var(--fl-accent-hover); } }
 @media(max-width:900px) { .fl-quick-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .fl-how { grid-template-columns:1fr; } }

@@ -86,7 +86,7 @@ function prerenderRoutes(): Plugin {
             : `<h1>${title.split(' — ')[0]}</h1><p>${description}</p><p>JavaScript is required to process files locally. <a href="${ORIGIN}">Browse all PDF tools</a>.</p>`)
         const tool = TOOLS.find(tool => tool.implemented && tool.route.slice(1) === dir)
         const article = tool ? breadcrumbHtml(hubForTool(tool), tool) + toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) : ''
-        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main${guide || info ? ' class="tool-workspace guide-page"' : ''}>${noJs}${article}</main></noscript>`)
+        html = html.replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" tabindex="-1"${guide || info ? ' class="tool-workspace guide-page"' : ''}>${noJs}${article}</main></noscript>`)
         return html
       }
 

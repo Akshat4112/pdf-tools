@@ -1,0 +1,4 @@
+/* PT-UI-007: accessible localized skip target, hidden until keyboard focus. */
+html:not(:lang(de)) .fl-skip-de, html:lang(de) .fl-skip-en { display:none; }
+.fl-skip-link { position:absolute; top:-10000px; left:12px; padding:10px 14px; color:var(--fl-text); background:var(--fl-surface); border:2px solid var(--fl-focus); z-index:99; }
+.fl-skip-link:focus-visible { position:fixed; top:12px; outline:3px solid var(--fl-focus); }

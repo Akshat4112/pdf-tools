@@ -282,21 +282,6 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
   font-size: 15px;
 }
 
-/* ---------------------------------------------------------------- footer */
-
-.site-footer {
-  border-top: 1px solid var(--line);
-  padding: 20px 0 36px;
-  margin-top: 20px;
-  font-size: 13.5px;
-  color: var(--ink-300);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  justify-content: space-between;
-}
-.site-footer a { color: var(--ink-500); }
-
 /* ---------------------------------------------------------------- responsive */
 
 @media (max-width: 640px) {
