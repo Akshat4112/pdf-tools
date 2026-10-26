@@ -6,7 +6,9 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
-import { readFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { join } from 'node:path'
+import { tmpdir } from 'node:os'
 
 async function fixture() {
   const doc = await PDFDocument.create()
@@ -81,13 +83,20 @@ test('PT-QA-002: merge gives verified download and reset in each engine', async 
 test('PT-QA-002: selection quota and two-tab isolation', async ({ page, context }) => {
   test.setTimeout(90_000)
   await page.goto('merge/')
-  // Reject oversized input before loading into app memory.
-  const tooLarge = Buffer.alloc(50 * 1024 * 1024 + 1)
-  tooLarge.set(Buffer.from('%PDF-'))
-  await page.locator('input[type=file]').setInputFiles({
-    name: 'synthetic-oversize.pdf', mimeType: 'application/pdf', buffer: tooLarge,
-  })
-  await expect(page.getByRole('alert').first()).toContainText('exceeds 50 MB')
+  // Playwright rejects in-memory uploads >50 MB. Use an ephemeral disk-backed
+  // synthetic file and remove it even if the browser assertion fails.
+  const directory = await mkdtemp(join(tmpdir(), 'pdf-tools-quota-'))
+  const oversizedPath = join(directory, 'synthetic-oversize.pdf')
+  try {
+    const tooLarge = Buffer.alloc(50 * 1024 * 1024 + 1)
+    tooLarge.set(Buffer.from('%PDF-'))
+    await writeFile(oversizedPath, tooLarge)
+    await page.locator('input[type=file]').setInputFiles(oversizedPath)
+    await expect(page.getByRole('alert').first()).toContainText('exceeds 50 MB')
+  } finally {
+    await page.locator('input[type=file]').setInputFiles([])
+    await rm(directory, { recursive: true, force: true })
+  }
 
   const other = await context.newPage()
   try {
