@@ -1,3 +1,4 @@
+import { GUIDES, guidePath, type Guide } from './guideCatalog.ts'
 import { HUBS, hubPath, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
@@ -21,7 +22,7 @@ export interface PageMeta {
   /** absolute canonical URL including /pdf-tools/ base */
   canonical: string
   /** Open Graph type; 'website' for catalog, 'article' feels wrong for tools */
-  ogType: 'website'
+  ogType: 'website' | 'article'
 }
 
 /** Catalog page metadata. */
@@ -76,9 +77,14 @@ export const NOT_FOUND_META: PageMeta = {
 }
 
 
-/** Only implemented tool routes may be advertised in generated entry pages. */
+export const GUIDE_INDEX_META: PageMeta = { title: 'Practical PDF guides — PDF Tools', description: 'Work through everyday PDF tasks with small synthetic examples, step-by-step checks and clear limits.', canonical: `${SITE_URL}guides/`, ogType: 'website' }
+export const guidePageMeta = (guide: Guide): PageMeta => ({ title: `${guide.title} — PDF Tools`, description: guide.description, canonical: `${SITE_URL}${guidePath(guide).slice(1)}/`, ogType: 'article' })
+
+/** Only shipped tools, hubs and published guides are indexable. */
 export const PUBLIC_PAGES = [
   { dir: '.', ...CATALOG_META },
+  { dir: 'guides', ...GUIDE_INDEX_META },
+  ...GUIDES.map(guide => ({ dir: guidePath(guide).slice(1), ...guidePageMeta(guide) })),
   ...HUBS.map(hub => ({ dir: hubPath(hub).slice(1), ...hubPageMeta(hub) })),
   ...TOOLS.filter(tool => tool.implemented).map(tool => ({ dir: tool.route.slice(1), ...toolPageMeta(tool) })),
 ]

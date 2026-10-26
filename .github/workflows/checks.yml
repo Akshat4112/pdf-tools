@@ -80,6 +80,19 @@ jobs:
           PDF_TOOLS_WORKSPACE_VISUAL_DIR: ${{ runner.temp }}/workspace-visuals
         run: npx playwright test categoryHubs.spec.ts --max-failures=1
 
+      - name: Practical guide and synthetic example browser checks
+        env:
+          PDF_TOOLS_GUIDE_VISUAL_DIR: ${{ runner.temp }}/guide-visuals
+        run: npx playwright test practicalGuides.spec.ts --max-failures=1
+
+      - name: Public guide visual review
+        uses: actions/upload-artifact@v4
+        with:
+          name: practical-guides-${{ github.sha }}
+          path: ${{ runner.temp }}/guide-visuals/*.png
+          retention-days: 1
+          if-no-files-found: error
+
       - name: Public tool guide browser checks
         run: npx playwright test toolContent.spec.ts --max-failures=1
 
@@ -109,7 +122,7 @@ jobs:
         run: npx playwright test toolDiscovery.spec.ts --max-failures=1
 
       - name: R1 browser regression checks
-        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-UI-004 discovery|PT-UI-006|PT-SEO-005 metadata|PT-UI-005 workspaces|PT-SEO-003 public guides|PT-SEO-004 hubs'
+        run: npm run test:pages-ui -- --max-failures=1 --grep-invert 'PT-SEO-009 guides|PT-UI-004 discovery|PT-UI-006|PT-SEO-005 metadata|PT-UI-005 workspaces|PT-SEO-003 public guides|PT-SEO-004 hubs'
 
       # Only empty tool-catalog captures from toolDiscovery.spec.ts. No document screenshots.
       - name: Empty catalog visual review
