@@ -134,10 +134,6 @@ function App() {
             <li><strong>{t("Save your result")}</strong><span>{t("Download the finished file, or read it here.")}</span></li></ol>
         </section>
       </main>
-      <footer className="site-footer fl-home-footer">
-        <span>{t("PDF Tools · Free and open-source PDF tools.")} <a href="https://github.com/Akshat4112/pdf-tools/blob/main/LICENSE">{t("MIT license")}</a>.</span>
-        <span><a href="https://github.com/Akshat4112/pdf-tools/blob/main/docs/security/PT-SEC-002-local-processing-audit.md">{t("How local processing works")}</a> · <a href="https://github.com/Akshat4112/pdf-tools">{t("Source on GitHub")}</a></span>
-      </footer>
     </div>
   )
 }
