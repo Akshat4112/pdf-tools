@@ -1,0 +1,12 @@
+# PT-OPS-002: guide all public submissions through visible privacy notices.
+blank_issues_enabled: false
+contact_links:
+  - name: "Help and FAQ"
+    url: "https://akshat4112.github.io/pdf-tools/help/"
+    about: "Check currently shipped tools, limits and common issues before reporting."
+  - name: "Trust and privacy"
+    url: "https://akshat4112.github.io/pdf-tools/trust/"
+    about: "Understand local processing, hosting requests and reporting boundaries."
+  - name: "Security guidance (check private reporting availability)"
+    url: "https://github.com/Akshat4112/pdf-tools/security"
+    about: "Never disclose sensitive vulnerabilities publicly. Private reporting may not be enabled."

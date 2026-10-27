@@ -1,0 +1,60 @@
+name: "Feature request"
+description: "Suggest a useful feature without uploading private documents."
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This is a PUBLIC GitHub issue. **Never share private or work PDFs, real filenames, document content, passwords, personal data, sensitive screenshots, or unredacted logs.** Use only synthetic test examples and generic instructions. For suspected vulnerabilities, do NOT post exploit details publicly; check [GitHub Security](https://github.com/Akshat4112/pdf-tools/security) to see whether private reporting is available.
+        Review the [working tool catalog](https://akshat4112.github.io/pdf-tools/) and [Limitations](https://akshat4112.github.io/pdf-tools/limitations/). Requests are not release promises.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Problem to solve"
+      description: "Explain a generic task, not a real customer case."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Desired behavior"
+      description: "Describe the useful outcome and constraints."
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: "Area of PDF Tools"
+      options:
+        - "Existing PDF tool"
+        - "New PDF tool"
+        - "Accessibility and usability"
+        - "Mobile and browser compatibility"
+        - "Documentation and translations"
+        - "Performance and file limits"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Workarounds or alternatives (optional)"
+      description: "Use generic, non-private examples."
+    validations:
+      required: false
+  - type: textarea
+    id: privacy
+    attributes:
+      label: "Privacy, accessibility or device requirements (optional)"
+      description: "Avoid personal data and sensitive use cases."
+    validations:
+      required: false
+  - type: checkboxes
+    id: public-confirmation
+    attributes:
+      label: "Public issue privacy check"
+      options:
+        - label: "My request contains no private files, identifiable documents or confidential information."
+          required: true
+        - label: "I understand that a feature request is not a promise of availability or a release date."
+          required: true
