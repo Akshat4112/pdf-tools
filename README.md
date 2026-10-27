@@ -9,9 +9,19 @@
 
 Merge, split, organize, read and convert PDFs in your browser. PDF Tools is open source, requires no account, and processes your selected documents on your device instead of uploading them to a conversion server.
 
-**[Open PDF Tools](https://akshat4112.github.io/pdf-tools/)** · [Browse tools](https://akshat4112.github.io/pdf-tools/#tool-catalog) · [Report an issue](https://github.com/Akshat4112/pdf-tools/issues) · [MIT license](LICENSE)
+**[Open PDF Tools](https://akshat4112.github.io/pdf-tools/)** · [All working tools](https://akshat4112.github.io/pdf-tools/#tool-catalog) · [Guides](https://akshat4112.github.io/pdf-tools/guides/) · [Help](https://akshat4112.github.io/pdf-tools/help/) · [Privacy](https://akshat4112.github.io/pdf-tools/privacy/) · [Trust and evidence](https://akshat4112.github.io/pdf-tools/trust/) · [Contribute](#contributing-and-feedback)
+
+[![Checks on main](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml) [![Cross-browser CI](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml) [![Startup performance](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml)
+
+These badges show live GitHub Actions outcomes; they are not independent security or accessibility certifications.
 
 The repository and site path are `pdf-tools`.
+
+### See the project before choosing a tool
+
+[![Branded PDF Tools preview, not an interface screenshot](app/public/brand/social-card.png)](https://akshat4112.github.io/pdf-tools/)
+
+*Original project artwork, not a screenshot or a tested device claim.* Explore the [real homepage](https://akshat4112.github.io/pdf-tools/), the [14 working tools](#available-tools), and [practical guides with synthetic examples](https://akshat4112.github.io/pdf-tools/guides/).
 
 ## Why PDF Tools?
 
@@ -51,6 +61,8 @@ Loading the website still requests static assets from GitHub Pages. GitHub Pages
 
 Clearing a workspace releases application-managed state and resources. It does not securely overwrite memory or delete your original files, downloaded files, clipboard contents or printed copies. Reader protections also do not sanitize exported PDFs for use in other viewers.
 
+For a user-facing explanation of the current release, read the [public privacy notice](https://akshat4112.github.io/pdf-tools/privacy/), [limitations](https://akshat4112.github.io/pdf-tools/limitations/), [help and FAQ](https://akshat4112.github.io/pdf-tools/help/) and [trust evidence page](https://akshat4112.github.io/pdf-tools/trust/).
+
 Read the [local data lifecycle](docs/product/PT-PD-003-data-lifecycle.md), [rendering and filename protections](docs/security/PT-SEC-001-rendering-and-filenames.md), and [all-tool local-processing audit](docs/security/PT-SEC-002-local-processing-audit.md) for implementation details and test boundaries. These are project documentation and CI evidence, not an independent security certification.
 
 ## Current limits
@@ -60,7 +72,7 @@ Read the [local data lifecycle](docs/product/PT-PD-003-data-lifecycle.md), [rend
 - Text export and reader search use existing PDF text. Image-only scans need OCR, which is not currently available. Reading order may vary in complex documents.
 - Password unlocking, OCR, compression, redaction, Office conversion and certificate signing are not shipped features. Document-information indicators do not validate a signature or certificate chain.
 - Modified copies may not preserve interactive forms, annotations, bookmarks, accessibility tags or signatures. Review the export warning and the resulting document, especially before modifying signed PDFs. Deleting a page or covering text is not secure redaction.
-- Browser memory and device performance affect capacity. Automated browser coverage currently uses desktop Chromium and mobile Chromium emulation; this is not a claim of complete Safari, Firefox or real-device verification.
+- Browser memory and device performance affect capacity. CI covers Chromium, Firefox and Linux WebKit browser engines, plus mobile browser emulation. This is **not** a claim of testing on physical iOS/Android devices, native macOS Safari, Windows Edge or assistive-technology hardware.
 
 ## Run locally
 
@@ -102,9 +114,9 @@ CI also checks browser workflows, privacy boundaries, dependency licenses/integr
 
 ## Contributing and feedback
 
-Bug reports, documentation improvements and focused pull requests are welcome. Read the [contributor workflow](docs/operations/PT-OPS-001-pr-task-workflow.md) before starting. Use the [project tracker](https://docs.google.com/spreadsheets/d/1m3iyaksGD-hY51JwFfIzb-JS5S3GSp0uJqS4Ae77-lg/edit) for task dependencies, acceptance criteria and progress; planned features are not availability promises.
+Bug reports, documentation improvements and focused pull requests are welcome. [Review the source](https://github.com/Akshat4112/pdf-tools), the [contributor workflow](docs/operations/PT-OPS-001-pr-task-workflow.md) and [the live task tracker](https://docs.google.com/spreadsheets/d/1m3iyaksGD-hY51JwFfIzb-JS5S3GSp0uJqS4Ae77-lg/edit) for task dependencies, acceptance criteria and progress. Planned features are not availability promises. Small changes to documentation, tested examples and accessibility are useful first contributions.
 
-For public bug reports, include the tool, browser/version, reproduction steps and expected result. Use a small synthetic example. **Do not attach private PDFs, personal information, credentials or sensitive screenshots to public issues or pull requests.** For a suspected vulnerability, avoid posting exploit details publicly; use GitHub private vulnerability reporting if the repository offers it.
+For public bug reports, include the tool, browser/version, reproduction steps and expected result. Use a small synthetic example. [Open a public issue](https://github.com/Akshat4112/pdf-tools/issues/new), or read the [security reporting options](https://github.com/Akshat4112/pdf-tools/security) first if the report is sensitive. **Do not attach private PDFs, personal information, credentials or sensitive screenshots to public issues or pull requests.** Private vulnerability reporting may not be enabled; public issues are not a confidential support channel.
 
 Keep contributions scoped to one task, verify relevant checks, and preserve the local-processing boundary. New dependencies need license and security review.
 
