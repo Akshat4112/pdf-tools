@@ -72,7 +72,7 @@ function prerenderRoutes(): Plugin {
           .replace('</head>', `${structuredDataScript(canonical)}\n</head>`)
         // GitHub Pages serves this fallback with HTTP 404; explicit noindex
         // also protects copies of 404.html accidentally served with HTTP 200.
-        if (dir === '404') html = html.replace('</head>', '  <meta name="robots" content="noindex,nofollow" />\\n</head>')
+        if (dir === '404') html = html.replace('</head>', '  <meta name="robots" content="noindex,nofollow" />\n</head>')
         // Crawlable, truthful no-JS navigation and description. Interactive
         // processing still requires JavaScript, and no document inputs leak
         // into the static source. This remains present without hydration.
