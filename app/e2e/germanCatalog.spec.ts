@@ -44,3 +44,11 @@ test('PT-SEO-010: English tool entries remain canonical; German aliases are abse
   await expect(page).toHaveURL('http://127.0.0.1:4178/pdf-tools/de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
 })
+
+test('PT-SEO-010: SPA tool navigation clears catalog-only hreflang tags', async ({ page }) => {
+  await page.goto('./')
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3)
+  await page.locator('.fl-quick-card').first().click()
+  await expect(page).toHaveURL(/\/pdf-tools\/merge\/?$/)
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0)
+})
