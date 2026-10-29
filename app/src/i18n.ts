@@ -348,7 +348,12 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 }
 
 // Keep preferences in memory: PT-PD-003 prohibits web storage for the frontend.
-let activeLocale: Locale = 'en'
+// A direct load of the authored German catalog must start in German without
+// relying on localStorage or a user preference. Other URLs remain English.
+let activeLocale: Locale =
+  typeof window !== 'undefined' && (window.location.pathname === '/pdf-tools/de/' || window.location.pathname === '/pdf-tools/de')
+    ? 'de'
+    : 'en'
 const listeners = new Set<() => void>()
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener) } }
 const getSnapshot = () => activeLocale

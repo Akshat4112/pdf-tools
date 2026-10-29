@@ -35,9 +35,20 @@ def normalized_size(data: bytes) -> int:
 
 def structural(entry: dict, data: bytes) -> dict:
     expected = entry.get("expected", {})
+    # F-011 is the intentionally truncated first 45% of generated F-001.
+    # PDF IDs/timestamps change its byte length before truncation, so exact
+    # byte count is not a reproducible structural feature of this negative
+    # fixture. Preserve its malformed-PDF structure and two-reader rejection
+    # checks instead of comparing nondeterministic lengths.
+    is_truncated = entry["id"] == "F-011"
+    if is_truncated and not (
+        data.startswith(b"%PDF-") and len(data) > 128 and b"%%EOF" not in data
+    ):
+        raise ValueError("F-011 must remain a nonempty, truncated PDF header")
     return {
         "id": entry["id"],
-        "normalized_bytes": normalized_size(data),
+        "normalized_bytes": None if is_truncated else normalized_size(data),
+        "truncated_pdf_header": True if is_truncated else None,
         "pages": expected.get("pages"),
         "fields": expected.get("form_fields"),
         "rotations": expected.get("rotations"),

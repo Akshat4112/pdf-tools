@@ -3,12 +3,14 @@ import { readFile, mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { HUBS, hubPath, hubTools, publicHref } from '../src/lib/categoryHubs'
 import { PUBLIC_PAGES, SITE_URL, hubPageMeta } from '../src/lib/pageMetadata'
+import { GERMAN_CATALOG_META } from '../src/lib/germanCatalog'
 
 test('PT-SEO-004 hubs: static link graph has no orphaned or broken public routes', async ({ request, browser }) => {
   test.setTimeout(120_000)
-  const paths = new Set(PUBLIC_PAGES.map(p => new URL(p.canonical).pathname))
+  const allPages = [...PUBLIC_PAGES, GERMAN_CATALOG_META]
+  const paths = new Set(allPages.map(p => new URL(p.canonical).pathname))
   const graph = new Map<string, string[]>()
-  for (const meta of PUBLIC_PAGES) {
+  for (const meta of allPages) {
     const path = new URL(meta.canonical).pathname
     const response = await request.get(path); expect(response.ok(), path).toBe(true)
     const html = await response.text()

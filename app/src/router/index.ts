@@ -19,7 +19,8 @@ import { hubPageMeta } from '../lib/pageMetadata'
 
 import { useEffect, useState } from 'react'
 import { toolByRoute } from '../registry'
-import { parseLocalizedPath } from '../lib/localizedRoutes'
+import { parseLocalizedPath, type PageLocale } from '../lib/localizedRoutes'
+import { GERMAN_CATALOG_META } from '../lib/germanCatalogMeta'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
 export interface Route {
@@ -27,6 +28,8 @@ export interface Route {
   name: 'catalog' | 'not-found' | string
   /** the pathname this route was parsed from (for diagnostics/tests) */
   path: string
+  /** Indexable German page only after a physical translated HTML entry exists. */
+  locale?: PageLocale
 }
 
 /** Site base path with trailing slash stripped for matching: '/pdf-tools'. */
@@ -47,9 +50,12 @@ export function routePathOf(pathname: string): string {
 /** Parse a pathname into a Route (pure — unit tested). */
 export function parsePath(pathname: string): Route {
   const localized = parseLocalizedPath(pathname)
-  // German URLs require real translated prerendered pages. Until the rollout,
-  // direct /de/* routes are intentionally not navigable or treated as English.
-  if (localized?.locale === 'de') return { name: 'not-found', path: pathname }
+  // Only the fully authored German catalog is shipped. Other German routes
+  // must remain not-found until their translated HTML files are published.
+  if (localized?.locale === 'de') {
+    if (localized.path === '/') return { name: 'catalog', path: '/', locale: 'de' }
+    return { name: 'not-found', path: pathname }
+  }
   const p = routePathOf(pathname)
   if (p === '/' || p === '') return { name: 'catalog', path: p }
   if (isGuidePath(p) || infoPageMeta(p)) return { name: 'guide', path: p }
@@ -67,6 +73,7 @@ export function href(path: string): string {
 
 /** Metadata for a route (pure — used by router + prerender plugin + tests). */
 export function metaForRoute(route: Route): typeof CATALOG_META {
+  if (route.name === 'catalog' && route.locale === 'de') return GERMAN_CATALOG_META
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
   const info = infoPageMeta(route.path)
@@ -112,7 +119,10 @@ export function usePathRoute(): [Route, (path: string) => void] {
       // Native fragment navigation must scroll to homepage sections.
       if (url.hash) return
       const localized = parseLocalizedPath(url.pathname)
-      if (!localized || localized.locale === 'de') return
+      // Catalog locale changes must reload so the in-memory UI locale is
+      // initialized from the destination URL, including DE → EN links.
+      const currentLocale = parseLocalizedPath(window.location.pathname)?.locale
+      if (!localized || localized.locale === 'de' || currentLocale === 'de') return
       const path = routePathOf(url.pathname)
       // only intercept registry routes + the catalog; let real files
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally

@@ -35,9 +35,13 @@ test('PT-QA-002: keyboard search, locale switch, zoom and responsive controls', 
   await select.focus()
   await expect(select).toBeFocused()
   await select.selectOption('de')
+  await expect(page).toHaveURL(/\/pdf-tools\/de\/$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
-  await expect(page.getByRole('searchbox', { name: 'Tools suchen' })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
+  // The German catalog is an authored page. English-only interactive tool
+  // routes remain unindexed; changing language returns to the English catalog.
   await select.selectOption('en')
+  await expect(page).toHaveURL(/\/pdf-tools\/$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 
   // Browser zoom is simulated with CSS zoom; real 200% browser zoom must still

@@ -43,7 +43,7 @@ export function SiteHeader() {
   return (
     <header className="folio-header" ref={root}>
       <div className="folio-header-row">
-        <a className="folio-home" href={SITE_BASE} aria-label={t("PDF Tools home")} onClick={() => {
+        <a className="folio-home" href={window.location.pathname === `${SITE_BASE}de/` ? `${SITE_BASE}de/` : SITE_BASE} aria-label={t("PDF Tools home")} onClick={() => {
           setOpen(false)
           root.current?.querySelectorAll('details[open]').forEach(detail => detail.removeAttribute('open'))
         }}>
@@ -85,7 +85,15 @@ export function SiteHeader() {
         </nav>
         <label className="folio-language">
           <span className="visually-hidden">{t('Language')}</span>
-          <select value={locale} aria-label={t('Language')} onChange={event => setLocale(event.target.value as 'en' | 'de')}>
+          <select value={locale} aria-label={t('Language')} onChange={event => {
+            const next = event.target.value as 'en' | 'de'
+            // The catalog pair has real prerendered language URLs. Other
+            // tools retain the in-memory PT-UX-005 switch until DE routes ship.
+            if (window.location.pathname === SITE_BASE || window.location.pathname === `${SITE_BASE}de/`) {
+              const target = next === 'de' ? `${SITE_BASE}de/` : SITE_BASE
+              if (window.location.pathname !== target) window.location.assign(target)
+            } else setLocale(next)
+          }}>
             <option value="en">EN</option><option value="de">DE</option>
           </select>
         </label>
