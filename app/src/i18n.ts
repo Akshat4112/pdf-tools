@@ -351,7 +351,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 // A direct load of the authored German catalog must start in German without
 // relying on localStorage or a user preference. Other URLs remain English.
 let activeLocale: Locale =
-  typeof window !== 'undefined' && window.location.pathname.replace(/\\/$/, '') === '/pdf-tools/de'
+  typeof window !== 'undefined' && (window.location.pathname === '/pdf-tools/de/' || window.location.pathname === '/pdf-tools/de')
     ? 'de'
     : 'en'
 const listeners = new Set<() => void>()
