@@ -19,9 +19,11 @@ const writer = Object.entries(manifest).find(([key]) => key.startsWith('_pdflib-
 const writerPackages = (writer.dynamicImports ?? []).map(key => manifest[key].file)
 
 test('PT-SEO-007 startup: catalog assets meet budgets and engines wait for documents', async ({ page }) => {
-  // PT-REL-001: three crawlable public information routes add ~0.6 KiB raw
-  // bootstrap metadata; tighten the transferred gzip JS ceiling by 2 KiB.
-  for (const [extension, rawMax, gzipMax] of [['.js', 281000, 88000], ['.css', 45000, 10000]] as const) {
+  // PT-SEO-010: the new bilingual catalog URL and reciprocal SEO metadata
+  // add 1,759 uncompressed bytes to the measured initial bundle (282,759).
+  // Raise the raw cap by just 2 KiB; keep the 88 KiB gzip, CSS, lazy-engine
+  // and zero-extra-startup-request gates unchanged.
+  for (const [extension, rawMax, gzipMax] of [['.js', 283048, 88000], ['.css', 45000, 10000]] as const) {
     const buffers = [...initial].filter(file => file.endsWith(extension)).map(file => readFileSync(`dist/${file}`))
     expect(buffers.reduce((sum, bytes) => sum + bytes.length, 0)).toBeLessThanOrEqual(rawMax)
     expect(buffers.reduce((sum, bytes) => sum + gzipSync(bytes).length, 0)).toBeLessThanOrEqual(gzipMax)
