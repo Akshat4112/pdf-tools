@@ -12,7 +12,10 @@ test('PT-UX-005 / PT-SEO-010: catalog languages use URLs; tools retain in-memory
   // German tool entries aren't published until their UI is fully translated.
   // This link goes to the existing English tool canonical.
   await page.locator('.hub-tool-list a[href="/pdf-tools/merge/"]').click()
-  await expect(page).toHaveURL(/\/pdf-tools\/merge\/$/)
+  // SPA navigation uses the established slashless tool path; static Pages
+  // loads may add a trailing slash. Both must retain the English canonical.
+  await expect(page).toHaveURL(/\/pdf-tools\/merge\/?$/)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://akshat4112.github.io/pdf-tools/merge/')
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
