@@ -20,7 +20,7 @@ import { hubPageMeta } from '../lib/pageMetadata'
 import { useEffect, useState } from 'react'
 import { toolByRoute } from '../registry'
 import { parseLocalizedPath, type PageLocale } from '../lib/localizedRoutes'
-import { GERMAN_CATALOG_META } from '../lib/germanCatalog'
+import { GERMAN_CATALOG_META } from '../lib/germanCatalogMeta'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
 export interface Route {
