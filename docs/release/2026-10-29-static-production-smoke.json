@@ -1,0 +1,187 @@
+{
+  "runAt": "2026-10-29T21:08:31.547Z",
+  "root": "https://akshat4112.github.io/pdf-tools/",
+  "originRobots": {
+    "url": "https://akshat4112.github.io/robots.txt",
+    "httpStatus": 200,
+    "note": "Origin-root robots governs crawling; project-folder robots and project sitemap advertisement are not required."
+  },
+  "checked": [
+    {
+      "path": "",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/"
+    },
+    {
+      "path": "sitemap.xml",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/sitemap.xml"
+    },
+    {
+      "path": "",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/"
+    },
+    {
+      "path": "help/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/help/"
+    },
+    {
+      "path": "privacy/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/privacy/"
+    },
+    {
+      "path": "limitations/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/limitations/"
+    },
+    {
+      "path": "trust/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/trust/"
+    },
+    {
+      "path": "guides/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/guides/"
+    },
+    {
+      "path": "guides/combine-pdfs-in-order/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/guides/combine-pdfs-in-order/"
+    },
+    {
+      "path": "guides/share-selected-pages/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/guides/share-selected-pages/"
+    },
+    {
+      "path": "guides/images-to-readable-pdf/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/guides/images-to-readable-pdf/"
+    },
+    {
+      "path": "guides/copy-text-or-scan/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/guides/copy-text-or-scan/"
+    },
+    {
+      "path": "tools/organize/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/organize/"
+    },
+    {
+      "path": "tools/convert/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/convert/"
+    },
+    {
+      "path": "tools/read/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/read/"
+    },
+    {
+      "path": "tools/markup/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/tools/markup/"
+    },
+    {
+      "path": "merge/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/merge/"
+    },
+    {
+      "path": "split/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/split/"
+    },
+    {
+      "path": "rotate/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/rotate/"
+    },
+    {
+      "path": "delete-pages/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/delete-pages/"
+    },
+    {
+      "path": "extract-pages/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/extract-pages/"
+    },
+    {
+      "path": "organize/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/organize/"
+    },
+    {
+      "path": "images-to-pdf/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/images-to-pdf/"
+    },
+    {
+      "path": "pdf-to-jpg/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-jpg/"
+    },
+    {
+      "path": "pdf-to-png/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-png/"
+    },
+    {
+      "path": "reader/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/reader/"
+    },
+    {
+      "path": "page-numbers/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/page-numbers/"
+    },
+    {
+      "path": "watermark/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/watermark/"
+    },
+    {
+      "path": "pdf-to-text/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/pdf-to-text/"
+    },
+    {
+      "path": "doc-info/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/doc-info/"
+    },
+    {
+      "path": "help/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/help/"
+    },
+    {
+      "path": "privacy/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/privacy/"
+    },
+    {
+      "path": "trust/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/trust/"
+    },
+    {
+      "path": "limitations/",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/limitations/"
+    },
+    {
+      "path": "404.html",
+      "status": 200,
+      "finalUrl": "https://akshat4112.github.io/pdf-tools/404.html"
+    }
+  ],
+  "issues": []
+}
