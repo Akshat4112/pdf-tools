@@ -6,7 +6,9 @@ import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog
 import { ToolLoadBoundary, ToolLoading } from './components/ToolLoadBoundary'
 const GuidePage = lazy(() => import('./components/GuidePage').then(module => ({ default: module.GuidePage })))
 const GermanCatalogPage = lazy(() => import('./components/GermanCatalogPage'))
-import { ToolCatalog } from './components/ToolCatalog'
+// The catalog search/filter module sits below the hero, so keep it out of
+// the initial bootstrap budget and load its controls on demand.
+const ToolCatalog = lazy(() => import('./components/ToolCatalog').then(module => ({ default: module.ToolCatalog })))
 import { ToolEntry } from './components/ToolEntry'
 import { NotFound } from './components/NotFound'
 import { usePathRoute, href } from './router'
@@ -133,7 +135,7 @@ function App() {
           <h2>{t("Find the right PDF tool")}</h2>
           <p>{t("Search and browse the available tools. Every option below links to a working browser-based workflow.")}</p>
         </div>
-        <ToolCatalog />
+        <Suspense fallback={<div className="catalog" role="status" aria-busy="true">{t('Loading PDF tools…')}</div>}><ToolCatalog /></Suspense>
         <div dangerouslySetInnerHTML={{ __html: hubDirectoryHtml() + guideDirectoryHtml() }} />
 
         <section className="fl-how" aria-labelledby="how-heading">
