@@ -14,7 +14,7 @@
 
 export * from './pageMetadata'
 import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
-import { GERMAN_CATALOG_META } from './germanCatalog'
+import { GERMAN_CATALOG_META } from './germanCatalogMeta'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
