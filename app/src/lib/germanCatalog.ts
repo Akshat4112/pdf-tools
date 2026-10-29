@@ -59,7 +59,7 @@ export function germanCatalogHtml(): string {
     <p>Mit PDF Tools kannst du PDFs zusammenfügen, teilen, drehen, lesen und bearbeiten. Die vorhandenen Werkzeuge verarbeiten ausgewählte Dateien auf deinem Gerät. Ein Benutzerkonto ist nicht nötig.</p>
     <p><strong>Wichtiger Hinweis:</strong> Diese deutschsprachige Übersicht führt zu Werkzeugen und Hilfeseiten, die derzeit überwiegend auf Englisch angeboten werden. Weitere deutsche Seiten werden erst nach vollständiger Übersetzung veröffentlicht.</p>
     <p>Beim Laden der Website und ihrer Dateien stellt dein Browser eine Verbindung zu GitHub Pages her. Dokumentinhalte werden für die angebotenen lokalen Werkzeuge nicht an einen Konvertierungsserver hochgeladen.</p>
-    <p><a href="/pdf-tools/">English version</a> · <a href="https://github.com/Akshat4112/pdf-tools" rel="noopener noreferrer">Quellcode (MIT-Lizenz)</a></p>
+    <p><a href="/pdf-tools/">English version</a> · <a href="/pdf-tools/trust/">Nachweise ansehen</a> · <a href="https://github.com/Akshat4112/pdf-tools" rel="noopener noreferrer">Quellcode (MIT-Lizenz)</a></p>
   </header>
   <section aria-labelledby="de-tool-heading">
     <h2 id="de-tool-heading">Verfügbare PDF-Werkzeuge</h2>
