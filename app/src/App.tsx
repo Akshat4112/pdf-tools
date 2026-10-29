@@ -6,9 +6,7 @@ import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog
 import { ToolLoadBoundary, ToolLoading } from './components/ToolLoadBoundary'
 const GuidePage = lazy(() => import('./components/GuidePage').then(module => ({ default: module.GuidePage })))
 const GermanCatalogPage = lazy(() => import('./components/GermanCatalogPage'))
-// The catalog search/filter module sits below the hero, so keep it out of
-// the initial bootstrap budget and load its controls on demand.
-const ToolCatalog = lazy(() => import('./components/ToolCatalog').then(module => ({ default: module.ToolCatalog })))
+import { ToolCatalog } from './components/ToolCatalog'
 import { ToolEntry } from './components/ToolEntry'
 import { NotFound } from './components/NotFound'
 import { usePathRoute, href } from './router'
@@ -27,9 +25,10 @@ function App() {
           !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName ?? '') &&
           !(document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable)) {
         const input = document.querySelector<HTMLInputElement>('input[type="search"]')
-        e.preventDefault()
-        if (input) input.focus()
-        else document.documentElement.dataset.focusSearchOnLoad = 'true'
+        if (input) {
+          e.preventDefault()
+          input.focus()
+        }
       }
     }
     window.addEventListener('keydown', onKey)
@@ -134,7 +133,7 @@ function App() {
           <h2>{t("Find the right PDF tool")}</h2>
           <p>{t("Search and browse the available tools. Every option below links to a working browser-based workflow.")}</p>
         </div>
-        <Suspense fallback={<div className="catalog" role="status" aria-busy="true">{t('Loading PDF tools…')}</div>}><ToolCatalog /></Suspense>
+        <ToolCatalog />
         <div dangerouslySetInnerHTML={{ __html: hubDirectoryHtml() + guideDirectoryHtml() }} />
 
         <section className="fl-how" aria-labelledby="how-heading">
