@@ -27,10 +27,9 @@ function App() {
           !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName ?? '') &&
           !(document.activeElement instanceof HTMLElement && document.activeElement.isContentEditable)) {
         const input = document.querySelector<HTMLInputElement>('input[type="search"]')
-        if (input) {
-          e.preventDefault()
-          input.focus()
-        }
+        e.preventDefault()
+        if (input) input.focus()
+        else document.documentElement.dataset.focusSearchOnLoad = 'true'
       }
     }
     window.addEventListener('keydown', onKey)
