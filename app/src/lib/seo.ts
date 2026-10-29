@@ -52,6 +52,19 @@ export function applyMeta(meta: PageMeta): void {
   }
   const previousCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href
   upsertLink('canonical', meta.canonical)
+  // Remove stale catalog hreflang tags when client navigation enters an
+  // English-only tool, guide, hub or policy page. Only the complete catalog
+  // pair may advertise reciprocal language alternatives.
+  document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach(link => link.remove())
+  if (meta.canonical === SITE_URL || meta.canonical === GERMAN_CATALOG_META.canonical) {
+    for (const [language, url] of [['en', SITE_URL], ['de', GERMAN_CATALOG_META.canonical], ['x-default', SITE_URL]]) {
+      const link = document.createElement('link')
+      link.rel = 'alternate'
+      link.hreflang = language
+      link.href = url
+      document.head.appendChild(link)
+    }
+  }
   const desired = meta.canonical
   const generation = ++schemaGeneration
   // No partly localized JSON-LD: the reviewed German catalog does not yet
