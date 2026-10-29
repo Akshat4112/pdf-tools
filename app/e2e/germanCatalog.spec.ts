@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { test, expect } from '@playwright/test'
 import { SITE_URL } from '../src/lib/pageMetadata'
 
@@ -30,8 +31,9 @@ test('PT-SEO-010: German catalog is statically served and is the only indexed Ge
 })
 
 test('PT-SEO-010: English tool entries remain canonical; German aliases are absent', async ({ request, page }) => {
-  const deMerge = await request.get('de/merge/')
-  expect(deMerge.status()).toBe(404)
+  // The Vite preview can serve its SPA fallback with HTTP 200; the actual
+  // GitHub Pages contract is that no physical German tool page is emitted.
+  expect(existsSync('dist/de/merge/index.html')).toBe(false)
   const enMerge = await request.get('merge/')
   expect(enMerge.ok()).toBe(true)
   const enHtml = await enMerge.text()
