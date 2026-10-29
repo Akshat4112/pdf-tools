@@ -105,7 +105,7 @@ export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
     title: 'Text aus PDF exportieren — PDF Tools',
     heading: 'Vorhandenen PDF-Text exportieren',
     description: 'Exportiere die vorhandene Textebene einer PDF-Datei als UTF-8-TXT. Kostenlos im Browser, ohne OCR.',
-    steps: ['PDF mit auswählbarem Text öffnen.', 'Textexport starten.', 'TXT-Datei herunterladen und Inhalt prüfen.'],
+    steps: ['PDF mit auswählbarem Text öffnen.', 'Textexport im Browser starten.', 'TXT-Datei herunterladen und Inhalt prüfen.'],
     limitation: 'Gescannten Bildseiten fehlt häufig eine Textebene. OCR und Layout-Erhaltung werden nicht angeboten.',
   },
   'doc-info': {
