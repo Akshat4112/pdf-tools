@@ -1,4 +1,5 @@
 import { publicInfoHtml } from './src/lib/publicInfo.ts'
+import { germanCatalogHtml, GERMAN_CATALOG_META } from './src/lib/germanCatalog.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -104,6 +105,15 @@ function prerenderRoutes(): Plugin {
         }
       }
 
+      // PT-SEO-010: first reviewed German page is a physical deep-linkable
+      // static route. All other /de/* pages stay absent and unindexed.
+      const germanDir = resolve(dist, 'de')
+      mkdirSync(germanDir, { recursive: true })
+      const germanHtml = withPageMetadata(indexHtml, GERMAN_CATALOG_META)
+        .replace('<html lang="en">', '<html lang="de">')
+        .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${germanCatalogHtml()}</main></noscript>`)
+      writeFileSync(resolve(germanDir, 'index.html'), germanHtml)
+
       // Invented public inputs only, generated at build time; no user documents.
       const examplesDir = resolve(dist, 'examples')
       mkdirSync(examplesDir, { recursive: true })
@@ -120,9 +130,10 @@ function prerenderRoutes(): Plugin {
       // sitemap.xml + robots.txt (registry-driven, same URLs as meta tags).
       // Do not invent modification dates on every build. Add <lastmod> only
       // when a route-specific content modification date is sourced and verified.
-      const urls = ROUTES.map((r) =>
-        r.dir === '.' ? ORIGIN : `${ORIGIN}${r.dir}/`,
-      )
+      const urls = [
+        ...ROUTES.map(r => r.dir === '.' ? ORIGIN : `${ORIGIN}${r.dir}/`),
+        GERMAN_CATALOG_META.canonical,
+      ]
       const sitemap =
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
         urls
