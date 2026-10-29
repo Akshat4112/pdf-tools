@@ -14,6 +14,7 @@
 
 export * from './pageMetadata'
 import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
+import { GERMAN_CATALOG_META } from './germanCatalog'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -53,6 +54,12 @@ export function applyMeta(meta: PageMeta): void {
   upsertLink('canonical', meta.canonical)
   const desired = meta.canonical
   const generation = ++schemaGeneration
+  // No partly localized JSON-LD: the reviewed German catalog does not yet
+  // carry its own translated schema. Its static HTML remains indexable.
+  if (desired === GERMAN_CATALOG_META.canonical) {
+    document.getElementById('public-structured-data')?.remove()
+    return
+  }
   // Prerendered HTML already has the correct public JSON-LD. Do not request
   // another JavaScript chunk on cold homepage/tool/guide loads.
   const existing = document.getElementById('public-structured-data')?.textContent ?? ''
@@ -85,7 +92,7 @@ export function sitemapLastmod(date = new Date()): string {
  * Only canonical, indexable pages — no query/user URLs can ever appear.
  */
 export function buildSitemapXml(lastmod = sitemapLastmod()): string {
-  const urls = PUBLIC_PAGES.map(page => page.canonical)
+  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical]
   const entries = urls
     .map(
       (u) =>
