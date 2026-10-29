@@ -1,5 +1,6 @@
 import { useLocale } from './i18n'
 import { infoPageMeta } from './lib/pageMetadata'
+import { germanCatalogHtml } from './lib/germanCatalog'
 import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
 import { lazy, Suspense, useEffect } from 'react'
 import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog'
@@ -33,6 +34,15 @@ function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
+
+  if (route.name === 'catalog' && route.locale === 'de') {
+    return (
+      <div className="shell">
+        <SiteHeader key="/de/" />
+        <main id="main-content" tabIndex={-1} className="tool-workspace category-hub" dangerouslySetInnerHTML={{ __html: germanCatalogHtml() }} />
+      </div>
+    )
+  }
 
   const activeTool = route.name !== 'catalog' && route.name !== 'not-found' ? toolByRoute(route.path) : undefined
 
