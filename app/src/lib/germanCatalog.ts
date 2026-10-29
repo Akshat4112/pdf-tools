@@ -1,5 +1,5 @@
 import { TOOLS, type ToolId } from '../registry.ts'
-import type { PageMeta } from './pageMetadata.ts'
+export { GERMAN_CATALOG_META } from './germanCatalogMeta.ts'
 
 /**
  * PT-SEO-010: German catalog is the first fully authored localized page.
@@ -7,12 +7,6 @@ import type { PageMeta } from './pageMetadata.ts'
  * canonical URLs and are explicitly labelled as such here.
  * Never add untranslated tools or policy pages to the German sitemap.
  */
-export const GERMAN_CATALOG_META: PageMeta = {
-  title: 'PDF-Tools kostenlos im Browser nutzen — PDF Tools',
-  description: 'Kostenlose Open-Source-PDF-Tools: PDFs zusammenfügen, teilen, bearbeiten und lesen. Dateien werden im Browser verarbeitet, ohne Benutzerkonto.',
-  canonical: 'https://akshat4112.github.io/pdf-tools/de/',
-  ogType: 'website',
-}
 
 const germanTitles: Record<ToolId, string> = {
   merge: 'PDFs zusammenfügen',
