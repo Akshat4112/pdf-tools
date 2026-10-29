@@ -123,12 +123,12 @@ export function pageMetaTags(meta: PageMeta) {
     { attribute: 'property', key: 'og:image:type', content: SHARE_IMAGE.type },
     { attribute: 'property', key: 'og:image:width', content: String(SHARE_IMAGE.width) },
     { attribute: 'property', key: 'og:image:height', content: String(SHARE_IMAGE.height) },
-    { attribute: 'property', key: 'og:image:alt', content: SHARE_IMAGE.alt },
+    { attribute: 'property', key: 'og:image:alt', content: meta.canonical === `${SITE_URL}de/` ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
     { attribute: 'name', key: 'twitter:card', content: 'summary_large_image' },
     { attribute: 'name', key: 'twitter:title', content: meta.title },
     { attribute: 'name', key: 'twitter:description', content: meta.description },
     { attribute: 'name', key: 'twitter:image', content: SHARE_IMAGE.url },
-    { attribute: 'name', key: 'twitter:image:alt', content: SHARE_IMAGE.alt },
+    { attribute: 'name', key: 'twitter:image:alt', content: meta.canonical === `${SITE_URL}de/` ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
   ] as const
 }
 
@@ -147,7 +147,7 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
   const isCatalogPair = meta.canonical === SITE_URL || meta.canonical === `${SITE_URL}de/`
   const alternatives = isCatalogPair
-    ? `  <link rel="alternate" hreflang="en" href="${SITE_URL}" />\n  <link rel="alternate" hreflang="de" href="${SITE_URL}de/" />\n  <link rel="alternate" hreflang="x-default" href="${SITE_URL}" />\n`.replaceAll('\n', '\n')
+    ? `  <link rel="alternate" hreflang="en" href="${SITE_URL}" />\n  <link rel="alternate" hreflang="de" href="${SITE_URL}de/" />\n  <link rel="alternate" hreflang="x-default" href="${SITE_URL}" />\n`
     : ''
   return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n${alternatives}</head>`)
 }
