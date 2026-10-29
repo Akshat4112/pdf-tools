@@ -1,0 +1,47 @@
+{
+  "runAt": "2026-10-29T21:12:27.708Z",
+  "root": "https://akshat4112.github.io/pdf-tools/",
+  "browser": "153.0.8010.12",
+  "coverage": "Chromium desktop and Pixel 7 emulation; not native Safari/Edge, physical devices or assistive technology",
+  "scenarios": [
+    {
+      "label": "desktop-chromium",
+      "merge": "PASS: two one-page synthetic inputs merged/downloaded; qpdf check passed and independent page count = 2",
+      "textExport": "PASS: UTF-8 download contains exact known synthetic sentinel",
+      "reset": "PASS: files/results cleared and localStorage/sessionStorage empty after each tool",
+      "network": {
+        "observedHttpRequests": 30,
+        "documentBearingOrExternalRequests": 0
+      },
+      "metadata": "PASS: no synthetic filename/text markers in head",
+      "result": "PASS",
+      "independentReader": {
+        "tool": "qpdf version 11.9.1",
+        "structuralCheckExitCode": 0,
+        "structuralCheckSummary": "PDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+        "pageCount": 2,
+        "expectedPageCount": 2
+      }
+    },
+    {
+      "label": "pixel7-emulation",
+      "merge": "PASS: two one-page synthetic inputs merged/downloaded; qpdf check passed and independent page count = 2",
+      "textExport": "PASS: UTF-8 download contains exact known synthetic sentinel",
+      "reset": "PASS: files/results cleared and localStorage/sessionStorage empty after each tool",
+      "network": {
+        "observedHttpRequests": 30,
+        "documentBearingOrExternalRequests": 0
+      },
+      "metadata": "PASS: no synthetic filename/text markers in head",
+      "result": "PASS",
+      "independentReader": {
+        "tool": "qpdf version 11.9.1",
+        "structuralCheckExitCode": 0,
+        "structuralCheckSummary": "PDF Version: 1.7\nFile is not encrypted\nFile is not linearized\nNo syntax or stream encoding errors found; the file may still contain\nerrors that qpdf cannot detect",
+        "pageCount": 2,
+        "expectedPageCount": 2
+      }
+    }
+  ],
+  "issues": []
+}

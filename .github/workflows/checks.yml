@@ -57,6 +57,9 @@ jobs:
           python3 -B -m unittest discover -s ../scripts -p test_search_console_readiness.py
           python3 -B ../scripts/check_search_console_readiness.py --dist dist
 
+      - name: Public production smoke regression checks (offline)
+        run: node --test ../scripts/test_verify_production_release.mjs
+
       - name: R1 privacy surface guard
         run: node ../scripts/check_privacy_surface.mjs
 
