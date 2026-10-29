@@ -19,6 +19,7 @@ import { hubPageMeta } from '../lib/pageMetadata'
 
 import { useEffect, useState } from 'react'
 import { toolByRoute } from '../registry'
+import { parseLocalizedPath } from '../lib/localizedRoutes'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
 export interface Route {
@@ -34,7 +35,9 @@ const BASE = SITE_BASE.replace(/\/$/, '')
 /** Strip <base>/prefix and leading slash: '/pdf-tools/merge' -> '/merge'. */
 export function routePathOf(pathname: string): string {
   let p = pathname
-  if (BASE && p.startsWith(BASE)) p = p.slice(BASE.length)
+  // Only strip the actual project prefix; never absorb sibling paths such as /pdf-tools-extra.
+  if (p === BASE) p = '/'
+  else if (p.startsWith(`${BASE}/`)) p = p.slice(BASE.length)
   if (!p.startsWith('/')) p = `/${p}`
   // ignore trailing slashes except for the bare base
   if (p.length > 1 && p.endsWith('/')) p = p.slice(0, -1)
@@ -43,6 +46,10 @@ export function routePathOf(pathname: string): string {
 
 /** Parse a pathname into a Route (pure — unit tested). */
 export function parsePath(pathname: string): Route {
+  const localized = parseLocalizedPath(pathname)
+  // German URLs require real translated prerendered pages. Until the rollout,
+  // direct /de/* routes are intentionally not navigable or treated as English.
+  if (localized?.locale === 'de') return { name: 'not-found', path: pathname }
   const p = routePathOf(pathname)
   if (p === '/' || p === '') return { name: 'catalog', path: p }
   if (isGuidePath(p) || infoPageMeta(p)) return { name: 'guide', path: p }
@@ -104,6 +111,8 @@ export function usePathRoute(): [Route, (path: string) => void] {
       if (url.origin !== window.location.origin) return
       // Native fragment navigation must scroll to homepage sections.
       if (url.hash) return
+      const localized = parseLocalizedPath(url.pathname)
+      if (!localized || localized.locale === 'de') return
       const path = routePathOf(url.pathname)
       // only intercept registry routes + the catalog; let real files
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
