@@ -1,11 +1,11 @@
 import { useLocale } from './i18n'
 import { infoPageMeta } from './lib/pageMetadata'
-import { germanCatalogHtml } from './lib/germanCatalog'
 import { categoryHubHtml, hubByPath, hubDirectoryHtml } from './lib/categoryHubs'
 import { lazy, Suspense, useEffect } from 'react'
 import { guideByPath, guideDirectoryHtml, isGuidePath } from './lib/guideCatalog'
 import { ToolLoadBoundary, ToolLoading } from './components/ToolLoadBoundary'
 const GuidePage = lazy(() => import('./components/GuidePage').then(module => ({ default: module.GuidePage })))
+const GermanCatalogPage = lazy(() => import('./components/GermanCatalogPage'))
 import { ToolCatalog } from './components/ToolCatalog'
 import { ToolEntry } from './components/ToolEntry'
 import { NotFound } from './components/NotFound'
@@ -39,7 +39,7 @@ function App() {
     return (
       <div className="shell">
         <SiteHeader key="/de/" />
-        <main id="main-content" tabIndex={-1} className="tool-workspace category-hub" dangerouslySetInnerHTML={{ __html: germanCatalogHtml() }} />
+        <Suspense fallback={<main id="main-content" className="tool-workspace category-hub"><p lang="de">PDF-Werkzeuge werden geladen …</p></main>}><GermanCatalogPage /></Suspense>
       </div>
     )
   }
