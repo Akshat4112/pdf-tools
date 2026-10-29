@@ -6,7 +6,6 @@
 .fl-home .fl-lead { font-size:1.08rem; line-height:1.65; color:var(--fl-muted); max-width:62ch; margin:0; }
 .fl-hero-actions { display:flex; gap:18px; align-items:center; flex-wrap:wrap; margin-top:24px; }
 .fl-home .fl-cta { min-height:48px; padding:12px 20px; display:inline-flex; align-items:center; gap:16px; border-radius:9px; background:var(--fl-teal); color:var(--fl-on-accent); font-weight:700; text-decoration:none; }
-.fl-home .fl-secondary-link { color:var(--fl-text); text-underline-offset:4px; font-weight:650; }
 .fl-home .fl-fine-print { color:var(--fl-muted); font-size:.875rem; line-height:1.6; max-width:62ch; margin:17px 0 0; }
 .fl-hero-art { min-height:285px; border-radius:20px; background:var(--fl-subtle); border:1px solid var(--fl-line); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 .fl-document { width:136px; height:184px; border-radius:10px; border:1px solid var(--fl-control); background:var(--fl-surface); box-shadow:0 10px 30px #142d3a18; padding:24px 20px; display:flex; flex-direction:column; gap:12px; }

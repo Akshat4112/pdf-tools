@@ -83,7 +83,7 @@ test('working-tool navigation and shared header survive routes and history', asy
   await page.goto('missing-header-test')
   await expect(header.getByRole('link', { name: 'PDF Tools home' })).toBeVisible()
   await expect(header.getByRole('link', { name: /Privacy/ })).toHaveAttribute('href', '/pdf-tools/privacy/')
-  await expect(header.getByRole('link', { name: /Source/ })).toHaveAttribute('href', 'https://github.com/Akshat4112/pdf-tools')
+  await expect(header.getByRole('link', { name: /Source/ })).toHaveCount(0)
 })
 
 test('PDF Tools brand name and document favicon match the public identity', async ({ page, request }) => {

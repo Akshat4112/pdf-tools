@@ -4,6 +4,7 @@ import { TOOLS } from '../src/registry'
 test('homepage provides accurate tool-first messaging and working entry points', async ({ page }) => {
   await page.goto('./')
   await expect(page.getByRole('heading', { name: 'PDF tools that work in your browser.' })).toBeVisible()
+  await expect(page.locator('.fl-hero-actions').getByRole('link', { name: /View source code/ })).toHaveCount(0)
   await expect(page.getByText('Free forever for local tools')).toBeVisible()
   await expect(page.getByText(/Loading the site and its assets still connects to GitHub Pages/)).toBeVisible()
   const links = page.locator('.fl-quick-card')
