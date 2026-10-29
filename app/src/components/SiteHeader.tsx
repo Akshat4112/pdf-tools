@@ -6,8 +6,6 @@ import { CATEGORIES, TOOLS } from '../registry'
 import { href } from '../router'
 import './SiteHeader.css'
 
-const SOURCE = 'https://github.com/Akshat4112/pdf-tools'
-
 /** Shared navigation never holds document or job state. */
 export function SiteHeader() {
   const { t, locale, setLocale } = useLocale()
@@ -81,7 +79,6 @@ export function SiteHeader() {
           <a href={`${SITE_BASE}guides/`} aria-current={window.location.pathname.replace(/\/$/, '') === `${SITE_BASE}guides` ? 'page' : undefined}>{t("Guides")}</a>
           <a href={`${SITE_BASE}help/`}>{t("Help")}</a>
           <a href={`${SITE_BASE}privacy/`}>{t("Privacy")}</a>
-          <a href={SOURCE}>{t("Source")} <span>↗<span className="visually-hidden"> (on GitHub)</span></span></a>
         </nav>
         <label className="folio-language">
           <span className="visually-hidden">{t('Language')}</span>

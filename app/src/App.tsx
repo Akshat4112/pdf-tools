@@ -92,7 +92,6 @@ function App() {
             <p className="fl-lead">{t("Merge, split, organize, read and convert PDFs with PDF Tools. Free forever, open source, and processed on your device — no account required.")}</p>
             <div className="fl-hero-actions">
               <a className="fl-cta" href="#tool-catalog">{t("Explore all PDF tools")} <span aria-hidden="true">→</span></a>
-              <a className="fl-secondary-link" href="https://github.com/Akshat4112/pdf-tools">{t("View source code")} <span aria-hidden="true">↗</span></a>
             </div>
             <p className="fl-fine-print">{t("This browser-based release does not upload document contents for processing. Loading the site and its assets still connects to GitHub Pages.")}</p>
           </div>
