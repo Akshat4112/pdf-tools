@@ -16,6 +16,7 @@ test('PT-UX-005 / PT-SEO-010: catalog languages use URLs; tools retain in-memory
   // loads may add a trailing slash. Both must retain the English canonical.
   await expect(page).toHaveURL(/\/pdf-tools\/merge\/?$/)
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://akshat4112.github.io/pdf-tools/merge/')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.reload()
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
@@ -26,6 +27,16 @@ test('PT-UX-005 / PT-SEO-010: catalog languages use URLs; tools retain in-memory
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await expect(page.getByRole('heading', { level: 1, name: 'Merge PDF' })).toBeVisible()
   expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual([])
+})
+
+test('PT-SEO-010: the German catalog English-version link resets the UI locale', async ({ page }) => {
+  await page.goto('de/')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
+  await page.getByRole('link', { name: 'English version', exact: true }).click()
+  await expect(page).toHaveURL(/\/pdf-tools\/$/)
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await expect(page.getByRole('combobox', { name: 'Language', exact: true })).toHaveValue('en')
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3)
 })
 
 test('PT-UX-005: language control is reachable by keyboard at narrow and zoomed layouts', async ({ page }) => {

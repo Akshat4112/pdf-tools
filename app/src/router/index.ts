@@ -119,7 +119,10 @@ export function usePathRoute(): [Route, (path: string) => void] {
       // Native fragment navigation must scroll to homepage sections.
       if (url.hash) return
       const localized = parseLocalizedPath(url.pathname)
-      if (!localized || localized.locale === 'de') return
+      // Catalog locale changes must reload so the in-memory UI locale is
+      // initialized from the destination URL, including DE → EN links.
+      const currentLocale = parseLocalizedPath(window.location.pathname)?.locale
+      if (!localized || localized.locale === 'de' || currentLocale === 'de') return
       const path = routePathOf(url.pathname)
       // only intercept registry routes + the catalog; let real files
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
