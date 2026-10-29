@@ -143,7 +143,12 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
     .replace(/\s*<meta\b[^>]*(?:name|property)=["'](?:description|og:[\w:]+|twitter:[\w:]+)["'][^>]*>/gi, '')
     .replace(/<script\b[^>]*id=["']public-structured-data["'][^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/\s*<link\b[^>]*rel=["']canonical["'][^>]*>/gi, '')
+    .replace(/\s*<link\b[^>]*rel=["']alternate["'][^>]*hreflang=["'][^"']+["'][^>]*>/gi, '')
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
-  return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n</head>`)
+  const isCatalogPair = meta.canonical === SITE_URL || meta.canonical === `${SITE_URL}de/`
+  const alternatives = isCatalogPair
+    ? `  <link rel="alternate" hreflang="en" href="${SITE_URL}" />\n  <link rel="alternate" hreflang="de" href="${SITE_URL}de/" />\n  <link rel="alternate" hreflang="x-default" href="${SITE_URL}" />\n`.replaceAll('\n', '\n')
+    : ''
+  return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n${alternatives}</head>`)
 }
 
