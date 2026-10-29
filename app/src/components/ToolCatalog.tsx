@@ -11,7 +11,7 @@ import { useLocale } from '../i18n'
  * - search + category nav are keyboard-first
  */
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CATEGORIES, TOOLS, QUOTAS, type ToolCategory, type ToolDefinition } from '../registry'
 import { href } from '../router'
 import { matchesTool, formatCue } from '../catalog/search'
@@ -179,6 +179,12 @@ export function ToolCatalog() {
   const [category, setCategory] = useState<ToolCategory | 'all'>('all')
 
   const searchInput = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    if (document.documentElement.dataset.focusSearchOnLoad === 'true') {
+      delete document.documentElement.dataset.focusSearchOnLoad
+      searchInput.current?.focus()
+    }
+  }, [])
   const filtered = useMemo(() => TOOLS.filter(tool => {
     if (category !== 'all' && tool.category !== category) return false
     if (matchesTool(tool, query)) return true
