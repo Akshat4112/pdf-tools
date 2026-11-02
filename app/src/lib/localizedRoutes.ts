@@ -5,6 +5,22 @@
 export type PageLocale = 'en' | 'de'
 export const LOCALE_BASE = '/pdf-tools/'
 const DE_PREFIX = '/pdf-tools/de/'
+const PUBLIC_ORIGIN = 'https://akshat4112.github.io'
+
+/** Explicit release gate: other translated UI does not create a public URL. */
+export function hasGermanPage(path: string): boolean {
+  return path === '/' || path === '/merge'
+}
+
+/** Document-free alternates for the two actually published language pairs. */
+export function approvedLanguageAlternates(canonical: string): readonly { hreflang: string; href: string }[] {
+  const url = new URL(canonical)
+  const route = parseLocalizedPath(url.pathname)
+  if (url.origin !== PUBLIC_ORIGIN || !route || !hasGermanPage(route.path)) return []
+  const en = PUBLIC_ORIGIN + localizedPath(route.path, 'en')
+  const de = PUBLIC_ORIGIN + localizedPath(route.path, 'de')
+  return [{ hreflang: 'en', href: en }, { hreflang: 'de', href: de }, { hreflang: 'x-default', href: en }]
+}
 
 /** Public default English URLs remain stable and unprefixed. */
 export function localizedPath(path: string, locale: PageLocale): string {

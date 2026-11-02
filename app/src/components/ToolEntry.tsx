@@ -1,8 +1,7 @@
 import { useLocale } from '../i18n'
-import { relatedGuidesHtml } from '../lib/guideCatalog'
 import { lazy, Suspense } from 'react'
 import { ToolLoadBoundary, ToolLoading } from './ToolLoadBoundary'
-import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHubs'
+import { breadcrumbHtml, hubForTool } from '../lib/categoryHubs'
 /**
  * Generated tool entry page — PT-UX-004.
  *
@@ -18,9 +17,10 @@ import { breadcrumbHtml, hubForTool, relatedToolsHtml } from '../lib/categoryHub
  */
 
 import type { ToolDefinition } from '../registry'
-import { toolArticleHtml } from '../lib/toolContent'
 import { SITE_BASE } from '../lib/seo'
 const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: module.MergeTool })))
+const GermanMergeGuide = lazy(() => import('./GermanMergeGuide'))
+const EnglishToolGuide = lazy(() => import('./EnglishToolGuide'))
 const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
 const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
 const OrganizeTool = lazy(() => import('./OrganizeTool').then(module => ({ default: module.OrganizeTool })))
@@ -111,10 +111,12 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
+  const germanMerge = locale === 'de' && tool.id === 'merge'
   return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
-      <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />
+      {germanMerge ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">PDFs zusammenfügen</span></nav>
+        : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
         <p>{t(TOOL_HELP[tool.id])}</p>
@@ -126,6 +128,8 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         <ToolContent tool={tool} onExit={onExit} />
       </Suspense>
     </ToolLoadBoundary>
-    {tool.implemented ? <div dangerouslySetInnerHTML={{ __html: toolArticleHtml(tool.id, tool.title) + relatedToolsHtml(tool) + relatedGuidesHtml(tool.id) }} /> : null}
+    {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanMerge ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
+      <Suspense fallback={null}>{germanMerge ? <GermanMergeGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
+    </ToolLoadBoundary> : null}
   </main>
 }

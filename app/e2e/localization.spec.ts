@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test('PT-UX-005 / PT-SEO-010: catalog languages use URLs; tools retain in-memory switching', async ({ page }) => {
+test('PT-UX-005 / PT-SEO-010: catalog and Merge languages use real URLs', async ({ page }) => {
   await page.goto('./')
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
   await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
@@ -9,17 +9,12 @@ test('PT-UX-005 / PT-SEO-010: catalog languages use URLs; tools retain in-memory
   await expect(page.getByRole('heading', { level: 1, name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Verfügbare PDF-Werkzeuge' })).toBeVisible()
   await expect(page.locator('.hub-tool-list a')).toHaveCount(14)
-  // German tool entries aren't published until their UI is fully translated.
-  // This link goes to the existing English tool canonical.
-  await page.locator('.hub-tool-list a[href="/pdf-tools/merge/"]').click()
-  // SPA navigation uses the established slashless tool path; static Pages
-  // loads may add a trailing slash. Both must retain the English canonical.
-  await expect(page).toHaveURL(/\/pdf-tools\/merge\/?$/)
-  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://akshat4112.github.io/pdf-tools/merge/')
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
+  await page.locator('.hub-tool-list a[href="/pdf-tools/de/merge/"]').click()
+  await expect(page).toHaveURL(/\/pdf-tools\/de\/merge\/$/)
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://akshat4112.github.io/pdf-tools/de/merge/')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await page.reload()
-  await expect(page.locator('html')).toHaveAttribute('lang', 'en')
-  await page.getByRole('combobox', { name: 'Language' }).selectOption('de')
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF zusammenfügen' })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Dateien auswählen' })).toBeVisible()
   await expect(page.locator('.folio-navigation > a').first()).toHaveText('Alle Tools')

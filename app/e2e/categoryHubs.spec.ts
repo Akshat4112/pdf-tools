@@ -4,10 +4,11 @@ import { join } from 'node:path'
 import { HUBS, hubPath, hubTools, publicHref } from '../src/lib/categoryHubs'
 import { PUBLIC_PAGES, SITE_URL, hubPageMeta } from '../src/lib/pageMetadata'
 import { GERMAN_CATALOG_META } from '../src/lib/germanCatalog'
+import { GERMAN_MERGE_META } from '../src/lib/germanMergeMeta'
 
 test('PT-SEO-004 hubs: static link graph has no orphaned or broken public routes', async ({ request, browser }) => {
   test.setTimeout(120_000)
-  const allPages = [...PUBLIC_PAGES, GERMAN_CATALOG_META]
+  const allPages = [...PUBLIC_PAGES, GERMAN_CATALOG_META, GERMAN_MERGE_META]
   const paths = new Set(allPages.map(p => new URL(p.canonical).pathname))
   const graph = new Map<string, string[]>()
   for (const meta of allPages) {

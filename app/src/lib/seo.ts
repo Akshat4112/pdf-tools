@@ -15,6 +15,8 @@
 export * from './pageMetadata'
 import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
 import { GERMAN_CATALOG_META } from './germanCatalogMeta'
+import { GERMAN_MERGE_META } from './germanMergeMeta'
+import { approvedLanguageAlternates } from './localizedRoutes'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -52,24 +54,34 @@ export function applyMeta(meta: PageMeta): void {
   }
   const previousCanonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href
   upsertLink('canonical', meta.canonical)
-  // Remove stale catalog hreflang tags when client navigation enters an
-  // English-only tool, guide, hub or policy page. Only the complete catalog
-  // pair may advertise reciprocal language alternatives.
+  // Remove stale language links; only explicitly approved pairs advertise them.
   document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach(link => link.remove())
-  if (meta.canonical === SITE_URL || meta.canonical === GERMAN_CATALOG_META.canonical) {
-    for (const [language, url] of [['en', SITE_URL], ['de', GERMAN_CATALOG_META.canonical], ['x-default', SITE_URL]]) {
+  for (const { hreflang, href } of approvedLanguageAlternates(meta.canonical)) {
       const link = document.createElement('link')
       link.rel = 'alternate'
-      link.hreflang = language
-      link.href = url
+      link.hreflang = hreflang
+      link.href = href
       document.head.appendChild(link)
-    }
   }
   const desired = meta.canonical
+  const german = desired === GERMAN_CATALOG_META.canonical || desired === GERMAN_MERGE_META.canonical
+  document.documentElement.lang = german ? 'de' : 'en'
+  document.querySelector('.fl-footer-navigation')?.setAttribute('aria-label', german ? 'Links zu PDF Tools' : 'PDF Tools links')
+  // The footer is outside React and survives SPA transitions. Route its two
+  // translated destinations with the page locale; other links stay labelled EN.
+  document.querySelectorAll<HTMLAnchorElement>('.fl-site-footer a[href]').forEach(link => {
+    const path = link.getAttribute('href')
+    if (path === '/pdf-tools/' || path === '/pdf-tools/de/') {
+      link.setAttribute('href', german ? '/pdf-tools/de/' : '/pdf-tools/')
+      link.hreflang = german ? 'de' : 'en'
+    } else if (path === '/pdf-tools/merge/' || path === '/pdf-tools/de/merge/') {
+      link.setAttribute('href', german ? '/pdf-tools/de/merge/' : '/pdf-tools/merge/')
+      link.hreflang = german ? 'de' : 'en'
+    }
+  })
   const generation = ++schemaGeneration
-  // No partly localized JSON-LD: the reviewed German catalog does not yet
-  // carry its own translated schema. Its static HTML remains indexable.
-  if (desired === GERMAN_CATALOG_META.canonical) {
+  // German pages deliberately omit untranslated JSON-LD.
+  if (german) {
     document.getElementById('public-structured-data')?.remove()
     return
   }
@@ -105,7 +117,7 @@ export function sitemapLastmod(date = new Date()): string {
  * Only canonical, indexable pages — no query/user URLs can ever appear.
  */
 export function buildSitemapXml(lastmod = sitemapLastmod()): string {
-  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical]
+  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical, GERMAN_MERGE_META.canonical]
   const entries = urls
     .map(
       (u) =>

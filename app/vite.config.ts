@@ -1,5 +1,7 @@
 import { publicInfoHtml } from './src/lib/publicInfo.ts'
 import { germanCatalogHtml, GERMAN_CATALOG_META } from './src/lib/germanCatalog.ts'
+import { GERMAN_MERGE_META } from './src/lib/germanMergeMeta.ts'
+import { germanMergeStaticHtml } from './src/lib/germanMergeContent.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -105,14 +107,21 @@ function prerenderRoutes(): Plugin {
         }
       }
 
-      // PT-SEO-010: first reviewed German page is a physical deep-linkable
-      // static route. All other /de/* pages stay absent and unindexed.
+      // PT-SEO-010: only catalog and Merge have reviewed German route content.
+      // Each has physical no-JS HTML; other /de/* routes remain absent.
       const germanDir = resolve(dist, 'de')
       mkdirSync(germanDir, { recursive: true })
-      const germanHtml = withPageMetadata(indexHtml, GERMAN_CATALOG_META)
-        .replace('<html lang="en">', '<html lang="de">')
-        .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${germanCatalogHtml()}</main></noscript>`)
-      writeFileSync(resolve(germanDir, 'index.html'), germanHtml)
+      const germanEntry = (meta: PageMeta, article: string): string => withPageMetadata(indexHtml, meta)
+          .replace('<html lang="en">', '<html lang="de">')
+          .replaceAll('href="/pdf-tools/"', 'href="/pdf-tools/de/"')
+          .replaceAll('href="/pdf-tools/merge/"', 'href="/pdf-tools/de/merge/"')
+          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:merge\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
+          .replace('aria-label="PDF Tools links"', 'aria-label="Links zu PDF Tools"')
+          .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${article}</main></noscript>`)
+      writeFileSync(resolve(germanDir, 'index.html'), germanEntry(GERMAN_CATALOG_META, germanCatalogHtml()))
+      const germanMergeDir = resolve(germanDir, 'merge')
+      mkdirSync(germanMergeDir, { recursive: true })
+      writeFileSync(resolve(germanMergeDir, 'index.html'), germanEntry(GERMAN_MERGE_META, germanMergeStaticHtml()))
 
       // Invented public inputs only, generated at build time; no user documents.
       const examplesDir = resolve(dist, 'examples')
@@ -133,6 +142,7 @@ function prerenderRoutes(): Plugin {
       const urls = [
         ...ROUTES.map(r => r.dir === '.' ? ORIGIN : `${ORIGIN}${r.dir}/`),
         GERMAN_CATALOG_META.canonical,
+        GERMAN_MERGE_META.canonical,
       ]
       const sitemap =
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
