@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { test, expect } from '@playwright/test'
 import { SITE_URL } from '../src/lib/pageMetadata'
 
-test('PT-SEO-010: German catalog is statically served and is the only indexed German page', async ({ page, request }) => {
+test('PT-SEO-010: German catalog and Merge are the only indexed German pages', async ({ page, request }) => {
   const response = await request.get('de/')
   expect(response.status()).toBe(200)
   const html = await response.text()
@@ -18,7 +18,8 @@ test('PT-SEO-010: German catalog is statically served and is the only indexed Ge
   expect(enHtml).toContain(`<link rel="canonical" href="${SITE_URL}"`)
   const sitemap = await (await request.get('sitemap.xml')).text()
   expect(sitemap).toContain(`<loc>${SITE_URL}de/</loc>`)
-  expect(sitemap).not.toContain(`${SITE_URL}de/merge/`)
+  expect(sitemap).toContain(`${SITE_URL}de/merge/`)
+  expect(sitemap).not.toContain(`${SITE_URL}de/split/`)
 
   await page.goto('de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
@@ -30,25 +31,29 @@ test('PT-SEO-010: German catalog is statically served and is the only indexed Ge
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
-test('PT-SEO-010: English tool entries remain canonical; German aliases are absent', async ({ request, page }) => {
+test('PT-SEO-010: only the approved Merge language pair is published', async ({ request, page }) => {
   // The Vite preview can serve its SPA fallback with HTTP 200; the actual
   // GitHub Pages contract is that no physical German tool page is emitted.
-  expect(existsSync('dist/de/merge/index.html')).toBe(false)
+  expect(existsSync('dist/de/merge/index.html')).toBe(true)
+  expect(existsSync('dist/de/split/index.html')).toBe(false)
   const enMerge = await request.get('merge/')
   expect(enMerge.ok()).toBe(true)
   const enHtml = await enMerge.text()
   expect(enHtml).toContain(`<link rel="canonical" href="${SITE_URL}merge/"`)
-  expect(enHtml).not.toContain('hreflang="de"')
+  expect(enHtml).toContain(`hreflang="de" href="${SITE_URL}de/merge/"`)
   await page.goto('./')
   await page.locator('select[aria-label="Language"]').selectOption('de')
   await expect(page).toHaveURL('http://127.0.0.1:4178/pdf-tools/de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
 })
 
-test('PT-SEO-010: SPA tool navigation clears catalog-only hreflang tags', async ({ page }) => {
+test('PT-SEO-010: SPA navigation replaces catalog alternatives with the tool pair', async ({ page }) => {
   await page.goto('./')
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3)
   await page.locator('.fl-quick-card').first().click()
   await expect(page).toHaveURL(/\/pdf-tools\/merge\/?$/)
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3)
+  await expect(page.locator('link[rel="alternate"][hreflang="de"]')).toHaveAttribute('href', `${SITE_URL}de/merge/`)
+  await page.locator('.related-tools a[href="/pdf-tools/split/"]').click()
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0)
 })

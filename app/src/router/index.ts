@@ -19,8 +19,10 @@ import { hubPageMeta } from '../lib/pageMetadata'
 
 import { useEffect, useState } from 'react'
 import { toolByRoute } from '../registry'
-import { parseLocalizedPath, type PageLocale } from '../lib/localizedRoutes'
+import { hasGermanPage, localizedPath, parseLocalizedPath, type PageLocale } from '../lib/localizedRoutes'
 import { GERMAN_CATALOG_META } from '../lib/germanCatalogMeta'
+import { GERMAN_MERGE_META } from '../lib/germanMergeMeta'
+import { setLocale } from '../i18n'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
 export interface Route {
@@ -50,10 +52,11 @@ export function routePathOf(pathname: string): string {
 /** Parse a pathname into a Route (pure — unit tested). */
 export function parsePath(pathname: string): Route {
   const localized = parseLocalizedPath(pathname)
-  // Only the fully authored German catalog is shipped. Other German routes
+  // Only the authored catalog and Merge workflow are shipped. Other routes
   // must remain not-found until their translated HTML files are published.
   if (localized?.locale === 'de') {
     if (localized.path === '/') return { name: 'catalog', path: '/', locale: 'de' }
+    if (localized.path === '/merge') return { name: 'merge', path: '/merge', locale: 'de' }
     return { name: 'not-found', path: pathname }
   }
   const p = routePathOf(pathname)
@@ -74,6 +77,7 @@ export function href(path: string): string {
 /** Metadata for a route (pure — used by router + prerender plugin + tests). */
 export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'catalog' && route.locale === 'de') return GERMAN_CATALOG_META
+  if (route.name === 'merge' && route.locale === 'de') return GERMAN_MERGE_META
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
   const info = infoPageMeta(route.path)
@@ -98,7 +102,11 @@ export function usePathRoute(): [Route, (path: string) => void] {
   )
 
   useEffect(() => {
-    const sync = () => setRoute(parsePath(window.location.pathname))
+    const sync = () => {
+      const next = parsePath(window.location.pathname)
+      setLocale(next.locale ?? 'en')
+      setRoute(next)
+    }
     window.addEventListener('popstate', sync)
     return () => window.removeEventListener('popstate', sync)
   }, [])
@@ -119,19 +127,17 @@ export function usePathRoute(): [Route, (path: string) => void] {
       // Native fragment navigation must scroll to homepage sections.
       if (url.hash) return
       const localized = parseLocalizedPath(url.pathname)
-      // Catalog locale changes must reload so the in-memory UI locale is
-      // initialized from the destination URL, including DE → EN links.
-      const currentLocale = parseLocalizedPath(window.location.pathname)?.locale
-      if (!localized || localized.locale === 'de' || currentLocale === 'de') return
-      const path = routePathOf(url.pathname)
+      if (!localized || (localized.locale === 'de' && !hasGermanPage(localized.path))) return
+      const path = localized.path
       // only intercept registry routes + the catalog; let real files
       // (assets, sitemap.xml, robots.txt) and unknown paths behave normally
       const isCatalog = path === '/' || path === ''
       const isTool = Boolean(toolByRoute(path))
       if (!isCatalog && !isTool && !hubByPath(path) && !isGuidePath(path) && !infoPageMeta(path)) return
       e.preventDefault()
-      const next = `${SITE_BASE}${path === '/' ? '' : path.replace(/^\//, '')}`
+      const next = localized.locale === 'de' ? localizedPath(path, 'de') : `${SITE_BASE}${path === '/' ? '' : path.replace(/^\//, '')}`
       if (next !== window.location.pathname) window.history.pushState({}, '', next)
+      setLocale(localized.locale)
       setRoute(parsePath(url.pathname))
     }
     document.addEventListener('click', onClick)
@@ -141,8 +147,19 @@ export function usePathRoute(): [Route, (path: string) => void] {
   const navigate = (path: string) => {
     const next = href(path)
     window.history.pushState({}, '', next)
+    setLocale(parsePath(next).locale ?? 'en')
     setRoute(parsePath(next))
   }
 
   return [route, navigate]
+}
+
+/** Switch approved URL pairs without remounting the active Merge workspace. */
+export function switchPageLocale(locale: PageLocale): boolean {
+  const current = parseLocalizedPath(window.location.pathname)
+  if (!current || !hasGermanPage(current.path)) return false
+  const next = localizedPath(current.path, locale)
+  if (window.location.pathname !== next) window.history.pushState({}, '', next)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+  return true
 }

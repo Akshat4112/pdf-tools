@@ -3,8 +3,30 @@ import { HUBS } from '../lib/categoryHubs'
 import { describe, expect, it } from 'vitest'
 import { CATALOG_META, INFO_PAGE_META, NOT_FOUND_META, PUBLIC_PAGES, SHARE_IMAGE, pageMetaTags, toolPageMeta, withPageMetadata } from '../lib/pageMetadata'
 import { TOOLS } from '../registry'
+import { GERMAN_MERGE_META } from '../lib/germanMergeMeta'
+import { GERMAN_TOOL_SEO } from '../lib/germanToolSeo'
 
 describe('PT-SEO-005 public metadata', () => {
+  it('publishes reciprocal Merge alternatives without exposing untranslated tool pairs', () => {
+    const base = '<head><title>Old</title></head><body>Public content</body>'
+    expect(GERMAN_MERGE_META.title).toBe(GERMAN_TOOL_SEO.merge.title)
+    expect(GERMAN_MERGE_META.description).toBe(GERMAN_TOOL_SEO.merge.description)
+    for (const meta of [toolPageMeta(TOOLS.find(tool => tool.id === 'merge')!), GERMAN_MERGE_META]) {
+      const html = withPageMetadata(base, meta)
+      expect(html).toContain('hreflang="en" href="https://akshat4112.github.io/pdf-tools/merge/"')
+      expect(html).toContain('hreflang="de" href="https://akshat4112.github.io/pdf-tools/de/merge/"')
+      expect(html).toContain('hreflang="x-default" href="https://akshat4112.github.io/pdf-tools/merge/"')
+      expect(html).toContain(`rel="canonical" href="${meta.canonical}"`)
+      const repeated = withPageMetadata(html, meta)
+      expect(repeated.match(/rel="canonical"/g)).toHaveLength(1)
+      expect(repeated.match(/rel="alternate"/g)).toHaveLength(3)
+      expect(repeated).toContain(`rel="canonical" href="${meta.canonical}"`)
+    }
+    const split = toolPageMeta(TOOLS.find(tool => tool.id === 'split')!)
+    expect(withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), split)).not.toContain('hreflang=')
+    const tags = pageMetaTags(GERMAN_MERGE_META)
+    expect(tags.find(tag => tag.key === 'og:image:alt')?.content).toContain('Kostenlose')
+  })
   it('covers only shipped routes with distinct useful copy', () => {
     expect(PUBLIC_PAGES).toHaveLength(TOOLS.filter(tool => tool.implemented).length + HUBS.length + GUIDES.length + INFO_PAGE_META.length + 2)
     expect(new Set(PUBLIC_PAGES.map(page => page.title)).size).toBe(PUBLIC_PAGES.length)

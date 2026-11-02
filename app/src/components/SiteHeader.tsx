@@ -3,12 +3,16 @@ import { hubForTool, hubPath, publicHref } from '../lib/categoryHubs'
 import { useEffect, useRef, useState } from 'react'
 import { SITE_BASE } from '../lib/seo'
 import { CATEGORIES, TOOLS } from '../registry'
-import { href } from '../router'
+import { href, switchPageLocale } from '../router'
+import { hasGermanPage, localizedPath } from '../lib/localizedRoutes'
 import './SiteHeader.css'
 
 /** Shared navigation never holds document or job state. */
 export function SiteHeader() {
   const { t, locale, setLocale } = useLocale()
+  const catalogHref = locale === 'de' ? `${SITE_BASE}de/` : SITE_BASE
+  const toolHref = (path: string): string => locale === 'de' && hasGermanPage(path) ? localizedPath(path, 'de') : href(path)
+  const englishFallback = (label: string): string => t(label) + (locale === 'de' ? ' (Englisch)' : '')
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLElement>(null)
   const toggle = useRef<HTMLButtonElement>(null)
@@ -41,7 +45,7 @@ export function SiteHeader() {
   return (
     <header className="folio-header" ref={root}>
       <div className="folio-header-row">
-        <a className="folio-home" href={window.location.pathname === `${SITE_BASE}de/` ? `${SITE_BASE}de/` : SITE_BASE} aria-label={t("PDF Tools home")} onClick={() => {
+        <a className="folio-home" href={catalogHref} aria-label={t("PDF Tools home")} onClick={() => {
           setOpen(false)
           root.current?.querySelectorAll('details[open]').forEach(detail => detail.removeAttribute('open'))
         }}>
@@ -61,35 +65,30 @@ export function SiteHeader() {
               root.current?.querySelectorAll('details[open]').forEach(detail => detail.removeAttribute('open'))
             }
           }}>
-          <a href={SITE_BASE} aria-current={window.location.pathname === SITE_BASE ? 'page' : undefined}>{t("All tools")}</a>
+          <a href={catalogHref} aria-current={window.location.pathname === catalogHref ? 'page' : undefined}>{t("All tools")}</a>
           <details className="folio-tools">
             <summary>{t("Categories")}</summary>
             <div className="folio-categories">
               {CATEGORIES.map(category => (
                 <section key={category.id} aria-labelledby={`nav-${category.id}`}>
                   <h2 id={`nav-${category.id}`}>{t(category.title)}</h2>
-                  <a href={publicHref(hubPath(hubForTool(TOOLS.find(t => t.category === category.id)!)))}>{locale === 'de' ? `${t('Explore all PDF tools')}: ${t(category.title)}` : `Explore ${category.title} tools`}</a>
+                  <a href={publicHref(hubPath(hubForTool(TOOLS.find(t => t.category === category.id)!)))} hrefLang="en">{locale === 'de' ? `${t('Explore all PDF tools')}: ${t(category.title)} (Englisch)` : `Explore ${category.title} tools`}</a>
                   {TOOLS.filter(tool => tool.implemented && tool.category === category.id).map(tool => (
-                    <a key={tool.id} href={href(tool.route)} aria-current={window.location.pathname.replace(/\/$/, '') === href(tool.route) ? 'page' : undefined}>{t(tool.title)}</a>
+                    <a key={tool.id} href={toolHref(tool.route)} hrefLang={locale === 'de' && hasGermanPage(tool.route) ? 'de' : 'en'} aria-current={window.location.pathname.replace(/\/$/, '') === toolHref(tool.route).replace(/\/$/, '') ? 'page' : undefined}>{locale === 'de' && !hasGermanPage(tool.route) ? englishFallback(tool.title) : t(tool.title)}</a>
                   ))}
                 </section>
               ))}
             </div>
           </details>
-          <a href={`${SITE_BASE}guides/`} aria-current={window.location.pathname.replace(/\/$/, '') === `${SITE_BASE}guides` ? 'page' : undefined}>{t("Guides")}</a>
-          <a href={`${SITE_BASE}help/`}>{t("Help")}</a>
-          <a href={`${SITE_BASE}privacy/`}>{t("Privacy")}</a>
+          <a href={`${SITE_BASE}guides/`} hrefLang="en" aria-current={window.location.pathname.replace(/\/$/, '') === `${SITE_BASE}guides` ? 'page' : undefined}>{englishFallback("Guides")}</a>
+          <a href={`${SITE_BASE}help/`} hrefLang="en">{englishFallback("Help")}</a>
+          <a href={`${SITE_BASE}privacy/`} hrefLang="en">{englishFallback("Privacy")}</a>
         </nav>
         <label className="folio-language">
           <span className="visually-hidden">{t('Language')}</span>
           <select value={locale} aria-label={t('Language')} onChange={event => {
             const next = event.target.value as 'en' | 'de'
-            // The catalog pair has real prerendered language URLs. Other
-            // tools retain the in-memory PT-UX-005 switch until DE routes ship.
-            if (window.location.pathname === SITE_BASE || window.location.pathname === `${SITE_BASE}de/`) {
-              const target = next === 'de' ? `${SITE_BASE}de/` : SITE_BASE
-              if (window.location.pathname !== target) window.location.assign(target)
-            } else setLocale(next)
+            if (!switchPageLocale(next)) setLocale(next)
           }}>
             <option value="en">EN</option><option value="de">DE</option>
           </select>

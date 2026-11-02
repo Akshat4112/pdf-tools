@@ -51,8 +51,9 @@ describe('sitemap + robots generation (PT-UX-004)', () => {
     const xml = buildSitemapXml('2026-01-01')
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
     expect(locs[0]).toBe(CATALOG_META.canonical)
-    expect(locs).toHaveLength(TOOLS.length + HUBS.length + GUIDES.length + INFO_PAGE_META.length + 3) // one reviewed German catalog
+    expect(locs).toHaveLength(TOOLS.length + HUBS.length + GUIDES.length + INFO_PAGE_META.length + 4) // approved German catalog and Merge only
     expect(locs).toContain(`${SITE_URL}de/`)
+    expect(locs.filter(url => url.startsWith(`${SITE_URL}de/`))).toEqual([`${SITE_URL}de/`, `${SITE_URL}de/merge/`])
     expect(new Set(locs).size).toBe(locs.length)
     for (const tool of TOOLS) {
       expect(locs).toContain(toolPageMeta(tool).canonical)

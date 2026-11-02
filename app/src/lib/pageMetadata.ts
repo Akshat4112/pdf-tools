@@ -2,6 +2,7 @@ import { GUIDES, guidePath, type Guide } from './guideCatalog.ts'
 import { HUBS, hubPath, type CategoryHub } from './categoryHubs.ts'
 /** Shared, document-free metadata for static HTML and client navigation (PT-SEO-005). */
 import { TOOLS, getTool, type ToolId, type ToolDefinition } from '../registry.ts'
+import { approvedLanguageAlternates } from './localizedRoutes.ts'
 
 /** Production origin + base path (PT-PD-004 §5). */
 export const SITE_ORIGIN = 'https://akshat4112.github.io'
@@ -123,12 +124,12 @@ export function pageMetaTags(meta: PageMeta) {
     { attribute: 'property', key: 'og:image:type', content: SHARE_IMAGE.type },
     { attribute: 'property', key: 'og:image:width', content: String(SHARE_IMAGE.width) },
     { attribute: 'property', key: 'og:image:height', content: String(SHARE_IMAGE.height) },
-    { attribute: 'property', key: 'og:image:alt', content: meta.canonical === `${SITE_URL}de/` ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
+    { attribute: 'property', key: 'og:image:alt', content: meta.canonical.startsWith(`${SITE_URL}de/`) ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
     { attribute: 'name', key: 'twitter:card', content: 'summary_large_image' },
     { attribute: 'name', key: 'twitter:title', content: meta.title },
     { attribute: 'name', key: 'twitter:description', content: meta.description },
     { attribute: 'name', key: 'twitter:image', content: SHARE_IMAGE.url },
-    { attribute: 'name', key: 'twitter:image:alt', content: meta.canonical === `${SITE_URL}de/` ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
+    { attribute: 'name', key: 'twitter:image:alt', content: meta.canonical.startsWith(`${SITE_URL}de/`) ? 'PDF Tools. Kostenlose Open-Source-PDF-Werkzeuge für deinen Browser.' : SHARE_IMAGE.alt },
   ] as const
 }
 
@@ -145,10 +146,8 @@ export function withPageMetadata(html: string, meta: PageMeta): string {
     .replace(/\s*<link\b[^>]*rel=["']canonical["'][^>]*>/gi, '')
     .replace(/\s*<link\b[^>]*rel=["']alternate["'][^>]*hreflang=["'][^"']+["'][^>]*>/gi, '')
   const tags = pageMetaTags(meta).map(tag => `  <meta ${tag.attribute}="${tag.key}" content="${escapeHtml(tag.content)}" />`).join('\n')
-  const isCatalogPair = meta.canonical === SITE_URL || meta.canonical === `${SITE_URL}de/`
-  const alternatives = isCatalogPair
-    ? `  <link rel="alternate" hreflang="en" href="${SITE_URL}" />\n  <link rel="alternate" hreflang="de" href="${SITE_URL}de/" />\n  <link rel="alternate" hreflang="x-default" href="${SITE_URL}" />\n`
-    : ''
+  const alternatives = approvedLanguageAlternates(meta.canonical)
+    .map(({ hreflang, href }) => `  <link rel="alternate" hreflang="${hreflang}" href="${escapeHtml(href)}" />\n`).join('')
   return clean.replace('</head>', `${tags}\n  <link rel="canonical" href="${escapeHtml(meta.canonical)}" />\n${alternatives}</head>`)
 }
 

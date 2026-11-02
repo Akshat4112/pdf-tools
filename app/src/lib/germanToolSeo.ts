@@ -1,4 +1,4 @@
-import type { ToolId } from '../registry'
+import type { ToolId } from '../registry.ts'
 
 /**
  * PT-SEO-010 translation inventory for shipped German tool landing pages.
@@ -16,14 +16,17 @@ export interface GermanToolSeoCopy {
   limitation: string
 }
 
-export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
-  merge: {
+/** The first released tool's metadata can load without the future tool inventory. */
+export const GERMAN_MERGE_COPY: GermanToolSeoCopy = {
     title: 'PDFs kostenlos zusammenfügen — PDF Tools',
     heading: 'PDF-Dateien zusammenfügen',
     description: 'Füge mehrere PDF-Dateien in deiner Reihenfolge zu einem Dokument zusammen. Kostenlos im Browser, ohne Benutzerkonto.',
     steps: ['PDF-Dateien auswählen und ihre Reihenfolge prüfen.', 'Dateien im Browser zusammenfügen.', 'Neue PDF-Datei prüfen und herunterladen.'],
     limitation: 'Interaktive Formulare und digitale Signaturen können durch das Zusammenfügen verändert oder ungültig werden.',
-  },
+}
+
+export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
+  merge: GERMAN_MERGE_COPY,
   split: {
     title: 'PDF-Datei kostenlos teilen — PDF Tools',
     heading: 'PDF in mehrere Dateien aufteilen',

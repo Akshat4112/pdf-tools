@@ -144,6 +144,8 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Try a current browser with the required features.": "Verwende einen aktuellen Browser mit den erforderlichen Funktionen.",
   "No download is available from this attempt.": "Für diesen Versuch ist kein Download verfügbar.",
   "How to use this tool": "So verwendest du dieses Tool",
+  "Usage guidance": "Anleitung",
+  "Usage guidance could not load. The tool remains available.": "Die Anleitung konnte nicht geladen werden. Das Werkzeug bleibt verfügbar.",
   "Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.": "Ausgewählte Dateien werden in diesem Browser verarbeitet und nicht zur Konvertierung hochgeladen. Beachte die unten angegebenen Datei- und Seitenlimits.",
   "In progress — not available yet": "In Arbeit – noch nicht verfügbar",
   "Opening this tool…": "Dieses Tool wird geöffnet …",
@@ -269,6 +271,24 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Preview unavailable": "Vorschau nicht verfügbar",
   "Pages": "Seiten",
   "Merge PDFs": "PDFs zusammenfügen",
+  "Merge order": "Reihenfolge beim Zusammenfügen",
+  "Order": "Reihenfolge",
+  "Merging your PDFs": "Deine PDFs werden zusammengefügt",
+  "Select at least two PDFs to merge. Files merge in the order shown — use the arrows to reorder.": "Wähle mindestens zwei PDFs aus. Sie werden in der angezeigten Reihenfolge zusammengefügt – mit den Pfeilen änderst du die Reihenfolge.",
+  "Select at least two PDFs to merge.": "Wähle mindestens zwei PDFs zum Zusammenfügen aus.",
+  "Add at least one more PDF to merge.": "Füge mindestens ein weiteres PDF zum Zusammenfügen hinzu.",
+  "A new file is created; your originals are untouched.": "Es wird eine neue Datei erstellt; deine Originale bleiben unverändert.",
+  "counting pages…": "Seiten werden gezählt …",
+  "Select at least one file to continue.": "Wähle mindestens eine Datei aus, um fortzufahren.",
+  "This file could not be read as a PDF.": "Diese Datei konnte nicht als PDF gelesen werden.",
+  "The generated file is empty and did not pass verification.": "Die erzeugte Datei ist leer und hat die Prüfung nicht bestanden.",
+  "The generated PDF did not pass structure verification.": "Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.",
+  "The generated output did not pass verification.": "Das erzeugte Ergebnis hat die Prüfung nicht bestanden.",
+  "Internal progress error.": "Interner Fehler bei der Fortschrittsanzeige.",
+  "Processing stopped unexpectedly.": "Die Verarbeitung wurde unerwartet beendet.",
+  "total. Sizes are the actual generated files, not estimates.": "insgesamt. Die Größen entsprechen den tatsächlich erzeugten Dateien und sind keine Schätzungen.",
+  "bytes": "Byte",
+  "This attempt was cancelled. No partial result is available to download. You can adjust the settings and try again.": "Dieser Versuch wurde abgebrochen. Es steht kein Teilergebnis zum Herunterladen bereit. Du kannst die Einstellungen anpassen und es erneut versuchen.",
   "Delete pages": "Seiten löschen",
   "Page numbers": "Seitenzahlen",
   "Text watermark": "Textwasserzeichen",
@@ -348,12 +368,14 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 }
 
 // Keep preferences in memory: PT-PD-003 prohibits web storage for the frontend.
-// A direct load of the authored German catalog must start in German without
-// relying on localStorage or a user preference. Other URLs remain English.
+// Only published German routes may initialize a German UI. Do not turn
+// unshipped aliases or sibling project paths into German tool workspaces.
+export function localeForPath(pathname: string): Locale {
+  return /^\/pdf-tools\/de(?:\/merge)?\/?$/.test(pathname) ? 'de' : 'en'
+}
+
 let activeLocale: Locale =
-  typeof window !== 'undefined' && (window.location.pathname === '/pdf-tools/de/' || window.location.pathname === '/pdf-tools/de')
-    ? 'de'
-    : 'en'
+  typeof window !== 'undefined' ? localeForPath(window.location.pathname) : 'en'
 const listeners = new Set<() => void>()
 const subscribe = (listener: () => void) => { listeners.add(listener); return () => { listeners.delete(listener) } }
 const getSnapshot = () => activeLocale
@@ -373,6 +395,16 @@ export function translate(message: string, language: Locale = activeLocale): str
   if (fileLimit) return `Bis zu ${fileLimit[1]} MB pro Datei · ${fileLimit[2]} Seiten · lokal verarbeitet`
   const count = /^(\d+) files were generated and verified\.$/.exec(message)
   if (count) return `${count[1]} Dateien wurden erstellt und geprüft.`
+  const mergeCount = /^(\d+) PDFs will be merged top to bottom, producing one document with their combined pages\.$/.exec(message)
+  if (mergeCount) return `${mergeCount[1]} PDFs werden von oben nach unten zu einem Dokument mit allen enthaltenen Seiten zusammengefügt.`
+  const fileSizeLimit = /^This file exceeds the current limit of (\d+) MB\.$/.exec(message)
+  if (fileSizeLimit) return `Diese Datei überschreitet die aktuelle Grenze von ${fileSizeLimit[1]} MB.`
+  const mergePageLimit = /^The merged result would have (\d+) pages; the current limit is (\d+)\.$/.exec(message)
+  if (mergePageLimit) return `Das zusammengefügte Ergebnis hätte ${mergePageLimit[1]} Seiten; die aktuelle Grenze liegt bei ${mergePageLimit[2]}.`
+  const documentPageLimit = /^This document has (\d+) pages; the current limit is (\d+)\.$/.exec(message)
+  if (documentPageLimit) return `Dieses Dokument hat ${documentPageLimit[1]} Seiten; die aktuelle Grenze liegt bei ${documentPageLimit[2]}.`
+  const outputPageCount = /^The generated PDF has (\d+) pages but (\d+) were expected\.$/.exec(message)
+  if (outputPageCount) return `Die erzeugte PDF-Datei hat ${outputPageCount[1]} ${outputPageCount[1] === '1' ? 'Seite' : 'Seiten'}; erwartet wurden ${outputPageCount[2]}.`
   return TRANSLATIONS[message] ?? message
 }
 

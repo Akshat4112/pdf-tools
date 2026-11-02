@@ -10,7 +10,7 @@ const copy: GermanToolLandingCopy = {
 }
 
 describe('PT-SEO-010 gated German tool landing renderer', () => {
-  it('renders meaningful German static content and English fallback without publishing hreflang', () => {
+  it('renders German content with correctly labelled English destinations and no indexing metadata', () => {
     const html = germanToolLandingHtml({ id: 'merge', route: '/merge' }, copy)
     expect(html).toContain('<h1 class="tool-heading">PDF-Dateien zusammenfügen</h1>')
     expect(html).toContain('aria-current="page"')
@@ -19,7 +19,9 @@ describe('PT-SEO-010 gated German tool landing renderer', () => {
     expect(html).toContain('href="/pdf-tools/de/"')
     expect(html).toContain('href="/pdf-tools/merge/" lang="en"')
     expect(html).not.toContain('rel="canonical"')
-    expect(html).not.toContain('hreflang=')
+    expect(html).toContain('href="/pdf-tools/privacy/" hreflang="en"')
+    expect(html).toContain('href="/pdf-tools/limitations/" hreflang="en"')
+    expect(html).not.toContain('<link')
     expect(html).not.toContain('upload')
   })
   it('escapes authored content for safe HTML output', () => {
@@ -32,7 +34,15 @@ describe('PT-SEO-010 gated German tool landing renderer', () => {
   })
   it('rejects nonregistry paths and incomplete translation content', () => {
     expect(() => germanToolLandingHtml({ id: 'merge', route: '/../privacy' }, copy)).toThrow()
+    expect(() => germanToolLandingHtml({ id: 'merge', route: '/split' }, copy)).toThrow()
     expect(() => germanToolLandingHtml({ id: 'merge', route: '/merge' }, { ...copy, steps: ['', 'Zwei', 'Drei'] })).toThrow()
     expect(() => germanToolLandingHtml({ id: 'merge', route: '/merge' }, { ...copy, limitation: '' })).toThrow()
+  })
+  it('can render guidance alongside an existing interactive heading without duplicating it', () => {
+    const html = germanToolLandingHtml({ id: 'merge', route: '/merge' }, copy, { includeHeader: false })
+    expect(html).not.toContain('<h1')
+    expect(html).not.toContain('Brotkrumennavigation')
+    expect(html).toContain('So funktioniert es')
+    expect(html).toContain('Wichtige Hinweise und Grenzen')
   })
 })

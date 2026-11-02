@@ -50,7 +50,7 @@ function App() {
     return (
       <div className="shell">
         <SiteHeader key={route.path} />
-        <ToolEntry tool={activeTool} onExit={() => navigate('/')} />
+        <ToolEntry tool={activeTool} onExit={() => navigate(route.locale === 'de' ? '/de/' : '/')} />
       </div>
     )
   }

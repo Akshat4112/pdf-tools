@@ -123,7 +123,7 @@ export function MergeTool({ onExit }: { onExit?: () => void }) {
             details={
               valid.length >= 2
                 ? [
-                    `Order: ${valid.map((f) => f.displayName).join(' → ')}`,
+                    `${t('Order')}: ${valid.map((f) => f.displayName).join(' → ')}`,
                     'A new file is created; your originals are untouched.',
                   ]
                 : undefined

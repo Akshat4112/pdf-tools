@@ -154,7 +154,7 @@ export function FailurePanel({
     <section className="panel state-panel is-error" aria-label={t("Something went wrong")} role="alert">
       <h2 ref={heading} tabIndex={-1} className="panel-title">{t("That didn't work")}</h2>
       <p className="panel-summary">{t(error.message)}</p>
-      <p className="panel-hint">{t(recovery[error.recovery])} No download is available from this attempt.</p>
+      <p className="panel-hint">{t(recovery[error.recovery])} {t('No download is available from this attempt.')}</p>
       <details className="error-details"><summary>{t("Error details")}</summary><p>{t("Error")} <code>{error.code}</code></p></details>
       <div className="panel-actions">
         <button type="button" className="btn-primary" onClick={onRetry}>
@@ -197,14 +197,14 @@ export function ResultPanel({
           ? t('One file was generated and verified.')
           : t(`${outputs.length} files were generated and verified.`)}
       </p>
-      <p className="panel-hint" role="status">Ready to download · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} total. Sizes are the actual generated files, not estimates.</p>
+      <p className="panel-hint" role="status">{t('Ready to download')} · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} {t('total. Sizes are the actual generated files, not estimates.')}</p>
       <ul className="result-list">
         {outputs.map((o) => (
           <li key={o.name} className="result-row">
             <span className="file-name" title={o.name}>
               {o.name}
             </span>
-            <span className="file-size" title={`${o.actualBytes.toLocaleString('en-US')} bytes`}>{formatBytes(o.actualBytes)}</span>
+            <span className="file-size" title={`${o.actualBytes.toLocaleString('en-US')} ${t('bytes')}`}>{formatBytes(o.actualBytes)}</span>
             <button
               type="button"
               className="btn-primary btn-download"
@@ -242,7 +242,7 @@ export function CancelledPanel({ onReset, onAdjust }: { onReset(): void; onAdjus
     <section className="panel state-panel is-cancelled" aria-label={t("Cancelled")} role="status">
       <h2 ref={heading} tabIndex={-1} className="panel-title">{t("Cancelled")}</h2>
       <p className="panel-summary">
-        This attempt was cancelled. No partial result is available to download. You can adjust the settings and try again.
+        {t('This attempt was cancelled. No partial result is available to download. You can adjust the settings and try again.')}
       </p>
       <div className="panel-actions">
         {onAdjust ? <button type="button" className="btn-primary" onClick={onAdjust}>{t("Adjust settings")}</button> : null}
