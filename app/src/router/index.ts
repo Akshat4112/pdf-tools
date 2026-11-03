@@ -22,6 +22,7 @@ import { toolByRoute } from '../registry'
 import { hasGermanPage, localizedPath, parseLocalizedPath, type PageLocale } from '../lib/localizedRoutes'
 import { GERMAN_CATALOG_META } from '../lib/germanCatalogMeta'
 import { GERMAN_MERGE_META } from '../lib/germanMergeMeta'
+import { GERMAN_SPLIT_META } from '../lib/germanSplitMeta'
 import { setLocale } from '../i18n'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
@@ -52,11 +53,12 @@ export function routePathOf(pathname: string): string {
 /** Parse a pathname into a Route (pure — unit tested). */
 export function parsePath(pathname: string): Route {
   const localized = parseLocalizedPath(pathname)
-  // Only the authored catalog and Merge workflow are shipped. Other routes
+  // Only the authored catalog, Merge and Split workflows are shipped. Other routes
   // must remain not-found until their translated HTML files are published.
   if (localized?.locale === 'de') {
     if (localized.path === '/') return { name: 'catalog', path: '/', locale: 'de' }
     if (localized.path === '/merge') return { name: 'merge', path: '/merge', locale: 'de' }
+    if (localized.path === '/split') return { name: 'split', path: '/split', locale: 'de' }
     return { name: 'not-found', path: pathname }
   }
   const p = routePathOf(pathname)
@@ -78,6 +80,7 @@ export function href(path: string): string {
 export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'catalog' && route.locale === 'de') return GERMAN_CATALOG_META
   if (route.name === 'merge' && route.locale === 'de') return GERMAN_MERGE_META
+  if (route.name === 'split' && route.locale === 'de') return GERMAN_SPLIT_META
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
   const info = infoPageMeta(route.path)
@@ -154,7 +157,7 @@ export function usePathRoute(): [Route, (path: string) => void] {
   return [route, navigate]
 }
 
-/** Switch approved URL pairs without remounting the active Merge workspace. */
+/** Switch approved URL pairs without remounting the active tool workspace. */
 export function switchPageLocale(locale: PageLocale): boolean {
   const current = parseLocalizedPath(window.location.pathname)
   if (!current || !hasGermanPage(current.path)) return false

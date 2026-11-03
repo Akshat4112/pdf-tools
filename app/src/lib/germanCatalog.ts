@@ -1,9 +1,10 @@
 import { TOOLS, type ToolId } from '../registry.ts'
+import { hasGermanPage } from './localizedRoutes.ts'
 export { GERMAN_CATALOG_META } from './germanCatalogMeta.ts'
 
 /**
  * PT-SEO-010: German catalog is the first fully authored localized page.
- * Merge has a translated workflow; other tools and legal/help routes remain
+ * Merge and Split have translated workflows; other tools and legal/help routes remain
  * at existing English canonical URLs and are explicitly labelled as such here.
  * Never add untranslated tools or policy pages to the German sitemap.
  */
@@ -48,10 +49,10 @@ const escapeHtml = (value: string) =>
 
 export function germanCatalogHtml(): string {
   const items = TOOLS.filter(tool => tool.implemented).map(tool =>
-    '<li><a hreflang="' + (tool.id === 'merge' ? 'de' : 'en') + '" href="/pdf-tools/' + (tool.id === 'merge' ? 'de/' : '') + escapeHtml(tool.route.replace(/^\//, '')) + '/">' +
+    '<li><a hreflang="' + (hasGermanPage(tool.route) ? 'de' : 'en') + '" href="/pdf-tools/' + (hasGermanPage(tool.route) ? 'de/' : '') + escapeHtml(tool.route.replace(/^\//, '')) + '/">' +
     escapeHtml(germanTitles[tool.id]) + '</a><p>' +
     escapeHtml(descriptions[tool.id]) +
-    (tool.id === 'merge' ? '' : ' <small>(Werkzeug derzeit auf Englisch)</small>') + '</p></li>',
+    (hasGermanPage(tool.route) ? '' : ' <small>(Werkzeug derzeit auf Englisch)</small>') + '</p></li>',
   ).join('')
   return `<header class="tool-header">
     <p class="fl-eyebrow">KOSTENLOS · OPEN SOURCE</p>

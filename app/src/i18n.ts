@@ -158,6 +158,8 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "This page doesn't exist.": "Diese Seite existiert nicht.",
   "The address may be mistyped, or the page moved. Everything PDF Tools offers is one click away in the catalog.": "Möglicherweise wurde die Adresse falsch eingegeben oder die Seite verschoben. Alle PDF Tools findest du im Katalog.",
   "How should it be split?": "Wie soll das PDF geteilt werden?",
+  "Split configuration": "Einstellungen zum Teilen",
+  "Split mode": "Teilungsmodus",
   "Custom ranges": "Eigene Seitenbereiche",
   "Every N pages": "Alle N Seiten",
   "One file per page": "Eine Datei pro Seite",
@@ -166,6 +168,19 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Split preview": "Vorschau der Teilung",
   "Reading the document…": "Dokument wird gelesen …",
   "Select a PDF to split. It is processed entirely on your device.": "Wähle ein PDF zum Teilen aus. Die Verarbeitung findet vollständig auf deinem Gerät statt.",
+  "One range produces a single file — add another range or use Extract pages.": "Ein Seitenbereich ergibt eine einzelne Datei – füge einen weiteren Bereich hinzu oder verwende „Seiten extrahieren“.",
+  "One range produces a single file. Add another range, or use Extract pages for one document.": "Ein Seitenbereich ergibt eine einzelne Datei. Füge einen weiteren Bereich hinzu oder verwende „Seiten extrahieren“ für ein einzelnes Dokument.",
+  "A new ZIP is created; your original stays untouched.": "Es wird eine neue ZIP-Datei erstellt; dein Original bleibt unverändert.",
+  "No file selected yet.": "Noch keine Datei ausgewählt.",
+  "Fix the split configuration above.": "Korrigiere die Einstellungen zum Teilen oben.",
+  "This configuration would not split anything.": "Mit diesen Einstellungen wird das Dokument nicht geteilt.",
+  "Splitting your PDF": "Dein PDF wird geteilt",
+  "Chunk size must be a whole number of pages.": "Die Anzahl der Seiten pro Datei muss eine positive ganze Zahl sein.",
+  "Select at least one page to continue.": "Wähle mindestens eine Seite aus, um fortzufahren.",
+  "The generated ZIP did not pass verification.": "Die erzeugte ZIP-Datei hat die Prüfung nicht bestanden.",
+  "Nothing to package.": "Es sind keine Dateien zum Verpacken vorhanden.",
+  "Invalid output extension.": "Ungültige Dateiendung für die Ausgabe.",
+  "An archive filename failed safety verification.": "Ein Dateiname im Archiv hat die Sicherheitsprüfung nicht bestanden.",
   "Choose pages to remove": "Zu löschende Seiten auswählen",
   "Choose pages to extract": "Zu extrahierende Seiten auswählen",
   "Pages to remove": "Zu löschende Seiten",
@@ -371,7 +386,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 // Only published German routes may initialize a German UI. Do not turn
 // unshipped aliases or sibling project paths into German tool workspaces.
 export function localeForPath(pathname: string): Locale {
-  return /^\/pdf-tools\/de(?:\/merge)?\/?$/.test(pathname) ? 'de' : 'en'
+  return /^\/pdf-tools\/de(?:\/(?:merge|split))?\/?$/.test(pathname) ? 'de' : 'en'
 }
 
 let activeLocale: Locale =
@@ -405,6 +420,26 @@ export function translate(message: string, language: Locale = activeLocale): str
   if (documentPageLimit) return `Dieses Dokument hat ${documentPageLimit[1]} Seiten; die aktuelle Grenze liegt bei ${documentPageLimit[2]}.`
   const outputPageCount = /^The generated PDF has (\d+) pages but (\d+) were expected\.$/.exec(message)
   if (outputPageCount) return `Die erzeugte PDF-Datei hat ${outputPageCount[1]} ${outputPageCount[1] === '1' ? 'Seite' : 'Seiten'}; erwartet wurden ${outputPageCount[2]}.`
+  const splitCount = /^(\d+) files? from a (\d+)-page document, zipped into one download\.$/.exec(message)
+  if (splitCount) return `${splitCount[1]} ${splitCount[1] === '1' ? 'Datei' : 'Dateien'} aus einem Dokument mit ${splitCount[2]} ${splitCount[2] === '1' ? 'Seite' : 'Seiten'}, als ZIP-Datei in einem Download.`
+  const splitParts = /^Parts: (\d+(?:–\d+)?(?:, \d+(?:–\d+)?)*)$/.exec(message)
+  if (splitParts) return `Teile: ${splitParts[1]}`
+  const invalidRange = /^'([\s\S]*)' is not a valid page or range\.$/.exec(message)
+  if (invalidRange) return `'${invalidRange[1]}' ist keine gültige Seite oder kein gültiger Seitenbereich.`
+  const rangeBounds = /^Range '(\d+(?:\s*-\s*\d+)?)' is not valid for a (\d+)-page document\.$/.exec(message)
+  if (rangeBounds) return `Der Bereich '${rangeBounds[1]}' ist für ein Dokument mit ${rangeBounds[2]} ${rangeBounds[2] === '1' ? 'Seite' : 'Seiten'} ungültig.`
+  const backwardsRange = /^Range '(\d+\s*-\s*\d+)' runs backwards\.$/.exec(message)
+  if (backwardsRange) return `Der Bereich '${backwardsRange[1]}' verläuft rückwärts.`
+  const chunkSize = /^Chunk size (\d+) is larger than the (\d+)-page document\.$/.exec(message)
+  if (chunkSize) return `Die Anzahl von ${chunkSize[1]} Seiten pro Datei ist größer als das Dokument mit ${chunkSize[2]} ${chunkSize[2] === '1' ? 'Seite' : 'Seiten'}.`
+  const splitLimit = /^This split would create (\d+) files; the current limit is (\d+)\.$/.exec(message)
+  if (splitLimit) return `Diese Teilung würde ${splitLimit[1]} Dateien erzeugen; die aktuelle Grenze liegt bei ${splitLimit[2]}.`
+  const zipLimit = /^The result would contain (\d+) files; the current limit is (\d+)\.$/.exec(message)
+  if (zipLimit) return `Das Ergebnis würde ${zipLimit[1]} Dateien enthalten; die aktuelle Grenze liegt bei ${zipLimit[2]}.`
+  const splitProgress = /^verifying part (\d+) of (\d+)…$/.exec(message)
+  if (splitProgress) return `Teil ${splitProgress[1]} von ${splitProgress[2]} wird geprüft …`
+  const invalidPage = /^Page (\d+) is not valid for a (\d+)-page document\.$/.exec(message)
+  if (invalidPage) return `Seite ${invalidPage[1]} ist für ein Dokument mit ${invalidPage[2]} ${invalidPage[2] === '1' ? 'Seite' : 'Seiten'} ungültig.`
   return TRANSLATIONS[message] ?? message
 }
 

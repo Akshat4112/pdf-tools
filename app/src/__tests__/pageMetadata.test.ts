@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { CATALOG_META, INFO_PAGE_META, NOT_FOUND_META, PUBLIC_PAGES, SHARE_IMAGE, pageMetaTags, toolPageMeta, withPageMetadata } from '../lib/pageMetadata'
 import { TOOLS } from '../registry'
 import { GERMAN_MERGE_META } from '../lib/germanMergeMeta'
+import { GERMAN_SPLIT_META } from '../lib/germanSplitMeta'
 import { GERMAN_TOOL_SEO } from '../lib/germanToolSeo'
 
 describe('PT-SEO-005 public metadata', () => {
@@ -22,10 +23,24 @@ describe('PT-SEO-005 public metadata', () => {
       expect(repeated.match(/rel="alternate"/g)).toHaveLength(3)
       expect(repeated).toContain(`rel="canonical" href="${meta.canonical}"`)
     }
-    const split = toolPageMeta(TOOLS.find(tool => tool.id === 'split')!)
-    expect(withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), split)).not.toContain('hreflang=')
+    const rotate = toolPageMeta(TOOLS.find(tool => tool.id === 'rotate')!)
+    expect(withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), rotate)).not.toContain('hreflang=')
     const tags = pageMetaTags(GERMAN_MERGE_META)
     expect(tags.find(tag => tag.key === 'og:image:alt')?.content).toContain('Kostenlose')
+  })
+  it('publishes the exact reciprocal Split pair and replaces stale Merge metadata', () => {
+    const base = '<head><title>Old</title></head>'
+    expect(GERMAN_SPLIT_META.title).toBe(GERMAN_TOOL_SEO.split.title)
+    expect(GERMAN_SPLIT_META.description).toBe(GERMAN_TOOL_SEO.split.description)
+    for (const meta of [toolPageMeta(TOOLS.find(tool => tool.id === 'split')!), GERMAN_SPLIT_META]) {
+      const html = withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), meta)
+      expect(html).toContain(`rel="canonical" href="${meta.canonical}"`)
+      expect(html).toContain('hreflang="en" href="https://akshat4112.github.io/pdf-tools/split/"')
+      expect(html).toContain('hreflang="de" href="https://akshat4112.github.io/pdf-tools/de/split/"')
+      expect(html).toContain('hreflang="x-default" href="https://akshat4112.github.io/pdf-tools/split/"')
+      expect(html.match(/rel="alternate"/g)).toHaveLength(3)
+      expect(html).not.toContain('/merge/')
+    }
   })
   it('covers only shipped routes with distinct useful copy', () => {
     expect(PUBLIC_PAGES).toHaveLength(TOOLS.filter(tool => tool.implemented).length + HUBS.length + GUIDES.length + INFO_PAGE_META.length + 2)

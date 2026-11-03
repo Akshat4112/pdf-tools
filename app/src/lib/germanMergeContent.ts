@@ -21,10 +21,10 @@ export function germanMergeArticleHtml(): string {
   </section>
   <nav class="related-tools" aria-label="Weitere PDF-Werkzeuge">
     <h2>Weitere Werkzeuge und Anleitungen</h2>
-    <p>Die folgenden Seiten sind derzeit auf Englisch:</p>
+    <p>PDF teilen ist auf Deutsch verfügbar. Weitere Seiten sind derzeit auf Englisch:</p>
     <ul>
       <li><a href="/pdf-tools/tools/organize/" hreflang="en">PDF-Seiten organisieren (Englisch)</a></li>
-      <li><a href="/pdf-tools/split/" hreflang="en">PDF teilen (Englisch)</a></li>
+      <li><a href="/pdf-tools/de/split/" hreflang="de">PDF teilen</a></li>
       <li><a href="/pdf-tools/guides/" hreflang="en">Praktische PDF-Anleitungen (Englisch)</a></li>
       <li><a href="/pdf-tools/help/" hreflang="en">Hilfe und FAQ (Englisch)</a></li>
     </ul>

@@ -16,6 +16,7 @@ export * from './pageMetadata'
 import { SITE_URL, CATALOG_META, PUBLIC_PAGES, pageMetaTags, type PageMeta } from './pageMetadata'
 import { GERMAN_CATALOG_META } from './germanCatalogMeta'
 import { GERMAN_MERGE_META } from './germanMergeMeta'
+import { GERMAN_SPLIT_META } from './germanSplitMeta'
 import { approvedLanguageAlternates } from './localizedRoutes'
 
 // ---------------------------------------------------------------------------
@@ -64,10 +65,10 @@ export function applyMeta(meta: PageMeta): void {
       document.head.appendChild(link)
   }
   const desired = meta.canonical
-  const german = desired === GERMAN_CATALOG_META.canonical || desired === GERMAN_MERGE_META.canonical
+  const german = desired === GERMAN_CATALOG_META.canonical || desired === GERMAN_MERGE_META.canonical || desired === GERMAN_SPLIT_META.canonical
   document.documentElement.lang = german ? 'de' : 'en'
   document.querySelector('.fl-footer-navigation')?.setAttribute('aria-label', german ? 'Links zu PDF Tools' : 'PDF Tools links')
-  // The footer is outside React and survives SPA transitions. Route its two
+  // The footer is outside React and survives SPA transitions. Route its
   // translated destinations with the page locale; other links stay labelled EN.
   document.querySelectorAll<HTMLAnchorElement>('.fl-site-footer a[href]').forEach(link => {
     const path = link.getAttribute('href')
@@ -76,6 +77,9 @@ export function applyMeta(meta: PageMeta): void {
       link.hreflang = german ? 'de' : 'en'
     } else if (path === '/pdf-tools/merge/' || path === '/pdf-tools/de/merge/') {
       link.setAttribute('href', german ? '/pdf-tools/de/merge/' : '/pdf-tools/merge/')
+      link.hreflang = german ? 'de' : 'en'
+    } else if (path === '/pdf-tools/split/' || path === '/pdf-tools/de/split/') {
+      link.setAttribute('href', german ? '/pdf-tools/de/split/' : '/pdf-tools/split/')
       link.hreflang = german ? 'de' : 'en'
     }
   })
@@ -117,7 +121,7 @@ export function sitemapLastmod(date = new Date()): string {
  * Only canonical, indexable pages — no query/user URLs can ever appear.
  */
 export function buildSitemapXml(lastmod = sitemapLastmod()): string {
-  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical, GERMAN_MERGE_META.canonical]
+  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical, GERMAN_MERGE_META.canonical, GERMAN_SPLIT_META.canonical]
   const entries = urls
     .map(
       (u) =>
