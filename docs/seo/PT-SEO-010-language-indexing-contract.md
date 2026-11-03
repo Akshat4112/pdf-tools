@@ -15,6 +15,7 @@ Status: **staged implementation; full bilingual rollout not complete.** German C
 
 - Split has its own German direct-load/no-JS page, metadata, reciprocal language alternatives and sitemap entry. Language/history switching retains the selected file, mode, page-range expression, chunk size, active work and verified ZIP result without reloading the workspace.
 - Authored guidance explains custom ranges, overlapping/omitted pages, fixed chunks with a shorter last part, one PDF per page, ZIP extraction, the single-custom-range warning, 50 MiB/300-page limits, signature/form caveats and reset boundaries. It does not promise immediate interruption of every background operation or secure operating-system memory erasure.
+- A failed PDF-processing asset download can require reloading the page because the existing PDF.js worker fallback retains its failed setup. German guidance warns that a reload clears selection/settings; browser acceptance verifies recovery with a fresh selection. Recoverable configuration/quota errors are separately tested with settings retained and a successful adjusted retry.
 - Acceptance covers all three modes with synthetic PDFs: independently read each downloaded ZIP member using qpdf to verify page counts and order; test invalid/backwards/out-of-bounds ranges, chunk errors, malformed input, processing failure and cancellation, locale continuity, no document-data requests/storage and existing startup budgets. Native-device, legal and owner-account acceptance remain separate release gates.
 
 ## Existing public URL contract

@@ -27,6 +27,7 @@ export function germanSplitArticleHtml(): string {
     <h2 id="split-caveats-de">Originale, Datenschutz und Neu beginnen</h2>
     <p>Bewahre das Original auf. Interaktive Formulare, Anmerkungen, Lesezeichen und Metadaten bleiben beim Neuschreiben möglicherweise nicht erhalten. Digitale Signaturen können ungültig werden. Aufteilen ist keine sichere Schwärzung und prüft nicht auf vertrauliche Inhalte.</p>
     <p>Mit „Neu beginnen“ entfernst du die ausgewählte Datei und Ergebnisse aus diesem Arbeitsbereich. Originale und bereits gespeicherte Downloads auf deinem Gerät werden nicht gelöscht. Das ist keine garantierte sichere Löschung des Betriebssystemspeichers.</p>
+    <p>Wenn eine für die Verarbeitung benötigte Website-Datei nicht geladen werden kann, kann ein erneutes Laden der Seite nötig sein. Dabei gehen die Auswahl und Einstellungen im Arbeitsbereich verloren; wähle die Originaldatei danach erneut aus.</p>
   </section>
   <nav class="related-tools" aria-label="Weitere PDF-Werkzeuge">
     <h2>Weitere Werkzeuge und Anleitungen</h2>
