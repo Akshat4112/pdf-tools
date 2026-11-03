@@ -1,15 +1,22 @@
 # PT-SEO-010 — Crawlable English/German URLs: implementation contract
 
-Status: **staged implementation; full bilingual rollout not complete.** The German catalog is published. The next review covers only the complete German Merge workflow. PT-UX-005 provides UI copy and accessible controls, but a language toggle alone is not an indexable German language variant. Do not emit a German `hreflang`, German sitemap URL, or a German canonical until the corresponding direct-load route renders complete, accurate German content without reliance on a stored preference.
+Status: **staged implementation; full bilingual rollout not complete.** German Catalog and Merge are published. This implementation adds the complete German Split workflow as the next bounded slice. PT-UX-005 provides UI copy and accessible controls, but a language toggle alone is not an indexable German language variant. Do not emit a German `hreflang`, German sitemap URL, or a German canonical until the corresponding direct-load route renders complete, accurate German content without reliance on a stored preference.
 
 ## First German tool: Merge PDF
 
-- The explicit route gate permits only the catalog and `/pdf-tools/de/merge/`; German Split, policy, guide and other tool aliases remain unavailable.
+- The explicit route gate permits only the catalog, `/pdf-tools/de/merge/` and `/pdf-tools/de/split/`; German policy, guide and other tool aliases remain unavailable.
 - The Merge pair has independent self-canonicals and reciprocal English/German/default alternatives. German metadata and no-JS guidance describe the same processing limits as the interactive workspace. German JSON-LD is deliberately omitted until translated schema is authored.
 - Changing language within Merge updates the URL and interface without remounting the workspace. Selected files, order, active work and verified results stay in memory; filenames are rendered unchanged. Back/forward navigation between the pair follows the URL language.
-- German navigation points to published German catalog/Merge routes. Other resources explicitly identify their English destination; untranslated policy content is not republished under a German URL.
+- German navigation points to approved German Catalog/Merge/Split routes. Other resources explicitly identify their English destination; untranslated policy content is not republished under a German URL.
 - German guidance covers input/output formats, 50 MiB input and 300-page limits, order, a synthetic example, signature/form caveats, original/download preservation and reset boundaries. It does not claim OCR, redaction or secure operating-system memory erasure.
 - Release review must verify direct/no-JS HTML, locale/metadata parity, one heading, desktop/mobile synthetic merge/download/reset, order/count, failure/cancellation recovery, preserved language-switch state, zero document-data requests/storage, and startup budgets. Code review and emulation do not replace native-device, legal or owner-account acceptance.
+
+## Next German tool: Split PDF
+
+- Split has its own German direct-load/no-JS page, metadata, reciprocal language alternatives and sitemap entry. Language/history switching retains the selected file, mode, page-range expression, chunk size, active work and verified ZIP result without reloading the workspace.
+- Authored guidance explains custom ranges, overlapping/omitted pages, fixed chunks with a shorter last part, one PDF per page, ZIP extraction, the single-custom-range warning, 50 MiB/300-page limits, signature/form caveats and reset boundaries. It does not promise immediate interruption of every background operation or secure operating-system memory erasure.
+- A failed PDF-processing asset download can require reloading the page because the existing PDF.js worker fallback retains its failed setup. German guidance warns that a reload clears selection/settings; browser acceptance verifies recovery with a fresh selection. Recoverable configuration/quota errors are separately tested with settings retained and a successful adjusted retry.
+- Acceptance covers all three modes with synthetic PDFs: independently read each downloaded ZIP member using qpdf to verify page counts and order; test invalid/backwards/out-of-bounds ranges, chunk errors, malformed input, processing failure and cancellation, locale continuity, no document-data requests/storage and existing startup budgets. Native-device, legal and owner-account acceptance remain separate release gates.
 
 ## Existing public URL contract
 

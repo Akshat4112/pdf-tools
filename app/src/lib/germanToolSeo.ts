@@ -25,15 +25,18 @@ export const GERMAN_MERGE_COPY: GermanToolSeoCopy = {
     limitation: 'Interaktive Formulare und digitale Signaturen können durch das Zusammenfügen verändert oder ungültig werden.',
 }
 
-export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
-  merge: GERMAN_MERGE_COPY,
-  split: {
+/** Keep shipped Split metadata independent of the remaining translation inventory. */
+export const GERMAN_SPLIT_COPY: GermanToolSeoCopy = {
     title: 'PDF-Datei kostenlos teilen — PDF Tools',
     heading: 'PDF in mehrere Dateien aufteilen',
     description: 'Teile ein PDF nach Seitenbereichen, in gleich große Abschnitte oder in einzelne Seiten. Lokal im Browser.',
     steps: ['PDF auswählen und Seitenumfang prüfen.', 'Seitenbereiche oder gewünschte Aufteilung festlegen.', 'Ergebnis als ZIP-Datei speichern.'],
     limitation: 'Das Teilen entfernt keine vertraulichen Informationen aus den verbleibenden Seiten.',
-  },
+}
+
+export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
+  merge: GERMAN_MERGE_COPY,
+  split: GERMAN_SPLIT_COPY,
   rotate: {
     title: 'PDF-Seiten kostenlos drehen — PDF Tools',
     heading: 'PDF-Seiten drehen',

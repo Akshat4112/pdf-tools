@@ -38,7 +38,7 @@ test('PT-QA-002: keyboard search, locale switch, zoom and responsive controls', 
   await expect(page).toHaveURL(/\/pdf-tools\/de\/$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'de')
   await expect(page.getByRole('heading', { level: 1, name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
-  // The catalog and Merge have authored German URLs; other tool aliases remain absent.
+  // Catalog, Merge and Split have authored German URLs; other aliases remain absent.
   await select.selectOption('en')
   await expect(page).toHaveURL(/\/pdf-tools\/$/)
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')

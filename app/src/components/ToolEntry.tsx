@@ -20,6 +20,7 @@ import type { ToolDefinition } from '../registry'
 import { SITE_BASE } from '../lib/seo'
 const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: module.MergeTool })))
 const GermanMergeGuide = lazy(() => import('./GermanMergeGuide'))
+const GermanSplitGuide = lazy(() => import('./GermanSplitGuide'))
 const EnglishToolGuide = lazy(() => import('./EnglishToolGuide'))
 const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
 const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
@@ -112,10 +113,10 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t, locale } = useLocale()
-  const germanMerge = locale === 'de' && tool.id === 'merge'
+  const germanTool = locale === 'de' && (tool.id === 'merge' || tool.id === 'split')
   return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
-      {germanMerge ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">PDFs zusammenfügen</span></nav>
+      {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{tool.id === 'merge' ? 'PDFs zusammenfügen' : 'PDF teilen'}</span></nav>
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
@@ -128,8 +129,8 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         <ToolContent tool={tool} onExit={onExit} />
       </Suspense>
     </ToolLoadBoundary>
-    {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanMerge ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
-      <Suspense fallback={null}>{germanMerge ? <GermanMergeGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
+    {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanTool ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
+      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : <GermanSplitGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
     </ToolLoadBoundary> : null}
   </main>
 }

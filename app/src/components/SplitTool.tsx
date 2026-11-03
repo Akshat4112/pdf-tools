@@ -184,9 +184,9 @@ export function SplitTool({ onExit }: { onExit?: () => void }) {
           />
 
           {selected ? (
-            <section className="panel" aria-label="Split configuration">
+            <section className="panel" aria-label={t('Split configuration')}>
               <h2 className="panel-title">{t("How should it be split?")}</h2>
-              <div className="split-modes" role="radiogroup" aria-label="Split mode">
+              <div className="split-modes" role="radiogroup" aria-label={t('Split mode')}>
                 {MODES.map((m) => (
                   <label key={m.id} className={`split-mode${mode === m.id ? ' is-active' : ''}`}>
                     <input

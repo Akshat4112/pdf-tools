@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { test, expect } from '@playwright/test'
 import { SITE_URL } from '../src/lib/pageMetadata'
 
-test('PT-SEO-010: German catalog and Merge are the only indexed German pages', async ({ page, request }) => {
+test('PT-SEO-010: German catalog, Merge and Split are the only indexed German pages', async ({ page, request }) => {
   const response = await request.get('de/')
   expect(response.status()).toBe(200)
   const html = await response.text()
@@ -19,7 +19,8 @@ test('PT-SEO-010: German catalog and Merge are the only indexed German pages', a
   const sitemap = await (await request.get('sitemap.xml')).text()
   expect(sitemap).toContain(`<loc>${SITE_URL}de/</loc>`)
   expect(sitemap).toContain(`${SITE_URL}de/merge/`)
-  expect(sitemap).not.toContain(`${SITE_URL}de/split/`)
+  expect(sitemap).toContain(`${SITE_URL}de/split/`)
+  expect(sitemap).not.toContain(`${SITE_URL}de/rotate/`)
 
   await page.goto('de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
@@ -31,11 +32,12 @@ test('PT-SEO-010: German catalog and Merge are the only indexed German pages', a
   await expect(page.locator('html')).toHaveAttribute('lang', 'en')
 })
 
-test('PT-SEO-010: only the approved Merge language pair is published', async ({ request, page }) => {
+test('PT-SEO-010: only the approved Merge and Split language pairs are published', async ({ request, page }) => {
   // The Vite preview can serve its SPA fallback with HTTP 200; the actual
   // GitHub Pages contract is that no physical German tool page is emitted.
   expect(existsSync('dist/de/merge/index.html')).toBe(true)
-  expect(existsSync('dist/de/split/index.html')).toBe(false)
+  expect(existsSync('dist/de/split/index.html')).toBe(true)
+  expect(existsSync('dist/de/rotate/index.html')).toBe(false)
   const enMerge = await request.get('merge/')
   expect(enMerge.ok()).toBe(true)
   const enHtml = await enMerge.text()
@@ -55,5 +57,7 @@ test('PT-SEO-010: SPA navigation replaces catalog alternatives with the tool pai
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3)
   await expect(page.locator('link[rel="alternate"][hreflang="de"]')).toHaveAttribute('href', `${SITE_URL}de/merge/`)
   await page.locator('.related-tools a[href="/pdf-tools/split/"]').click()
+  await expect(page.locator('link[rel="alternate"][hreflang="de"]')).toHaveAttribute('href', `${SITE_URL}de/split/`)
+  await page.locator('.related-tools a[href="/pdf-tools/rotate/"]').click()
   await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0)
 })

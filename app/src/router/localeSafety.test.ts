@@ -7,12 +7,14 @@ describe('PT-SEO-010 locale routing safety', () => {
     expect(parsePath('/pdf-tools/merge/').name).toBe('merge')
     expect(routePathOf('/pdf-tools/merge/')).toBe('/merge')
   })
-  it('ships the German catalog and Merge workflow but not other German pages', () => {
+  it('ships the German catalog, Merge and Split workflows but not other German pages', () => {
     expect(parsePath('/pdf-tools/de/')).toEqual({ name: 'catalog', path: '/', locale: 'de' })
     expect(metaForRoute(parsePath('/pdf-tools/de/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/')
     expect(parsePath('/pdf-tools/de/merge/')).toEqual({ name: 'merge', path: '/merge', locale: 'de' })
     expect(metaForRoute(parsePath('/pdf-tools/de/merge/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/merge/')
-    expect(parsePath('/pdf-tools/de/split/').name).toBe('not-found')
+    expect(parsePath('/pdf-tools/de/split/')).toEqual({ name: 'split', path: '/split', locale: 'de' })
+    expect(metaForRoute(parsePath('/pdf-tools/de/split/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/split/')
+    expect(parsePath('/pdf-tools/de/rotate/').name).toBe('not-found')
     expect(parsePath('/pdf-tools/de/privacy/').name).toBe('not-found')
   })
   it('does not confuse unrelated shared-origin prefixes with the project base', () => {

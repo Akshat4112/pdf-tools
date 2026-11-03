@@ -2,6 +2,8 @@ import { publicInfoHtml } from './src/lib/publicInfo.ts'
 import { germanCatalogHtml, GERMAN_CATALOG_META } from './src/lib/germanCatalog.ts'
 import { GERMAN_MERGE_META } from './src/lib/germanMergeMeta.ts'
 import { germanMergeStaticHtml } from './src/lib/germanMergeContent.ts'
+import { GERMAN_SPLIT_META } from './src/lib/germanSplitMeta.ts'
+import { germanSplitStaticHtml } from './src/lib/germanSplitContent.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -107,7 +109,7 @@ function prerenderRoutes(): Plugin {
         }
       }
 
-      // PT-SEO-010: only catalog and Merge have reviewed German route content.
+      // PT-SEO-010: only catalog, Merge and Split have reviewed German route content.
       // Each has physical no-JS HTML; other /de/* routes remain absent.
       const germanDir = resolve(dist, 'de')
       mkdirSync(germanDir, { recursive: true })
@@ -115,13 +117,17 @@ function prerenderRoutes(): Plugin {
           .replace('<html lang="en">', '<html lang="de">')
           .replaceAll('href="/pdf-tools/"', 'href="/pdf-tools/de/"')
           .replaceAll('href="/pdf-tools/merge/"', 'href="/pdf-tools/de/merge/"')
-          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:merge\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
+          .replaceAll('href="/pdf-tools/split/"', 'href="/pdf-tools/de/split/"')
+          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:(?:merge|split)\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
           .replace('aria-label="PDF Tools links"', 'aria-label="Links zu PDF Tools"')
           .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${article}</main></noscript>`)
       writeFileSync(resolve(germanDir, 'index.html'), germanEntry(GERMAN_CATALOG_META, germanCatalogHtml()))
       const germanMergeDir = resolve(germanDir, 'merge')
       mkdirSync(germanMergeDir, { recursive: true })
       writeFileSync(resolve(germanMergeDir, 'index.html'), germanEntry(GERMAN_MERGE_META, germanMergeStaticHtml()))
+      const germanSplitDir = resolve(germanDir, 'split')
+      mkdirSync(germanSplitDir, { recursive: true })
+      writeFileSync(resolve(germanSplitDir, 'index.html'), germanEntry(GERMAN_SPLIT_META, germanSplitStaticHtml()))
 
       // Invented public inputs only, generated at build time; no user documents.
       const examplesDir = resolve(dist, 'examples')
@@ -143,6 +149,7 @@ function prerenderRoutes(): Plugin {
         ...ROUTES.map(r => r.dir === '.' ? ORIGIN : `${ORIGIN}${r.dir}/`),
         GERMAN_CATALOG_META.canonical,
         GERMAN_MERGE_META.canonical,
+        GERMAN_SPLIT_META.canonical,
       ]
       const sitemap =
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
