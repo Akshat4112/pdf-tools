@@ -23,6 +23,7 @@ import { hasGermanPage, localizedPath, parseLocalizedPath, type PageLocale } fro
 import { GERMAN_CATALOG_META } from '../lib/germanCatalogMeta'
 import { GERMAN_MERGE_META } from '../lib/germanMergeMeta'
 import { GERMAN_SPLIT_META } from '../lib/germanSplitMeta'
+import { GERMAN_ROTATE_META } from '../lib/germanRotateMeta'
 import { setLocale } from '../i18n'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
@@ -59,6 +60,7 @@ export function parsePath(pathname: string): Route {
     if (localized.path === '/') return { name: 'catalog', path: '/', locale: 'de' }
     if (localized.path === '/merge') return { name: 'merge', path: '/merge', locale: 'de' }
     if (localized.path === '/split') return { name: 'split', path: '/split', locale: 'de' }
+    if (localized.path === '/rotate') return { name: 'rotate', path: '/rotate', locale: 'de' }
     return { name: 'not-found', path: pathname }
   }
   const p = routePathOf(pathname)
@@ -81,6 +83,7 @@ export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'catalog' && route.locale === 'de') return GERMAN_CATALOG_META
   if (route.name === 'merge' && route.locale === 'de') return GERMAN_MERGE_META
   if (route.name === 'split' && route.locale === 'de') return GERMAN_SPLIT_META
+  if (route.name === 'rotate' && route.locale === 'de') return GERMAN_ROTATE_META
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
   const info = infoPageMeta(route.path)
