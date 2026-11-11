@@ -21,7 +21,7 @@ permissions:
 jobs:
   app:
     name: app checks (lint, test, build)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: app
@@ -159,7 +159,7 @@ jobs:
 
   corpus:
     name: fixture corpus validation (two readers)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
