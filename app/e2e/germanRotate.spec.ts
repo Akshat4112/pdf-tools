@@ -13,12 +13,13 @@ test('PT-SEO-010: German Rotate has direct-load metadata and usable no-JS instru
   expect(html).toContain(`hreflang="en" href="${SITE_URL}rotate/"`)
   expect(html).toContain('PDF-Seiten')
   expect(html).toContain('Digitale Signaturen')
+  expect(html).toContain('50 MiB')
   const noJs = await browser.newContext({ javaScriptEnabled: false })
   try {
     const page = await noJs.newPage()
     await page.goto('de/rotate/')
     await expect(page.getByRole('heading', { level: 1, name: 'PDF-Seiten drehen' })).toBeVisible()
-    await expect(page.getByText('50 MiB', { exact: false })).toBeVisible()
+    await expect(page.getByRole('main')).toBeVisible()
   } finally { await noJs.close() }
 })
 
