@@ -5,6 +5,7 @@ export type Locale = 'en' | 'de'
 const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Menu": "Menü",
   "Close": "Schließen",
+  "The generated PDF did not pass structure verification.": "Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.",
   "All tools": "Alle Tools",
   "Help": "Hilfe",
   "Categories": "Kategorien",
