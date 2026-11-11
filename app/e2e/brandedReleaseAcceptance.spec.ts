@@ -16,7 +16,7 @@ test('release contract: 14 advertised tools have real canonical HTML and one ind
   const paths = new Set(PUBLIC_PAGES.map(page => page.canonical))
   expect(paths.size).toBe(PUBLIC_PAGES.length)
   const sitemap = await (await request.get('sitemap.xml')).text()
-  expect((sitemap.match(/<loc>/g) || [])).toHaveLength(PUBLIC_PAGES.length + 3) // reviewed German catalog, Merge and Split
+  expect((sitemap.match(/<loc>/g) || [])).toHaveLength(PUBLIC_PAGES.length + 4) // reviewed German catalog, Merge, Split and Rotate
   expect(sitemap).toContain(`<loc>${SITE_URL}de/</loc>`)
   const home = await (await request.get('./')).text()
   expect(home).toContain('PDF Tools')
