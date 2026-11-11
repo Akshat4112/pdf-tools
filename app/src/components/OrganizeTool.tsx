@@ -12,12 +12,38 @@ import { startOrganize, type OrganizeInput } from '../tools/organizeFlow'
 import type { Job, JobProgress, JobState } from '../jobs/orchestrator'
 import type { VerifiedOutput } from '../outputs/verify'
 
+const ROTATE_DE: Readonly<Record<string, string>> = {
+  'Choose pages to rotate': 'Seiten zum Drehen auswählen',
+  'Select pages, then rotate left or right. Existing rotations are included in the preview.': 'Wähle Seiten aus und drehe sie nach links oder rechts. Vorhandene Drehungen werden in der Vorschau berücksichtigt.',
+  'Select all pages': 'Alle Seiten auswählen',
+  'Clear selection': 'Auswahl aufheben',
+  'Rotate selected left': 'Ausgewählte nach links drehen',
+  'Rotate selected right': 'Ausgewählte nach rechts drehen',
+  'Undo': 'Rückgängig',
+  'Restore original pages': 'Originalseiten wiederherstellen',
+  'Rotate ↻': 'Drehen ↻',
+  'Rotation preview': 'Drehvorschau',
+  'Create rotated copy': 'Gedrehte Kopie erstellen',
+  'Choose a PDF to edit locally.': 'Wähle ein PDF zur lokalen Bearbeitung.',
+  'Choose a readable PDF first.': 'Wähle zuerst eine lesbare PDF-Datei.',
+  'Make at least one change above.': 'Nimm oben mindestens eine Änderung vor.',
+  'Review and confirm the removed source pages below.': 'Prüfe und bestätige die entfernten Originalseiten unten.',
+  'Creating and verifying your new copy': 'Neue Kopie wird erstellt und geprüft',
+  'Select pages or use the controls below each thumbnail.': 'Wähle Seiten aus oder verwende die Schaltflächen unter den Vorschaubildern.',
+  'A new copy is created. Your original stays untouched; changes can invalidate digital signatures. Document-level forms and bookmarks may not be preserved.': 'Eine neue Kopie wird erstellt. Dein Original bleibt unverändert. Änderungen können digitale Signaturen ungültig machen; Formulare und Lesezeichen bleiben möglicherweise nicht erhalten.',
+  'Output page order': 'Reihenfolge der Ausgabeseiten',
+  'Output thumbnails': 'Vorschaubilder der Ausgabe',
+  'Page workspace': 'Seiten-Arbeitsbereich',
+  'The generated PDF did not pass structure verification.': 'Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.',
+}
+
 const VIEW_SIZE = 8
 interface DocumentState { fileId: number; doc?: PdfjsDocument; rotations?: number[]; error?: ToolError }
 
 export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' | 'rotate'; onExit?: () => void }) {
-  const { t, locale } = useLocale()
+  const { t: baseT, locale } = useLocale()
   const germanRotate = locale === 'de' && mode === 'rotate'
+  const t = (message: string) => germanRotate ? (ROTATE_DE[message] ?? baseT(message)) : baseT(message)
   const tool = getTool(mode)
   const organizing = mode === 'organize'
   const [files, setFiles] = useState<WorkspaceFile[]>([])
