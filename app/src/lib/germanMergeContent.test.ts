@@ -10,13 +10,13 @@ describe('first complete German Merge page', () => {
     expect(germanMergeArticleHtml()).not.toContain('<h1')
     expect(html).toContain('hreflang="en"')
   })
-  it('only exposes approved catalog, Merge and Split language pairs', () => {
+  it('only exposes approved catalog, Merge, Split and Rotate language pairs', () => {
     expect(hasGermanPage('/merge')).toBe(true)
     expect(hasGermanPage('/split')).toBe(true)
-    expect(hasGermanPage('/rotate')).toBe(false)
+    expect(hasGermanPage('/rotate')).toBe(true)
     const merge = approvedLanguageAlternates('https://akshat4112.github.io/pdf-tools/de/merge/')
     expect(merge.map(x => x.href)).toEqual(['https://akshat4112.github.io/pdf-tools/merge/', 'https://akshat4112.github.io/pdf-tools/de/merge/', 'https://akshat4112.github.io/pdf-tools/merge/'])
-    expect(approvedLanguageAlternates('https://akshat4112.github.io/pdf-tools/rotate/')).toEqual([])
+    expect(approvedLanguageAlternates('https://akshat4112.github.io/pdf-tools/rotate/')).toHaveLength(3)
     expect(approvedLanguageAlternates('https://example.com/pdf-tools/merge/')).toEqual([])
   })
 })

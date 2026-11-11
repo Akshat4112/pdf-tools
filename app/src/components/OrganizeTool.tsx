@@ -12,11 +12,38 @@ import { startOrganize, type OrganizeInput } from '../tools/organizeFlow'
 import type { Job, JobProgress, JobState } from '../jobs/orchestrator'
 import type { VerifiedOutput } from '../outputs/verify'
 
+const ROTATE_DE: Readonly<Record<string, string>> = {
+  'Choose pages to rotate': 'Seiten zum Drehen auswählen',
+  'Select pages, then rotate left or right. Existing rotations are included in the preview.': 'Wähle Seiten aus und drehe sie nach links oder rechts. Vorhandene Drehungen werden in der Vorschau berücksichtigt.',
+  'Select all pages': 'Alle Seiten auswählen',
+  'Clear selection': 'Auswahl aufheben',
+  'Rotate selected left': 'Ausgewählte nach links drehen',
+  'Rotate selected right': 'Ausgewählte nach rechts drehen',
+  'Undo': 'Rückgängig',
+  'Restore original pages': 'Originalseiten wiederherstellen',
+  'Rotate ↻': 'Drehen ↻',
+  'Rotation preview': 'Drehvorschau',
+  'Create rotated copy': 'Gedrehte Kopie erstellen',
+  'Choose a PDF to edit locally.': 'Wähle ein PDF zur lokalen Bearbeitung.',
+  'Choose a readable PDF first.': 'Wähle zuerst eine lesbare PDF-Datei.',
+  'Make at least one change above.': 'Nimm oben mindestens eine Änderung vor.',
+  'Review and confirm the removed source pages below.': 'Prüfe und bestätige die entfernten Originalseiten unten.',
+  'Creating and verifying your new copy': 'Neue Kopie wird erstellt und geprüft',
+  'Select pages or use the controls below each thumbnail.': 'Wähle Seiten aus oder verwende die Schaltflächen unter den Vorschaubildern.',
+  'A new copy is created. Your original stays untouched; changes can invalidate digital signatures. Document-level forms and bookmarks may not be preserved.': 'Eine neue Kopie wird erstellt. Dein Original bleibt unverändert. Änderungen können digitale Signaturen ungültig machen; Formulare und Lesezeichen bleiben möglicherweise nicht erhalten.',
+  'Output page order': 'Reihenfolge der Ausgabeseiten',
+  'Output thumbnails': 'Vorschaubilder der Ausgabe',
+  'Page workspace': 'Seiten-Arbeitsbereich',
+  'The generated PDF did not pass structure verification.': 'Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.',
+}
+
 const VIEW_SIZE = 8
 interface DocumentState { fileId: number; doc?: PdfjsDocument; rotations?: number[]; error?: ToolError }
 
 export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' | 'rotate'; onExit?: () => void }) {
-  const { t } = useLocale()
+  const { t: baseT, locale } = useLocale()
+  const germanRotate = locale === 'de' && mode === 'rotate'
+  const t = (message: string) => germanRotate ? (ROTATE_DE[message] ?? baseT(message)) : baseT(message)
   const tool = getTool(mode)
   const organizing = mode === 'organize'
   const [files, setFiles] = useState<WorkspaceFile[]>([])
@@ -168,32 +195,32 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
       <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">{t(tool.description)}</p></header>
       {phase === 'configure' ? <>
         <FileSelection expected="pdf" multiple={false} files={files} onChange={changeFiles} />
-        {selected ? <section className="panel" aria-label="Page workspace">
-          <h2 className="panel-title">{organizing ? 'Arrange the new copy' : 'Choose pages to rotate'}</h2>
-          <p className="panel-summary">{organizing ? 'Drag a handle to another page, or use Move earlier/later with touch or keyboard. Thumbnails show the exact output order and orientation.' : 'Select pages, then rotate left or right. Existing rotations are included in the preview.'}</p>
+        {selected ? <section className="panel" aria-label={t('Page workspace')}>
+          <h2 className="panel-title">{organizing ? 'Arrange the new copy' : t('Choose pages to rotate')}</h2>
+          <p className="panel-summary">{organizing ? 'Drag a handle to another page, or use Move earlier/later with touch or keyboard. Thumbnails show the exact output order and orientation.' : t('Select pages, then rotate left or right. Existing rotations are included in the preview.')}</p>
           {doc ? <>
             <div className="panel-actions organize-toolbar">
               <button type="button" className="btn-ghost" onClick={() => setPicked(pages.map(p => p.id))}>{t("Select all pages")}</button>
               <button type="button" className="btn-ghost" onClick={() => setPicked([])}>{t("Clear selection")}</button>
-              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: -90 }, 'Selected pages rotated left.')}>{t("Rotate selected left")}</button>
-              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: 90 }, 'Selected pages rotated right.')}>{t("Rotate selected right")}</button>
+              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: -90 }, germanRotate ? 'Ausgewählte Seiten nach links gedreht.' : 'Selected pages rotated left.')}>{t("Rotate selected left")}</button>
+              <button type="button" className="btn-ghost" disabled={!selectedIds.length} onClick={() => edit({ type: 'rotate', ids: selectedIds, delta: 90 }, germanRotate ? 'Ausgewählte Seiten nach rechts gedreht.' : 'Selected pages rotated right.')}>{t("Rotate selected right")}</button>
               {organizing ? <button type="button" className="btn-ghost" disabled={!selectedIds.length || selectedIds.length === pages.length} onClick={() => edit({ type: 'delete', ids: selectedIds }, 'Selected pages removed from the new copy. Undo restores them.')}>{t("Delete selected pages")}</button> : null}
-              <button type="button" className="btn-ghost" disabled={!editor.history.length} onClick={() => edit({ type: 'undo' }, 'Last change undone.')}>{t("Undo")}</button>
-              <button type="button" className="btn-ghost" disabled={!dirty} onClick={() => edit({ type: 'restore', rotations }, 'Original pages and rotations restored.')}>{t("Restore original pages")}</button>
+              <button type="button" className="btn-ghost" disabled={!editor.history.length} onClick={() => edit({ type: 'undo' }, germanRotate ? 'Letzte Änderung rückgängig gemacht.' : 'Last change undone.')}>{t("Undo")}</button>
+              <button type="button" className="btn-ghost" disabled={!dirty} onClick={() => edit({ type: 'restore', rotations }, germanRotate ? 'Originalseiten und Drehungen wiederhergestellt.' : 'Original pages and rotations restored.')}>{t("Restore original pages")}</button>
             </div>
-            <p className="panel-hint">{pages.length} output pages · {selectedIds.length} selected · undo keeps the last {UNDO_LIMIT} changes. Keep at least one page; limit {QUOTAS.maxPages} pages.</p>
+            <p className="panel-hint">{germanRotate ? `${pages.length} Ausgabeseiten · ${selectedIds.length} ausgewählt · Rückgängig für die letzten ${UNDO_LIMIT} Änderungen. Mindestens eine Seite behalten; Grenze: ${QUOTAS.maxPages} Seiten.` : `${pages.length} output pages · ${selectedIds.length} selected · undo keeps the last ${UNDO_LIMIT} changes. Keep at least one page; limit ${QUOTAS.maxPages} pages.`}</p>
             {organizing ? <div className="organize-move-field">
               <label htmlFor="organize-position">{t("Move one selected page to position")}</label>
               <input id="organize-position" type="number" min="1" max={pages.length} value={destination} onChange={e => setDestination(e.target.value)} aria-invalid={!validDestination} />
               <button type="button" className="btn-ghost" disabled={selectedIds.length !== 1 || !validDestination} onClick={() => move(selectedIds[0], Number(destination) - 1)}>{t("Move selected page")}</button>
             </div> : null}
-            <div className="organize-grid" role="group" aria-label="Output page order">
+            <div className="organize-grid" role="group" aria-label={t('Output page order')}>
               {pages.slice(start, start + VIEW_SIZE).map((page, offset) => {
                 const index = start + offset
                 const position = index + 1
                 return <div className={`organize-card${dropPosition === index ? ' is-drop-target' : ''}`} key={page.id} data-output-position={index}>
                   <PageThumbnail key={`${page.id}:${page.rotation}`} doc={doc} pageNumber={page.sourcePage} rotation={page.rotation} selected={selectedIds.includes(page.id)} deleting={false}
-                    label={`Output page ${position}, source page ${page.sourcePage}`} caption={`Output ${position} · source ${page.sourcePage}`} detail={`${page.rotation}°`}
+                    label={germanRotate ? `Ausgabeseite ${position}, Originalseite ${page.sourcePage}` : `Output page ${position}, source page ${page.sourcePage}`} caption={germanRotate ? `Ausgabe ${position} · Original ${page.sourcePage}` : `Output ${position} · source ${page.sourcePage}`} detail={`${page.rotation}°`}
                     onToggle={() => setPicked(ids => ids.includes(page.id) ? ids.filter(id => id !== page.id) : [...ids, page.id])} />
                   <div className="organize-card-actions">
                     {organizing ? <>
@@ -217,7 +244,7 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
                       <button type="button" className="btn-ghost" aria-label={`Move earlier at position ${position}`} disabled={index === 0} onClick={() => move(page.id, index - 1)}>{t("Earlier")}</button>
                       <button type="button" className="btn-ghost" aria-label={`Move later at position ${position}`} disabled={position === pages.length} onClick={() => move(page.id, index + 1)}>{t("Later")}</button>
                     </> : null}
-                    <button type="button" className="btn-ghost" aria-label={`Rotate right at position ${position}`} onClick={() => edit({ type: 'rotate', ids: [page.id], delta: 90 }, `Output page ${position} rotated right.`)}>{t("Rotate ↻")}</button>
+                    <button type="button" className="btn-ghost" aria-label={germanRotate ? `Seite an Position ${position} nach rechts drehen` : `Rotate right at position ${position}`} onClick={() => edit({ type: 'rotate', ids: [page.id], delta: 90 }, germanRotate ? `Ausgabeseite ${position} nach rechts gedreht.` : `Output page ${position} rotated right.`)}>{t("Rotate ↻")}</button>
                     {organizing ? <>
                       <button type="button" className="btn-ghost" aria-label={`Duplicate at position ${position}`} disabled={pages.length >= QUOTAS.maxPages} onClick={() => edit({ type: 'duplicate', id: page.id }, `Output page ${position} duplicated. Copies can be edited independently.`)}>{t("Duplicate")}</button>
                       <button type="button" className="btn-ghost" aria-label={`Delete at position ${position}`} disabled={pages.length === 1} onClick={() => edit({ type: 'delete', ids: [page.id] }, `Output page ${position} removed. Undo restores it.`)}>{t("Delete")}</button>
@@ -226,22 +253,22 @@ export function OrganizeTool({ mode = 'organize', onExit }: { mode?: 'organize' 
                 </div>
               })}
             </div>
-            <nav className="page-pagination" aria-label="Output thumbnails">
+            <nav className="page-pagination" aria-label={t('Output thumbnails')}>
               <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - VIEW_SIZE)}>{t("Previous pages")}</button>
-              <span>Output pages {start + 1}–{Math.min(start + VIEW_SIZE, pages.length)} of {pages.length}</span>
+              <span>{germanRotate ? `Ausgabeseiten ${start + 1}–${Math.min(start + VIEW_SIZE, pages.length)} von ${pages.length}` : `Output pages ${start + 1}–${Math.min(start + VIEW_SIZE, pages.length)} of ${pages.length}`}</span>
               <button type="button" className="btn-ghost" disabled={start + VIEW_SIZE >= pages.length} onClick={() => setViewStart(start + VIEW_SIZE)}>{t("Next pages")}</button>
             </nav>
           </> : null}
-          <p className="page-selection-status" role={current?.error ? 'alert' : 'status'}>{current?.error ? current.error.message : !doc ? 'Reading the document…' : message || 'Select pages or use the controls below each thumbnail.'}</p>
+          <p className="page-selection-status" role={current?.error ? 'alert' : 'status'}>{current?.error ? t(current.error.message) : !doc ? t('Reading the document…') : message || t('Select pages or use the controls below each thumbnail.')}</p>
         </section> : null}
-        <PreviewPanel title={organizing ? 'Organize preview' : 'Rotation preview'} summary={doc ? `${pages.length}-page PDF · ${duplicateCount} duplicate${duplicateCount === 1 ? '' : 's'} · ${removed.length} source page${removed.length === 1 ? '' : 's'} removed` : 'Choose a PDF to edit locally.'}
-          details={doc ? [`Output source order: ${pages.map(p => p.sourcePage).join(', ')}`, `Final rotations: ${pages.map(p => `${p.rotation}°`).join(', ')}`, ...(removed.length ? [`Source pages to remove: ${removed.join(', ')}`] : []), 'A new copy is created. Your original stays untouched; changes can invalidate digital signatures. Document-level forms and bookmarks may not be preserved.'] : undefined}
-          actionLabel={organizing ? 'Create organized copy' : 'Create rotated copy'} onConfirm={run} disabled={!canRun}
-          disabledReason={!doc ? 'Choose a readable PDF first.' : !dirty ? 'Make at least one change above.' : 'Review and confirm the removed source pages below.'} onCancel={onExit} />
+        <PreviewPanel title={organizing ? 'Organize preview' : t('Rotation preview')} summary={doc ? (germanRotate ? `PDF mit ${pages.length} Seiten · ${duplicateCount} Duplikate · ${removed.length} Originalseiten entfernt` : `${pages.length}-page PDF · ${duplicateCount} duplicate${duplicateCount === 1 ? '' : 's'} · ${removed.length} source page${removed.length === 1 ? '' : 's'} removed`) : t('Choose a PDF to edit locally.')}
+          details={doc ? [germanRotate ? `Reihenfolge der Originalseiten: ${pages.map(p => p.sourcePage).join(', ')}` : `Output source order: ${pages.map(p => p.sourcePage).join(', ')}`, germanRotate ? `Endgültige Drehungen: ${pages.map(p => `${p.rotation}°`).join(', ')}` : `Final rotations: ${pages.map(p => `${p.rotation}°`).join(', ')}`, ...(removed.length ? [`Source pages to remove: ${removed.join(', ')}`] : []), t('A new copy is created. Your original stays untouched; changes can invalidate digital signatures. Document-level forms and bookmarks may not be preserved.')] : undefined}
+          actionLabel={organizing ? 'Create organized copy' : t('Create rotated copy')} onConfirm={run} disabled={!canRun}
+          disabledReason={!doc ? t('Choose a readable PDF first.') : !dirty ? t('Make at least one change above.') : t('Review and confirm the removed source pages below.')} onCancel={onExit} />
         {removed.length ? <label className="page-delete-confirmation"><input type="checkbox" checked={confirmed === reviewKey} onChange={e => setConfirmed(e.target.checked ? reviewKey : null)} /><span>{t("I reviewed the output order and source pages to remove. Create a new copy without those pages.")}</span></label> : null}
       </> : null}
-      {phase === 'processing' ? <ProcessingPanel label="Creating and verifying your new copy" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
-      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}
+      {phase === 'processing' ? <ProcessingPanel label={t('Creating and verifying your new copy')} progress={progress} onCancel={() => job.current?.cancel()} /> : null}
+      {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel={t('Adjust settings')} onReset={reset} onContinue={onExit} /> : null}
       {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
       {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
     </div>

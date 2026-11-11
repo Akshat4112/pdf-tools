@@ -5,6 +5,7 @@ export type Locale = 'en' | 'de'
 const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Menu": "Menü",
   "Close": "Schließen",
+  "The generated PDF did not pass structure verification.": "Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.",
   "All tools": "Alle Tools",
   "Help": "Hilfe",
   "Categories": "Kategorien",
@@ -187,7 +188,6 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Pages to extract": "Zu extrahierende Seiten",
   "Delete configuration": "Einstellungen zum Löschen",
   "Extract configuration": "Einstellungen zum Extrahieren",
-  "Select all pages": "Alle Seiten auswählen",
   "Clear page selection": "Seitenauswahl löschen",
   "Previous pages": "Vorherige Seiten",
   "Next pages": "Nächste Seiten",
@@ -270,16 +270,10 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Drag": "Ziehen",
   "Earlier": "Früher",
   "Later": "Später",
-  "Rotate ↻": "Drehen ↻",
   "Duplicate": "Duplizieren",
   "Delete": "Löschen",
-  "Undo": "Rückgängig",
-  "Restore original pages": "Originalseiten wiederherstellen",
   "Move selected page": "Ausgewählte Seite verschieben",
   "Move selected page to position": "Ausgewählte Seite an Position verschieben",
-  "Clear selection": "Auswahl löschen",
-  "Rotate selected left": "Ausgewählte Seiten nach links drehen",
-  "Rotate selected right": "Ausgewählte Seiten nach rechts drehen",
   "Delete selected pages": "Ausgewählte Seiten löschen",
   "Reading…": "Wird gelesen …",
   "Preparing preview…": "Vorschau wird vorbereitet …",
@@ -297,7 +291,6 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "Select at least one file to continue.": "Wähle mindestens eine Datei aus, um fortzufahren.",
   "This file could not be read as a PDF.": "Diese Datei konnte nicht als PDF gelesen werden.",
   "The generated file is empty and did not pass verification.": "Die erzeugte Datei ist leer und hat die Prüfung nicht bestanden.",
-  "The generated PDF did not pass structure verification.": "Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.",
   "The generated output did not pass verification.": "Das erzeugte Ergebnis hat die Prüfung nicht bestanden.",
   "Internal progress error.": "Interner Fehler bei der Fortschrittsanzeige.",
   "Processing stopped unexpectedly.": "Die Verarbeitung wurde unerwartet beendet.",
@@ -386,7 +379,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 // Only published German routes may initialize a German UI. Do not turn
 // unshipped aliases or sibling project paths into German tool workspaces.
 export function localeForPath(pathname: string): Locale {
-  return /^\/pdf-tools\/de(?:\/(?:merge|split))?\/?$/.test(pathname) ? 'de' : 'en'
+  return /^\/pdf-tools\/de(?:\/(?:merge|split|rotate))?\/?$/.test(pathname) ? 'de' : 'en'
 }
 
 let activeLocale: Locale =
