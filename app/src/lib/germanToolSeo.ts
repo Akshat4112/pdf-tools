@@ -34,16 +34,19 @@ export const GERMAN_SPLIT_COPY: GermanToolSeoCopy = {
     limitation: 'Das Teilen entfernt keine vertraulichen Informationen aus den verbleibenden Seiten.',
 }
 
-export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
-  merge: GERMAN_MERGE_COPY,
-  split: GERMAN_SPLIT_COPY,
-  rotate: {
+/** Keep the shipped Rotate page out of the unpublished tool SEO inventory. */
+export const GERMAN_ROTATE_COPY: GermanToolSeoCopy = {
     title: 'PDF-Seiten kostenlos drehen — PDF Tools',
     heading: 'PDF-Seiten drehen',
     description: 'Drehe ausgewählte PDF-Seiten in 90-Grad-Schritten und speichere eine neue Kopie direkt im Browser.',
     steps: ['PDF auswählen und Seiten anzeigen.', 'Zu drehende Seiten und Winkel festlegen.', 'Vorschau kontrollieren und PDF-Kopie speichern.'],
     limitation: 'Eine neu gespeicherte PDF-Datei kann vorhandene digitale Signaturen ungültig machen.',
-  },
+  }
+
+export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
+  merge: GERMAN_MERGE_COPY,
+  split: GERMAN_SPLIT_COPY,
+  rotate: GERMAN_ROTATE_COPY,
   'delete-pages': {
     title: 'PDF-Seiten entfernen — PDF Tools',
     heading: 'Seiten aus einem PDF entfernen',
