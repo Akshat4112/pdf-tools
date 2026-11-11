@@ -24,7 +24,7 @@ describe('PT-SEO-005 public metadata', () => {
       expect(repeated).toContain(`rel="canonical" href="${meta.canonical}"`)
     }
     const rotate = toolPageMeta(TOOLS.find(tool => tool.id === 'rotate')!)
-    expect(withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), rotate)).not.toContain('hreflang=')
+    expect(withPageMetadata(withPageMetadata(base, GERMAN_MERGE_META), rotate)).toContain('hreflang="de" href="https://akshat4112.github.io/pdf-tools/de/rotate/"')
     const tags = pageMetaTags(GERMAN_MERGE_META)
     expect(tags.find(tag => tag.key === 'og:image:alt')?.content).toContain('Kostenlose')
   })
