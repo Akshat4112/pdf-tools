@@ -1,10 +1,10 @@
-import { GERMAN_TOOL_SEO } from './germanToolSeo.ts'
+import { GERMAN_ROTATE_COPY } from './germanToolSeo.ts'
 import { germanToolLandingHtml } from './germanToolLanding.ts'
 import { escapeHtml } from './pageMetadata.ts'
 
 /** Public authored content only. Never interpolate a PDF, filename, or user input. */
 export function germanRotateArticleHtml(): string {
-  return germanToolLandingHtml({ id: 'rotate', route: '/rotate' }, GERMAN_TOOL_SEO.rotate, { includeHeader: false }) + `
+  return germanToolLandingHtml({ id: 'rotate', route: '/rotate' }, GERMAN_ROTATE_COPY, { includeHeader: false }) + `
   <section aria-labelledby="rotation-modes-de">
     <h2 id="rotation-modes-de">PDF-Seiten einzeln oder gemeinsam drehen</h2>
     <p>Wähle eine PDF-Datei und markiere die gewünschten Seiten in der Vorschau. Mit „Nach links drehen“ oder „Nach rechts drehen“ änderst du die Ausrichtung in 90-Grad-Schritten. Du kannst auch alle Seiten markieren. Bereits vorhandene Drehungen werden berücksichtigt.</p>
@@ -34,7 +34,7 @@ export function germanRotateArticleHtml(): string {
 }
 export function germanRotateStaticHtml(): string {
   return `<nav class="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">PDF drehen</span></nav>
-  <h1>${escapeHtml(GERMAN_TOOL_SEO.rotate.heading)}</h1>
-  <p>${escapeHtml(GERMAN_TOOL_SEO.rotate.description)}</p>
+  <h1>${escapeHtml(GERMAN_ROTATE_COPY.heading)}</h1>
+  <p>${escapeHtml(GERMAN_ROTATE_COPY.description)}</p>
   <p>Aktiviere JavaScript, um PDF-Seiten lokal im Browser zu drehen. Die Hinweise kannst du auch ohne JavaScript lesen.</p>` + germanRotateArticleHtml()
 }
