@@ -36,7 +36,7 @@ const DELETE_DE: Readonly<Record<string, string>> = {
 const EXTRACT_DE: Readonly<Record<string, string>> = {
   'Extract configuration': 'Einstellungen zum Extrahieren',
   'Choose pages to extract': 'Seiten zum Extrahieren auswählen',
-  'Pick thumbnails or enter ranges. Pages are extracted in the order you choose.': 'Wähle Seiten über die Miniaturen oder gib Seitenbereiche ein. Die Ausgabeseiten folgen der Reihenfolge im Original.',
+  'Pick thumbnails or enter ranges. Pages are extracted in the order you choose.': 'Wähle Seiten über die Miniaturen oder gib Seitenbereiche ein. Die Ausgabeseiten folgen deiner gewählten Reihenfolge.',
   'Pages to extract': 'Zu extrahierende Seiten',
   'Extraction preview': 'Vorschau der ausgewählten Seiten',
   'Extract pages': 'Ausgewählte Seiten extrahieren',
