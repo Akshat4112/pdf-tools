@@ -61,19 +61,22 @@ export const GERMAN_EXTRACT_COPY: GermanToolSeoCopy = {
   limitation: 'Nicht ausgewählte Seiten werden nicht übernommen. Das Ergebnis ist keine Datenschutzprüfung oder Schwärzung.',
 }
 
+/** Published Organize copy, kept separate from the unpublished tool inventory. */
+export const GERMAN_ORGANIZE_COPY: GermanToolSeoCopy = {
+  title: 'PDF-Seiten kostenlos organisieren — PDF Tools',
+  heading: 'PDF-Seiten organisieren',
+  description: 'Sortiere, drehe, dupliziere oder entferne PDF-Seiten und speichere eine neue Kopie im Browser.',
+  steps: ['PDF öffnen und Seitenvorschau prüfen.', 'Seiten sortieren, drehen, duplizieren oder entfernen.', 'Änderungen und Ausgabereihenfolge prüfen, Kopie speichern.'],
+  limitation: 'Digitale Signaturen können ungültig werden. Seiten entfernen ist keine sichere Schwärzung.',
+}
+
 export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   merge: GERMAN_MERGE_COPY,
   split: GERMAN_SPLIT_COPY,
   rotate: GERMAN_ROTATE_COPY,
   'delete-pages': GERMAN_DELETE_COPY,
   'extract-pages': GERMAN_EXTRACT_COPY,
-  organize: {
-    title: 'PDF-Seiten sortieren und organisieren — PDF Tools',
-    heading: 'PDF-Seiten neu anordnen',
-    description: 'Sortiere, drehe, dupliziere oder entferne PDF-Seiten. Prüfe das Ergebnis und speichere eine neue Datei.',
-    steps: ['PDF auswählen und Seitenvorschau prüfen.', 'Seiten verschieben, drehen, kopieren oder entfernen.', 'Änderungen kontrollieren und eine neue Kopie erstellen.'],
-    limitation: 'Interaktive Inhalte, Lesezeichen oder digitale Signaturen bleiben beim Umschreiben möglicherweise nicht erhalten.',
-  },
+  organize: GERMAN_ORGANIZE_COPY,
   'images-to-pdf': {
     title: 'JPG und PNG in PDF umwandeln — PDF Tools',
     heading: 'Bilder in eine PDF-Datei umwandeln',
