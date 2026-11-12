@@ -26,6 +26,7 @@ import { GERMAN_SPLIT_META } from '../lib/germanSplitMeta'
 import { GERMAN_ROTATE_META } from '../lib/germanRotateMeta'
 import { GERMAN_DELETE_META } from '../lib/germanDeleteMeta'
 import { GERMAN_EXTRACT_META } from '../lib/germanExtractMeta'
+import { GERMAN_ORGANIZE_META } from '../lib/germanOrganizeMeta'
 import { setLocale } from '../i18n'
 import { applyMeta, CATALOG_META, NOT_FOUND_META, SITE_BASE, toolPageMeta } from '../lib/seo'
 
@@ -65,6 +66,7 @@ export function parsePath(pathname: string): Route {
     if (localized.path === '/rotate') return { name: 'rotate', path: '/rotate', locale: 'de' }
     if (localized.path === '/delete-pages') return { name: 'delete-pages', path: '/delete-pages', locale: 'de' }
     if (localized.path === '/extract-pages') return { name: 'extract-pages', path: '/extract-pages', locale: 'de' }
+    if (localized.path === '/organize') return { name: 'organize', path: '/organize', locale: 'de' }
     return { name: 'not-found', path: pathname }
   }
   const p = routePathOf(pathname)
@@ -90,6 +92,7 @@ export function metaForRoute(route: Route): typeof CATALOG_META {
   if (route.name === 'rotate' && route.locale === 'de') return GERMAN_ROTATE_META
   if (route.name === 'delete-pages' && route.locale === 'de') return GERMAN_DELETE_META
   if (route.name === 'extract-pages' && route.locale === 'de') return GERMAN_EXTRACT_META
+  if (route.name === 'organize' && route.locale === 'de') return GERMAN_ORGANIZE_META
   if (route.name === 'catalog') return CATALOG_META
   if (route.name === 'not-found') return NOT_FOUND_META
   const info = infoPageMeta(route.path)
