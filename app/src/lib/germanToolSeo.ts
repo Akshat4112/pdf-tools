@@ -70,6 +70,15 @@ export const GERMAN_ORGANIZE_COPY: GermanToolSeoCopy = {
   limitation: 'Digitale Signaturen können ungültig werden. Seiten entfernen ist keine sichere Schwärzung.',
 }
 
+/** Reviewed Images-to-PDF copy independent from future tool localization. */
+export const GERMAN_IMAGES_TO_PDF_COPY: GermanToolSeoCopy = {
+  title: 'Bilder kostenlos in PDF umwandeln — PDF Tools',
+  heading: 'JPG und PNG in PDF umwandeln',
+  description: 'Füge JPG- oder PNG-Bilder zu einer PDF-Datei zusammen und wähle Format, Anpassung und Ränder direkt im Browser.',
+  steps: ['JPG- oder PNG-Bilder auswählen und sortieren.', 'Seitengröße, Ausrichtung, Anpassung und Ränder einstellen.', 'Vorschau prüfen und PDF-Kopie herunterladen.'],
+  limitation: 'Bilder werden als Seiten eingebettet, ohne automatische Texterkennung. Transparente Bildbereiche werden weiß dargestellt.',
+}
+
 export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   merge: GERMAN_MERGE_COPY,
   split: GERMAN_SPLIT_COPY,
@@ -77,13 +86,7 @@ export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   'delete-pages': GERMAN_DELETE_COPY,
   'extract-pages': GERMAN_EXTRACT_COPY,
   organize: GERMAN_ORGANIZE_COPY,
-  'images-to-pdf': {
-    title: 'JPG und PNG in PDF umwandeln — PDF Tools',
-    heading: 'Bilder in eine PDF-Datei umwandeln',
-    description: 'Füge JPG- oder PNG-Bilder zu einem PDF zusammen. Wähle Reihenfolge, Seitengröße und Ränder im Browser.',
-    steps: ['JPG- oder PNG-Bilder auswählen.', 'Reihenfolge, Seitengröße und Anpassung festlegen.', 'Vorschau prüfen und PDF speichern.'],
-    limitation: 'Die Bilder werden als Seiten eingebettet; dadurch entsteht nicht automatisch durchsuchbarer Text.',
-  },
+  'images-to-pdf': GERMAN_IMAGES_TO_PDF_COPY,
   'pdf-to-jpg': {
     title: 'PDF-Seiten in JPG umwandeln — PDF Tools',
     heading: 'PDF als JPG-Bilder exportieren',
