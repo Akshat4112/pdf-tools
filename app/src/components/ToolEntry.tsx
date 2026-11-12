@@ -99,23 +99,6 @@ function ToolContent({ tool, onExit }: { tool: ToolDefinition; onExit: () => voi
 }
 
 
-const TOOL_HELP: Record<ToolDefinition['id'], string> = {
-  merge: 'Select two or more PDFs, arrange them, merge and download the verified copy. Originals are unchanged.',
-  split: 'Choose a PDF, split by ranges, every N pages or single pages, review the parts and download the ZIP.',
-  rotate: 'Select PDF pages, rotate in 90-degree steps, review and save a new copy.',
-  'delete-pages': 'Mark PDF pages for removal, confirm the review and create a copy. Keep at least one page.',
-  'extract-pages': 'Select PDF pages by thumbnail or range. Review their order, then create a new PDF.',
-  organize: 'Reorder, rotate, duplicate or remove PDF pages. Undo, review and save a new copy.',
-  'images-to-pdf': 'Choose JPG/PNG images, set order, page size, fit and margins. Review, then create a PDF with one image per page.',
-  'pdf-to-jpg': 'Choose PDF pages, set JPG resolution and quality, then download individual images or a ZIP.',
-  'pdf-to-png': 'Choose PDF pages, set PNG resolution and background, then download images or a ZIP.',
-  reader: 'Read, zoom, search existing PDF text, copy or print. Image-only pages require OCR.',
-  'page-numbers': 'Set PDF page numbers, start value, position and style. Review before applying.',
-  watermark: 'Set watermark text, position, opacity and pages. Review; watermarks do not redact content.',
-  'pdf-to-text': 'Export the existing PDF text layer as UTF-8 TXT. Scanned pages require OCR.',
-  'doc-info': 'Inspect PDF metadata and dimensions. Locked PDFs yield limited results; signature indicators do not verify authenticity.',
-}
-
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t, locale } = useLocale()
@@ -126,7 +109,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
-        <p>{germanTool && tool.id === 'images-to-pdf' ? 'Wähle und sortiere JPG/PNG-Bilder, stelle Format und Ränder ein, prüfe die Vorschau und speichere die PDF.' : t(TOOL_HELP[tool.id])}</p>
+        <p>{t(tool.description)}</p>
         <p>{t("Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.")}</p>
       </details> : null}
     </div>
