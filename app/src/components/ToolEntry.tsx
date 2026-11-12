@@ -18,6 +18,7 @@ import { breadcrumbHtml, hubForTool } from '../lib/categoryHubs'
 
 import type { ToolDefinition } from '../registry'
 import { SITE_BASE } from '../lib/seo'
+import { hasGermanPage } from '../lib/localizedRoutes'
 const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: module.MergeTool })))
 const GermanMergeGuide = lazy(() => import('./GermanMergeGuide'))
 const GermanSplitGuide = lazy(() => import('./GermanSplitGuide'))
@@ -117,7 +118,7 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t, locale } = useLocale()
-  const germanTool = locale === 'de' && (tool.id === 'merge' || tool.id === 'split' || tool.id === 'rotate' || tool.id === 'delete-pages' || tool.id === 'extract-pages' || tool.id === 'organize')
+  const germanTool = locale === 'de' && hasGermanPage(tool.route)
   return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
       {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{tool.id === 'merge' ? 'PDFs zusammenfügen' : tool.id === 'split' ? 'PDF teilen' : tool.id === 'rotate' ? 'PDF drehen' : tool.id === 'delete-pages' ? 'PDF-Seiten entfernen' : tool.id === 'extract-pages' ? 'PDF-Seiten extrahieren' : 'PDF-Seiten organisieren'}</span></nav>
