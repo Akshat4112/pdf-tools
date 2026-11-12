@@ -121,7 +121,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
   const germanTool = locale === 'de' && hasGermanPage(tool.route)
   return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
-      {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{tool.id === 'merge' ? 'PDFs zusammenfügen' : tool.id === 'split' ? 'PDF teilen' : tool.id === 'rotate' ? 'PDF drehen' : tool.id === 'delete-pages' ? 'PDF-Seiten entfernen' : tool.id === 'extract-pages' ? 'PDF-Seiten extrahieren' : 'PDF-Seiten organisieren'}</span></nav>
+      {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{t(tool.title)}</span></nav>
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
