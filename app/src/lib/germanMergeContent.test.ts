@@ -17,6 +17,7 @@ describe('first complete German Merge page', () => {
     expect(hasGermanPage('/delete-pages')).toBe(true)
     expect(hasGermanPage('/extract-pages')).toBe(true)
     expect(hasGermanPage('/organize')).toBe(true)
+    expect(hasGermanPage('/images-to-pdf')).toBe(true)
     const merge = approvedLanguageAlternates('https://akshat4112.github.io/pdf-tools/de/merge/')
     expect(merge.map(x => x.href)).toEqual(['https://akshat4112.github.io/pdf-tools/merge/', 'https://akshat4112.github.io/pdf-tools/de/merge/', 'https://akshat4112.github.io/pdf-tools/merge/'])
     expect(approvedLanguageAlternates('https://akshat4112.github.io/pdf-tools/rotate/')).toHaveLength(3)
