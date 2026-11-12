@@ -4,7 +4,7 @@ export { GERMAN_CATALOG_META } from './germanCatalogMeta.ts'
 
 /**
  * PT-SEO-010: German catalog is the first fully authored localized page.
- * Merge, Split, Rotate, Delete Pages, Extract Pages and Organize have translated workflows; other tools and legal/help routes remain
+ * Merge, Split, Rotate, Delete Pages, Extract Pages, Organize and Images to PDF have translated workflows; other tools and legal/help routes remain
  * at existing English canonical URLs and are explicitly labelled as such here.
  * Never add untranslated tools or policy pages to the German sitemap.
  */
