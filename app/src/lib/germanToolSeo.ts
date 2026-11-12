@@ -56,8 +56,8 @@ export const GERMAN_DELETE_COPY: GermanToolSeoCopy = {
 export const GERMAN_EXTRACT_COPY: GermanToolSeoCopy = {
   title: 'PDF-Seiten kostenlos extrahieren — PDF Tools',
   heading: 'Ausgewählte PDF-Seiten extrahieren',
-  description: 'Wähle bestimmte PDF-Seiten aus und speichere sie in einer neuen Datei, kostenlos und im Browser.',
-  steps: ['PDF auswählen und Seiten ansehen.', 'Gewünschte Seiten markieren und Reihenfolge prüfen.', 'Neue Datei erstellen, prüfen und speichern.'],
+  description: 'Extrahiere ausgewählte PDF-Seiten kostenlos in eine neue Datei, direkt im Browser.',
+  steps: ['PDF auswählen und Seiten prüfen.', 'Seiten markieren und Reihenfolge prüfen.', 'Neue PDF-Datei prüfen und speichern.'],
   limitation: 'Nicht ausgewählte Seiten werden nicht übernommen. Das Ergebnis ist keine Datenschutzprüfung oder Schwärzung.',
 }
 
