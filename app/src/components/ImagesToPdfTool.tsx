@@ -16,8 +16,47 @@ interface ImageFile extends WorkspaceFile { metadata?: ImageMetadata }
 const PER_VIEW = 8
 const IMAGE_LABELS = { browse: 'Choose images', dropzone: 'Drop JPG or PNG images here', emptyHint: 'No images selected yet.', limits: 'Static JPG/PNG only · 300 images · 50 MB total · 16 million pixels per image · 25.6 million pixels total · processed locally' }
 
+/** Images-to-PDF tool copy remains lazy so the catalog bundle stays within budget. */
+const IMAGES_TO_PDF_DE: Readonly<Record<string, string>> = {
+  'Set up your pages': 'PDF-Seiten einrichten',
+  'One image per page, in the order above. Use the arrows to move images earlier or later.': 'Ein Bild pro Seite in der angegebenen Reihenfolge. Verwende die Pfeile, um Bilder zu verschieben.',
+  'Page size': 'Seitengröße',
+  'Letter': 'Letter',
+  'Original image size': 'Originalbildgröße',
+  'Page orientation': 'Seitenausrichtung',
+  'Auto — match each image': 'Automatisch nach Bild',
+  'Portrait': 'Hochformat',
+  'Landscape': 'Querformat',
+  'Image fit': 'Bildanpassung',
+  'Fit entire image': 'Ganzes Bild einpassen',
+  'Fill page — crop edges': 'Seite füllen – Ränder abschneiden',
+  'Margins (points)': 'Seitenränder (Punkte)',
+  'Original size DPI': 'Originalgröße (DPI)',
+  'Transparent areas and page margins are white. Color profiles may look different in the PDF.': 'Transparente Bereiche und Seitenränder sind weiß. Farbprofile können in der PDF anders aussehen.',
+  'Page layout preview': 'Vorschau des Seitenlayouts',
+  'The preview uses your page size, margins, fit and image orientation. Review every page before creating your PDF.': 'Die Vorschau berücksichtigt Seitengröße, Ränder, Bildanpassung und Ausrichtung. Prüfe jede Seite vor dem Export.',
+  'Previous images': 'Vorherige Bilder',
+  'Next images': 'Nächste Bilder',
+  'Create your PDF': 'PDF-Datei erstellen',
+  'Create PDF': 'PDF erstellen',
+  'Creating your PDF': 'PDF-Datei wird erstellt',
+  'Adjust settings': 'Einstellungen anpassen',
+}
+const IMAGE_LABELS_DE = {
+  browse: 'Bilder auswählen',
+  dropzone: 'JPG- oder PNG-Bilder hier ablegen',
+  emptyHint: 'Noch keine Bilder ausgewählt.',
+  limits: 'Statische JPG/PNG · max. 300 Bilder · 50 MiB insgesamt · 16 Millionen Pixel pro Bild · 25,6 Millionen Pixel insgesamt · lokale Verarbeitung',
+  clear: 'Dateien entfernen',
+  moveUp: 'Früher platzieren',
+  moveDown: 'Später platzieren',
+  remove: 'Dieses Bild entfernen',
+}
+
 export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
-  const { t } = useLocale()
+  const { t: baseT, locale } = useLocale()
+  const german = locale === 'de'
+  const t = (message: string) => german ? (IMAGES_TO_PDF_DE[message] ?? baseT(message)) : baseT(message)
   const tool = getTool('images-to-pdf')
   const [files, setFiles] = useState<ImageFile[]>([])
   const [options, setOptions] = useState<ImagePdfOptions>({ ...DEFAULT_IMAGE_OPTIONS })
@@ -92,8 +131,8 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
   return <div className="tool-screen images-to-pdf-tool">
     <header className="tool-header"><h1 className="tool-heading">{t(tool.title)}</h1><p className="tool-subtitle">{t(tool.description)}</p></header>
     {phase === 'configure' ? <>
-      <FileSelection expected="jpeg" multiple files={files} onChange={changeFiles} labels={IMAGE_LABELS} maxFiles={QUOTAS.maxPages} maxTotalBytes={IMAGE_LIMITS.totalBytes} />
-      {layout.count ? <section className="panel" aria-label="Image page settings">
+      <FileSelection expected="jpeg" multiple files={files} onChange={changeFiles} labels={german ? IMAGE_LABELS_DE : IMAGE_LABELS} maxFiles={QUOTAS.maxPages} maxTotalBytes={IMAGE_LIMITS.totalBytes} />
+      {layout.count ? <section className="panel" aria-label={german ? 'Einstellungen für PDF-Seiten' : 'Image page settings'}>
         <h2 className="panel-title">{t("Set up your pages")}</h2>
         <p className="panel-summary">{t("One image per page, in the order above. Use the arrows to move images earlier or later.")}</p>
         <div className="image-settings-grid">
@@ -111,26 +150,26 @@ export function ImagesToPdfTool({ onExit }: { onExit?: () => void }) {
             {QUOTAS.renderDpis.map(dpi => <option key={dpi} value={dpi}>{dpi} DPI</option>)}
           </select></label> : null}
         </div>
-        <p id="image-layout-help" className="panel-hint">72 points = 1 inch. Auto orientation honors camera rotation. Original size uses the selected DPI plus margins. Fit keeps the whole image; Fill crops the center to the area inside the margins.</p>
+        <p id="image-layout-help" className="panel-hint">{german ? '72 Punkte = 1 Zoll. Die automatische Ausrichtung berücksichtigt die Kameradrehung. Die Originalgröße verwendet die DPI-Einstellung und Seitenränder. Einpassen zeigt das ganze Bild, Füllen schneidet Ränder ab.' : '72 points = 1 inch. Auto orientation honors camera rotation. Original size uses the selected DPI plus margins. Fit keeps the whole image; Fill crops the center to the area inside the margins.'}</p>
         <p className="panel-hint">{t("Transparent areas and page margins are white. Color profiles may look different in the PDF.")}</p>
-        <p id="image-layout-status" className="page-selection-status" role={layout.error ? 'alert' : 'status'}>{layout.error ? layout.error.message : `${layout.count} image${layout.count === 1 ? '' : 's'} → ${layout.count} page${layout.count === 1 ? '' : 's'}`}</p>
+        <p id="image-layout-status" className="page-selection-status" role={layout.error ? 'alert' : 'status'}>{layout.error ? t(layout.error.message) : german ? `${layout.count} Bilder → ${layout.count} Seiten` : `${layout.count} image${layout.count === 1 ? '' : 's'} → ${layout.count} page${layout.count === 1 ? '' : 's'}`}</p>
       </section> : null}
-      {visible.length ? <section className="panel" aria-label="Page layout previews">
+      {visible.length ? <section className="panel" aria-label={german ? 'Vorschau des Seitenlayouts' : 'Page layout previews'}>
         <h2 className="panel-title">{t("Page layout preview")}</h2>
         <p className="panel-summary">{t("The preview uses your page size, margins, fit and image orientation. Review every page before creating your PDF.")}</p>
-        <ImageLayoutPreviews key={previewKey} items={visible} onError={previewError} />
-        <nav className="page-pagination" aria-label="Image preview pages">
+        <ImageLayoutPreviews key={previewKey} items={visible} onError={previewError} locale={locale} />
+        <nav className="page-pagination" aria-label={german ? 'Bildvorschau-Seiten' : 'Image preview pages'}>
           <button type="button" className="btn-ghost" disabled={start === 0} onClick={() => setViewStart(start - PER_VIEW)}>{t("Previous images")}</button>
-          <span>Pages {start + 1}–{Math.min(start + PER_VIEW, layout.items.length)} of {layout.items.length}</span>
+          <span>{german ? 'Seiten' : 'Pages'} {start + 1}–{Math.min(start + PER_VIEW, layout.items.length)} {german ? 'von' : 'of'} {layout.items.length}</span>
           <button type="button" className="btn-ghost" disabled={start + PER_VIEW >= layout.items.length} onClick={() => setViewStart(start + PER_VIEW)}>{t("Next images")}</button>
         </nav>
       </section> : null}
-      <PreviewPanel title="Create your PDF" summary={canRun ? `${layout.count} image${layout.count === 1 ? '' : 's'} will become one ${layout.count}-page PDF.` : 'Choose JPG or PNG images and valid page settings to continue.'}
-        details={canRun ? [`Output order: ${layout.items.map(item => item.displayName).join(' → ')}`, ...(files.some(file => file.error) ? ['Files marked with errors are left out. Remove them or choose a replacement.'] : []), 'Your original images stay untouched. Processing stays on your device.'] : undefined}
-        actionLabel="Create PDF" onConfirm={run} onCancel={onExit} disabled={!canRun} disabledReason={layout.error?.message ?? 'No valid images selected yet.'} />
+      <PreviewPanel title={t('Create your PDF')} summary={canRun ? (german ? `Aus ${layout.count} Bildern wird eine PDF mit ${layout.count} Seiten erstellt.` : `${layout.count} image${layout.count === 1 ? '' : 's'} will become one ${layout.count}-page PDF.`) : (german ? 'Wähle JPG- oder PNG-Bilder sowie gültige Seiteneinstellungen aus.' : 'Choose JPG or PNG images and valid page settings to continue.')}
+        details={canRun ? [german ? `Ausgabereihenfolge: ${layout.items.map(item => item.displayName).join(' → ')}` : `Output order: ${layout.items.map(item => item.displayName).join(' → ')}`, ...(files.some(file => file.error) ? [german ? 'Bilder mit Fehlern werden ausgelassen. Entferne oder ersetze sie.' : 'Files marked with errors are left out. Remove them or choose a replacement.'] : []), german ? 'Deine Originalbilder bleiben unverändert. Die Verarbeitung erfolgt auf deinem Gerät.' : 'Your original images stay untouched. Processing stays on your device.'] : undefined}
+        actionLabel={t('Create PDF')} onConfirm={run} onCancel={onExit} disabled={!canRun} disabledReason={layout.error ? t(layout.error.message) : german ? 'Noch keine gültigen Bilder ausgewählt.' : 'No valid images selected yet.'} />
     </> : null}
-    {phase === 'processing' ? <ProcessingPanel label="Creating your PDF" progress={progress} onCancel={() => job.current?.cancel()} /> : null}
-    {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel="Adjust settings" onReset={reset} onContinue={onExit} /> : null}
+    {phase === 'processing' ? <ProcessingPanel label={t('Creating your PDF')} progress={progress} onCancel={() => job.current?.cancel()} /> : null}
+    {phase === 'result' && result ? <ResultPanel outputs={[result]} onDownload={download} onRetry={resetJob} retryLabel={t('Adjust settings')} onReset={reset} onContinue={onExit} /> : null}
     {phase === 'failed' && error ? <FailurePanel error={error} onRetry={resetJob} onReset={reset} /> : null}
     {phase === 'cancelled' ? <CancelledPanel onReset={reset} onAdjust={resetJob} /> : null}
   </div>
