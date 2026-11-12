@@ -32,12 +32,29 @@ const DELETE_DE: Readonly<Record<string, string>> = {
   'This PDF has no pages.': 'Dieses PDF hat keine Seiten.',
 }
 
+/** Extract-specific strings stay in this lazy workspace chunk, not the catalog. */
+const EXTRACT_DE: Readonly<Record<string, string>> = {
+  'Extract configuration': 'Einstellungen zum Extrahieren',
+  'Choose pages to extract': 'Seiten zum Extrahieren auswählen',
+  'Pick thumbnails or enter ranges. Pages are extracted in the order you choose.': 'Wähle Seiten über die Miniaturen oder gib Seitenbereiche ein. Die Ausgabeseiten folgen der Reihenfolge im Original.',
+  'Pages to extract': 'Zu extrahierende Seiten',
+  'Extraction preview': 'Vorschau der ausgewählten Seiten',
+  'Extract pages': 'Ausgewählte Seiten extrahieren',
+  'Choose a PDF to select pages. Processing stays on your device.': 'Wähle ein PDF zum Extrahieren. Die Verarbeitung erfolgt auf deinem Gerät.',
+  'Choose a valid page selection to review the new copy.': 'Wähle gültige Seiten aus, um die neue PDF-Datei zu prüfen.',
+  'Choose a valid page selection above.': 'Wähle oben gültige Seiten aus.',
+  'Extracting selected pages': 'Ausgewählte Seiten werden extrahiert',
+  'Your original file stays untouched. Changes can invalidate digital signatures.': 'Das Original bleibt unverändert. Die neue Datei kann digitale Signaturen ungültig machen.',
+  'Reading the document…': 'Dokument wird gelesen …',
+}
+
 const THUMBNAILS_PER_VIEW = 8
 
 export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; onExit?: () => void }) {
   const { t: baseT, locale } = useLocale()
   const germanDelete = locale === 'de' && mode === 'delete-pages'
-  const t = (message: string) => germanDelete ? (DELETE_DE[message] ?? baseT(message)) : baseT(message)
+  const germanExtract = locale === 'de' && mode === 'extract-pages'
+  const t = (message: string) => germanDelete ? (DELETE_DE[message] ?? baseT(message)) : germanExtract ? (EXTRACT_DE[message] ?? baseT(message)) : baseT(message)
   const tool = getTool(mode)
   const deleting = mode === 'delete-pages'
   const [files, setFiles] = useState<WorkspaceFile[]>([])
@@ -185,27 +202,27 @@ export function PageSelectionTool({ mode, onExit }: { mode: PageSelectionMode; o
                   <div className="page-grid" role="group" aria-label={t(deleting ? 'Pages to remove' : 'Pages to extract')}>
                     {Array.from({ length: Math.min(THUMBNAILS_PER_VIEW, doc.numPages - viewStart) }, (_, i) => viewStart + i + 1).map((page) => (
                       <PageThumbnail key={`${selected.id}:${page}`} doc={doc} pageNumber={page} selected={picked.has(page)} deleting={deleting}
-                        label={germanDelete ? `Seite ${page}` : undefined} caption={germanDelete ? `Seite ${page}` : undefined}
+                        label={germanDelete || germanExtract ? `Seite ${page}` : undefined} caption={germanDelete || germanExtract ? `Seite ${page}` : undefined} detail={germanExtract ? (picked.has(page) ? 'Ausgewählt' : 'Auswählen') : germanDelete ? (picked.has(page) ? 'Entfernen' : 'Auswählen') : undefined}
                         onToggle={() => updateExpression(togglePage(expression, page, doc.numPages))} />
                     ))}
                   </div>
                   <nav className="page-pagination" aria-label={t("Thumbnail pages")}>
                     <button type="button" className="btn-ghost" disabled={viewStart === 0} onClick={() => setViewStart((p) => p - THUMBNAILS_PER_VIEW)}>{t("Previous pages")}</button>
-                    <span>{germanDelete ? `Seiten ${viewStart + 1}–${Math.min(viewStart + THUMBNAILS_PER_VIEW, doc.numPages)} von ${doc.numPages}` : `Pages ${viewStart + 1}–${Math.min(viewStart + THUMBNAILS_PER_VIEW, doc.numPages)} of ${doc.numPages}`}</span>
+                    <span>{germanDelete || germanExtract ? `Seiten ${viewStart + 1}–${Math.min(viewStart + THUMBNAILS_PER_VIEW, doc.numPages)} von ${doc.numPages}` : `Pages ${viewStart + 1}–${Math.min(viewStart + THUMBNAILS_PER_VIEW, doc.numPages)} of ${doc.numPages}`}</span>
                     <button type="button" className="btn-ghost" disabled={viewStart + THUMBNAILS_PER_VIEW >= doc.numPages} onClick={() => setViewStart((p) => p + THUMBNAILS_PER_VIEW)}>{t("Next pages")}</button>
                   </nav>
                 </>
               ) : null}
               <p id="page-selection-status" className="page-selection-status" role={readError ? 'alert' : 'status'}>
-                {readError ? t(readError.message) : !doc ? t('Reading the document…') : selection.error ? t(selection.error.message) : germanDelete ? `${selection.pages.length} ausgewählt · ${selection.output.length} Seiten im Ergebnis` : `${selection.pages.length} selected · ${selection.output.length} pages in the output`}
+                {readError ? t(readError.message) : !doc ? t('Reading the document…') : selection.error ? t(selection.error.message) : germanDelete || germanExtract ? `${selection.pages.length} ausgewählt · ${selection.output.length} Seiten im Ergebnis` : `${selection.pages.length} selected · ${selection.output.length} pages in the output`}
               </p>
             </section>
           ) : null}
           <PreviewPanel title={t(deleting ? 'Deletion preview' : 'Extraction preview')}
-            summary={!selected ? t('Choose a PDF to select pages. Processing stays on your device.') : !valid ? t('Choose a valid page selection to review the new copy.') : germanDelete ? `Eine PDF-Datei mit ${selection.output.length} Seiten wird erstellt.` : `${selection.output.length}-page PDF will be created.`}
+            summary={!selected ? t('Choose a PDF to select pages. Processing stays on your device.') : !valid ? t('Choose a valid page selection to review the new copy.') : germanDelete || germanExtract ? `Eine PDF-Datei mit ${selection.output.length} Seiten wird erstellt.` : `${selection.output.length}-page PDF will be created.`}
             details={valid ? [
               ...(deleting ? [germanDelete ? `Zu entfernende Seiten: ${selection.pages.join(', ')}` : `Pages to remove: ${selection.pages.join(', ')}`] : []),
-              germanDelete ? `Reihenfolge im Ergebnis: ${selection.output.join(', ')}` : `Output order: ${selection.output.join(', ')}`, 
+              germanDelete || germanExtract ? `Reihenfolge im Ergebnis: ${selection.output.join(', ')}` : `Output order: ${selection.output.join(', ')}`, 
               t('Your original file stays untouched. Changes can invalidate digital signatures.'),
             ] : undefined}
             actionLabel={t(deleting ? 'Create copy without selected pages' : 'Extract pages')}
