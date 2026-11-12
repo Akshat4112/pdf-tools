@@ -68,7 +68,7 @@ export function applyMeta(meta: PageMeta): void {
       document.head.appendChild(link)
   }
   const desired = meta.canonical
-  const german = desired.startsWith(SITE_URL + 'de/')
+  const german = desired.includes('/pdf-tools/de/')
   document.documentElement.lang = german ? 'de' : 'en'
   document.querySelector('.fl-footer-navigation')?.setAttribute('aria-label', german ? 'Links zu PDF Tools' : 'PDF Tools links')
   // The footer is outside React and survives SPA transitions. Route its
