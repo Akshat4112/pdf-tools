@@ -22,6 +22,7 @@ const MergeTool = lazy(() => import('./MergeTool').then(module => ({ default: mo
 const GermanMergeGuide = lazy(() => import('./GermanMergeGuide'))
 const GermanSplitGuide = lazy(() => import('./GermanSplitGuide'))
 const GermanRotateGuide = lazy(() => import('./GermanRotateGuide'))
+const GermanDeleteGuide = lazy(() => import('./GermanDeleteGuide'))
 const EnglishToolGuide = lazy(() => import('./EnglishToolGuide'))
 const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
 const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
@@ -114,10 +115,10 @@ const TOOL_HELP: Record<ToolDefinition['id'], string> = {
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t, locale } = useLocale()
-  const germanTool = locale === 'de' && (tool.id === 'merge' || tool.id === 'split' || tool.id === 'rotate')
+  const germanTool = locale === 'de' && (tool.id === 'merge' || tool.id === 'split' || tool.id === 'rotate' || tool.id === 'delete-pages')
   return <main tabIndex={-1} id="main-content" className="tool-workspace">
     <div className="workspace-context">
-      {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{tool.id === 'merge' ? 'PDFs zusammenfügen' : tool.id === 'split' ? 'PDF teilen' : 'PDF drehen'}</span></nav>
+      {germanTool ? <nav className="workspace-breadcrumb" aria-label="Brotkrumennavigation"><a href="/pdf-tools/de/">Alle PDF-Werkzeuge</a><span aria-hidden="true">/</span><span aria-current="page">{tool.id === 'merge' ? 'PDFs zusammenfügen' : tool.id === 'split' ? 'PDF teilen' : tool.id === 'rotate' ? 'PDF drehen' : 'PDF-Seiten entfernen'}</span></nav>
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
@@ -131,7 +132,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       </Suspense>
     </ToolLoadBoundary>
     {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanTool ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
-      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : <GermanRotateGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
+      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : tool.id === 'rotate' ? <GermanRotateGuide /> : <GermanDeleteGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
     </ToolLoadBoundary> : null}
   </main>
 }

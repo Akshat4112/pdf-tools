@@ -43,17 +43,20 @@ export const GERMAN_ROTATE_COPY: GermanToolSeoCopy = {
     limitation: 'Eine neu gespeicherte PDF-Datei kann vorhandene digitale Signaturen ungültig machen.',
   }
 
+/** Reviewed Delete Pages copy; importing this alone does not pull the unpublished inventory. */
+export const GERMAN_DELETE_COPY: GermanToolSeoCopy = {
+  title: 'PDF-Seiten entfernen — PDF Tools',
+  heading: 'Seiten aus einem PDF entfernen',
+  description: 'Entferne ganze Seiten aus einer PDF-Kopie, prüfe die Auswahl und lade das Ergebnis kostenlos herunter.',
+  steps: ['PDF auswählen und Seitenübersicht öffnen.', 'Zu entfernende Seiten markieren und Auswahl prüfen.', 'Neue PDF-Kopie erstellen und kontrollieren.'],
+  limitation: 'Seiten entfernen ist keine sichere Schwärzung. Inhalte können an anderer Stelle im Dokument verbleiben.',
+}
+
 export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   merge: GERMAN_MERGE_COPY,
   split: GERMAN_SPLIT_COPY,
   rotate: GERMAN_ROTATE_COPY,
-  'delete-pages': {
-    title: 'PDF-Seiten entfernen — PDF Tools',
-    heading: 'Seiten aus einem PDF entfernen',
-    description: 'Entferne ganze Seiten aus einer PDF-Kopie, prüfe die Auswahl und lade das Ergebnis kostenlos herunter.',
-    steps: ['PDF auswählen und Seitenübersicht öffnen.', 'Zu entfernende Seiten markieren und Auswahl prüfen.', 'Neue PDF-Kopie erstellen und kontrollieren.'],
-    limitation: 'Seiten entfernen ist keine sichere Schwärzung. Inhalte können an anderer Stelle im Dokument verbleiben.',
-  },
+  'delete-pages': GERMAN_DELETE_COPY,
   'extract-pages': {
     title: 'PDF-Seiten kostenlos extrahieren — PDF Tools',
     heading: 'Ausgewählte PDF-Seiten extrahieren',
