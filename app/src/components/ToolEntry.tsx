@@ -126,7 +126,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
-        <p>{t(TOOL_HELP[tool.id])}</p>
+        <p>{germanTool && tool.id === 'images-to-pdf' ? 'Wähle JPG- oder PNG-Bilder, sortiere sie und stelle Seitengröße, Bildanpassung und Ränder ein. Prüfe anschließend die Vorschau und speichere die PDF-Datei.' : t(TOOL_HELP[tool.id])}</p>
         <p>{t("Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.")}</p>
       </details> : null}
     </div>
