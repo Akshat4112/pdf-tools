@@ -586,7 +586,13 @@ a.tool-card:focus-visible { outline: none; box-shadow: var(--focus); }
 .organize-move-field input[aria-invalid="true"] { border-color: var(--warn); }
 .organize-move-field .btn-ghost { margin-top: 0; }
 .organize-tool .panel-details { overflow-wrap: anywhere; }
-@media (max-width: 540px) { .organize-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 540px) {
+  .organize-grid { grid-template-columns: minmax(0, 1fr); }
+  /* Accessible alternatives to drag-and-drop: finger-size controls without horizontal overflow. */
+  .organize-card-actions .btn-ghost { min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .organize-card-actions .organize-drag { min-width: 52px; }
+  .organize-move-field .btn-ghost { min-height: 44px; }
+}
 
 /* Images to PDF: shared geometry rendered on eight bounded white paper canvases. */
 .image-settings-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
