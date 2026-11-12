@@ -101,8 +101,8 @@ function ToolContent({ tool, onExit }: { tool: ToolDefinition; onExit: () => voi
 const TOOL_HELP: Record<ToolDefinition['id'], string> = {
   merge: 'Select two or more PDFs, arrange them, merge and download the verified copy. Originals are unchanged.',
   split: 'Choose a PDF, split by ranges, every N pages or single pages, review the parts and download the ZIP.',
-  rotate: 'Choose a PDF, select pages and rotate them in 90-degree steps. Review the preview and create a new copy.',
-  'delete-pages': 'Choose a PDF and mark the pages to remove. Confirm the deletion review before creating a new copy. Keep at least one page.',
+  rotate: 'Select PDF pages, rotate in 90-degree steps, review and save a new copy.',
+  'delete-pages': 'Mark PDF pages for removal, confirm the review and create a copy. Keep at least one page.',
   'extract-pages': 'Choose a PDF and select pages using thumbnails or page ranges. Review the output order before creating a new PDF.',
   organize: 'Reorder, rotate, duplicate or remove PDF pages. Undo, review and save a new copy.',
   'images-to-pdf': 'Choose JPG or PNG images, arrange their order and set page size, fit and margins. Review the layout, then create one PDF with one image per page.',
