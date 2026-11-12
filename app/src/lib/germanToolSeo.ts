@@ -52,18 +52,21 @@ export const GERMAN_DELETE_COPY: GermanToolSeoCopy = {
   limitation: 'Seiten entfernen ist keine sichere Schwärzung. Inhalte können an anderer Stelle im Dokument verbleiben.',
 }
 
+/** Released Extract Pages metadata isolated from the untranslated inventory. */
+export const GERMAN_EXTRACT_COPY: GermanToolSeoCopy = {
+  title: 'PDF-Seiten kostenlos extrahieren — PDF Tools',
+  heading: 'Ausgewählte PDF-Seiten extrahieren',
+  description: 'Extrahiere ausgewählte PDF-Seiten kostenlos in eine neue Datei, direkt im Browser.',
+  steps: ['PDF auswählen und Seiten prüfen.', 'Seiten markieren und Reihenfolge prüfen.', 'Neue PDF-Datei prüfen und speichern.'],
+  limitation: 'Nicht ausgewählte Seiten werden nicht übernommen. Das Ergebnis ist keine Datenschutzprüfung oder Schwärzung.',
+}
+
 export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   merge: GERMAN_MERGE_COPY,
   split: GERMAN_SPLIT_COPY,
   rotate: GERMAN_ROTATE_COPY,
   'delete-pages': GERMAN_DELETE_COPY,
-  'extract-pages': {
-    title: 'PDF-Seiten kostenlos extrahieren — PDF Tools',
-    heading: 'Ausgewählte PDF-Seiten extrahieren',
-    description: 'Wähle bestimmte PDF-Seiten aus und speichere sie in einer neuen Datei, kostenlos und im Browser.',
-    steps: ['PDF auswählen und Seiten ansehen.', 'Gewünschte Seiten und Reihenfolge festlegen.', 'Neue Datei erstellen, prüfen und speichern.'],
-    limitation: 'Nicht ausgewählte Seiten werden nicht übernommen. Das Ergebnis ist keine Datenschutzprüfung oder Schwärzung.',
-  },
+  'extract-pages': GERMAN_EXTRACT_COPY,
   organize: {
     title: 'PDF-Seiten sortieren und organisieren — PDF Tools',
     heading: 'PDF-Seiten neu anordnen',

@@ -2,7 +2,7 @@ import { existsSync } from 'node:fs'
 import { test, expect } from '@playwright/test'
 import { SITE_URL } from '../src/lib/pageMetadata'
 
-test('PT-SEO-010: German catalog, Merge, Split, Rotate and Delete Pages are the indexed German pages', async ({ page, request }) => {
+test('PT-SEO-010: German catalog, Merge, Split, Rotate, Delete and Extract Pages are the indexed German pages', async ({ page, request }) => {
   const response = await request.get('de/')
   expect(response.status()).toBe(200)
   const html = await response.text()
@@ -22,6 +22,7 @@ test('PT-SEO-010: German catalog, Merge, Split, Rotate and Delete Pages are the 
   expect(sitemap).toContain(`${SITE_URL}de/split/`)
   expect(sitemap).toContain(`${SITE_URL}de/rotate/`)
   expect(sitemap).toContain(`${SITE_URL}de/delete-pages/`)
+  expect(sitemap).toContain(`${SITE_URL}de/extract-pages/`)
 
   await page.goto('de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
@@ -40,6 +41,7 @@ test('PT-SEO-010: only the approved Merge, Split and Rotate language pairs are p
   expect(existsSync('dist/de/split/index.html')).toBe(true)
   expect(existsSync('dist/de/rotate/index.html')).toBe(true)
   expect(existsSync('dist/de/delete-pages/index.html')).toBe(true)
+  expect(existsSync('dist/de/extract-pages/index.html')).toBe(true)
   const enMerge = await request.get('merge/')
   expect(enMerge.ok()).toBe(true)
   const enHtml = await enMerge.text()

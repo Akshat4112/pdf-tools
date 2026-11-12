@@ -8,6 +8,8 @@ import { GERMAN_ROTATE_META } from './src/lib/germanRotateMeta.ts'
 import { germanRotateStaticHtml } from './src/lib/germanRotateContent.ts'
 import { GERMAN_DELETE_META } from './src/lib/germanDeleteMeta.ts'
 import { germanDeleteStaticHtml } from './src/lib/germanDeleteContent.ts'
+import { GERMAN_EXTRACT_META } from './src/lib/germanExtractMeta.ts'
+import { germanExtractStaticHtml } from './src/lib/germanExtractContent.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -124,7 +126,8 @@ function prerenderRoutes(): Plugin {
           .replaceAll('href="/pdf-tools/split/"', 'href="/pdf-tools/de/split/"')
           .replaceAll('href="/pdf-tools/rotate/"', 'href="/pdf-tools/de/rotate/"')
           .replaceAll('href="/pdf-tools/delete-pages/"', 'href="/pdf-tools/de/delete-pages/"')
-          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:(?:merge|split|rotate|delete-pages)\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
+          .replaceAll('href="/pdf-tools/extract-pages/"', 'href="/pdf-tools/de/extract-pages/"')
+          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:(?:merge|split|rotate|delete-pages|extract-pages)\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
           .replace('aria-label="PDF Tools links"', 'aria-label="Links zu PDF Tools"')
           .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${article}</main></noscript>`)
       writeFileSync(resolve(germanDir, 'index.html'), germanEntry(GERMAN_CATALOG_META, germanCatalogHtml()))
@@ -140,6 +143,9 @@ function prerenderRoutes(): Plugin {
       const germanDeleteDir = resolve(germanDir, 'delete-pages')
       mkdirSync(germanDeleteDir, { recursive: true })
       writeFileSync(resolve(germanDeleteDir, 'index.html'), germanEntry(GERMAN_DELETE_META, germanDeleteStaticHtml()))
+      const germanExtractDir = resolve(germanDir, 'extract-pages')
+      mkdirSync(germanExtractDir, { recursive: true })
+      writeFileSync(resolve(germanExtractDir, 'index.html'), germanEntry(GERMAN_EXTRACT_META, germanExtractStaticHtml()))
 
       // Invented public inputs only, generated at build time; no user documents.
       const examplesDir = resolve(dist, 'examples')
@@ -164,6 +170,7 @@ function prerenderRoutes(): Plugin {
         GERMAN_SPLIT_META.canonical,
         GERMAN_ROTATE_META.canonical,
         GERMAN_DELETE_META.canonical,
+        GERMAN_EXTRACT_META.canonical,
       ]
       const sitemap =
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

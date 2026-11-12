@@ -130,8 +130,8 @@ describe('PT-UX-005 interface translations', () => {
       'This split would create 301 files; the current limit is 300..pdf',
     ]) expect(translate(text, 'de'), text).toBe(text)
   })
-  it('initializes German only for the published catalog, merge, split, rotate and delete pages routes', () => {
-    for (const path of ['/pdf-tools/de', '/pdf-tools/de/', '/pdf-tools/de/merge', '/pdf-tools/de/merge/', '/pdf-tools/de/split', '/pdf-tools/de/split/', '/pdf-tools/de/rotate', '/pdf-tools/de/rotate/', '/pdf-tools/de/delete-pages', '/pdf-tools/de/delete-pages/']) expect(localeForPath(path), path).toBe('de')
+  it('initializes German only for the published catalog, merge, split, rotate, delete and extract pages routes', () => {
+    for (const path of ['/pdf-tools/de', '/pdf-tools/de/', '/pdf-tools/de/merge', '/pdf-tools/de/merge/', '/pdf-tools/de/split', '/pdf-tools/de/split/', '/pdf-tools/de/rotate', '/pdf-tools/de/rotate/', '/pdf-tools/de/delete-pages', '/pdf-tools/de/delete-pages/', '/pdf-tools/de/extract-pages', '/pdf-tools/de/extract-pages/']) expect(localeForPath(path), path).toBe('de')
     for (const path of ['/pdf-tools/', '/pdf-tools/merge/', '/pdf-tools/split/', '/pdf-tools/de/rotate-extra/', '/pdf-tools/de/merge-extra/', '/pdf-tools/de/split-extra/', '/pdf-tools-extra/de/merge/', '/another-project/de/merge/', '/another-project/de/split/', '/pdf-tools/de/merge/extra', '/pdf-tools/de/split/extra']) expect(localeForPath(path), path).toBe('en')
   })
   it('keeps inline guidance failures separate from the working tool and its navigation', () => {
