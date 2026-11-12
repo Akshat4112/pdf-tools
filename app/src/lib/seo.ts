@@ -20,7 +20,7 @@ import { GERMAN_SPLIT_META } from './germanSplitMeta'
 import { GERMAN_ROTATE_META } from './germanRotateMeta'
 import { GERMAN_DELETE_META } from './germanDeleteMeta'
 import { GERMAN_EXTRACT_META } from './germanExtractMeta'
-import { approvedLanguageAlternates } from './localizedRoutes'
+import { approvedLanguageAlternates, hasGermanPage } from './localizedRoutes'
 
 // ---------------------------------------------------------------------------
 // DOM helpers — applied by the router on each route change (client side).
@@ -78,21 +78,12 @@ export function applyMeta(meta: PageMeta): void {
     if (path === '/pdf-tools/' || path === '/pdf-tools/de/') {
       link.setAttribute('href', german ? '/pdf-tools/de/' : '/pdf-tools/')
       link.hreflang = german ? 'de' : 'en'
-    } else if (path === '/pdf-tools/merge/' || path === '/pdf-tools/de/merge/') {
-      link.setAttribute('href', german ? '/pdf-tools/de/merge/' : '/pdf-tools/merge/')
-      link.hreflang = german ? 'de' : 'en'
-    } else if (path === '/pdf-tools/extract-pages/' || path === '/pdf-tools/de/extract-pages/') {
-      link.setAttribute('href', german ? '/pdf-tools/de/extract-pages/' : '/pdf-tools/extract-pages/')
-      link.hreflang = german ? 'de' : 'en'
-    } else if (path === '/pdf-tools/delete-pages/' || path === '/pdf-tools/de/delete-pages/') {
-      link.setAttribute('href', german ? '/pdf-tools/de/delete-pages/' : '/pdf-tools/delete-pages/')
-      link.hreflang = german ? 'de' : 'en'
-    } else if (path === '/pdf-tools/rotate/' || path === '/pdf-tools/de/rotate/') {
-      link.setAttribute('href', german ? '/pdf-tools/de/rotate/' : '/pdf-tools/rotate/')
-      link.hreflang = german ? 'de' : 'en'
-    } else if (path === '/pdf-tools/split/' || path === '/pdf-tools/de/split/') {
-      link.setAttribute('href', german ? '/pdf-tools/de/split/' : '/pdf-tools/split/')
-      link.hreflang = german ? 'de' : 'en'
+    } else {
+      const toolPath = /^\/pdf-tools\/(?:de\/)?([a-z-]+)\/$/.exec(path ?? '')?.[1]
+      if (toolPath && hasGermanPage('/' + toolPath)) {
+        link.setAttribute('href', '/pdf-tools/' + (german ? 'de/' : '') + toolPath + '/')
+        link.hreflang = german ? 'de' : 'en'
+      }
     }
   })
   const generation = ++schemaGeneration
