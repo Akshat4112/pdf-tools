@@ -7,7 +7,7 @@ export function germanExtractArticleHtml(): string {
   return germanToolLandingHtml({ id: 'extract-pages', route: '/extract-pages' }, GERMAN_EXTRACT_COPY, { includeHeader: false }) + `
   <section aria-labelledby="extract-choose-de">
     <h2 id="extract-choose-de">Einzelne PDF-Seiten auswählen</h2>
-    <p>Wähle eine PDF-Datei und markiere Seiten über die Miniaturansichten oder das Eingabefeld. Trenne die Seitenzahlen durch Kommas und verwende für zusammenhängende Bereiche einen Bindestrich, zum Beispiel 1, 3-5, 8. Wiederholte Seitenzahlen werden nur einmal berücksichtigt. Die neue PDF-Kopie enthält die ausgewählten Seiten in aufsteigender Reihenfolge des Originals.</p>
+    <p>Wähle eine PDF-Datei und markiere Seiten über die Miniaturansichten oder das Eingabefeld. Trenne die Seitenzahlen durch Kommas und verwende für zusammenhängende Bereiche einen Bindestrich, zum Beispiel 1, 3-5, 8. Wiederholte Seitenzahlen werden nur einmal berücksichtigt. Die neue PDF-Kopie enthält die ausgewählten Seiten in der von dir angegebenen Reihenfolge. Bei „4, 2“ steht Seite 4 vor Seite 2.</p>
     <p>Die Vorschau zeigt die Anzahl und Reihenfolge der Ausgabeseiten. Nicht ausgewählte Seiten erscheinen nicht in der erzeugten Kopie. Das Original bleibt unverändert. Prüfe das Ergebnis, bevor du die Datei weitergibst.</p>
   </section>
   <section aria-labelledby="extract-limits-de">
