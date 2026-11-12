@@ -9,7 +9,7 @@ const PUBLIC_ORIGIN = 'https://akshat4112.github.io'
 
 /** Explicit release gate: other translated UI does not create a public URL. */
 export function hasGermanPage(path: string): boolean {
-  return path === '/' || path === '/merge' || path === '/split' || path === '/rotate' || path === '/delete-pages' || path === '/extract-pages'
+  return path === '/' || path === '/merge' || path === '/split' || path === '/rotate' || path === '/delete-pages' || path === '/extract-pages' || path === '/organize'
 }
 
 /** Document-free alternates for the approved language pairs. */
