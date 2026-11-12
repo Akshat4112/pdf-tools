@@ -26,6 +26,7 @@ const GermanRotateGuide = lazy(() => import('./GermanRotateGuide'))
 const GermanDeleteGuide = lazy(() => import('./GermanDeleteGuide'))
 const GermanExtractGuide = lazy(() => import('./GermanExtractGuide'))
 const GermanOrganizeGuide = lazy(() => import('./GermanOrganizeGuide'))
+const GermanImagesToPdfGuide = lazy(() => import('./GermanImagesToPdfGuide'))
 const EnglishToolGuide = lazy(() => import('./EnglishToolGuide'))
 const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
 const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
@@ -135,7 +136,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       </Suspense>
     </ToolLoadBoundary>
     {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanTool ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
-      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : tool.id === 'rotate' ? <GermanRotateGuide /> : tool.id === 'delete-pages' ? <GermanDeleteGuide /> : tool.id === 'extract-pages' ? <GermanExtractGuide /> : <GermanOrganizeGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
+      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : tool.id === 'rotate' ? <GermanRotateGuide /> : tool.id === 'delete-pages' ? <GermanDeleteGuide /> : tool.id === 'extract-pages' ? <GermanExtractGuide /> : tool.id === 'organize' ? <GermanOrganizeGuide /> : <GermanImagesToPdfGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
     </ToolLoadBoundary> : null}
   </main>
 }
