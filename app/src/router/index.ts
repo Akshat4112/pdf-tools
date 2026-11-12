@@ -61,12 +61,8 @@ export function parsePath(pathname: string): Route {
   // must remain not-found until their translated HTML files are published.
   if (localized?.locale === 'de') {
     if (localized.path === '/') return { name: 'catalog', path: '/', locale: 'de' }
-    if (localized.path === '/merge') return { name: 'merge', path: '/merge', locale: 'de' }
-    if (localized.path === '/split') return { name: 'split', path: '/split', locale: 'de' }
-    if (localized.path === '/rotate') return { name: 'rotate', path: '/rotate', locale: 'de' }
-    if (localized.path === '/delete-pages') return { name: 'delete-pages', path: '/delete-pages', locale: 'de' }
-    if (localized.path === '/extract-pages') return { name: 'extract-pages', path: '/extract-pages', locale: 'de' }
-    if (localized.path === '/organize') return { name: 'organize', path: '/organize', locale: 'de' }
+    const approved = hasGermanPage(localized.path) ? toolByRoute(localized.path) : null
+    if (approved) return { name: approved.id, path: localized.path, locale: 'de' }
     return { name: 'not-found', path: pathname }
   }
   const p = routePathOf(pathname)
