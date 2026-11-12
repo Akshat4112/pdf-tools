@@ -10,7 +10,7 @@ test('PT-SEO-010: German Extract has an indexable standalone no-JS route and pai
   expect(html).toContain('<html lang="de">')
   expect(html).toContain(`rel="canonical" href="${SITE_URL}de/extract-pages/"`)
   expect(html).toContain(`hreflang="en" href="${SITE_URL}extract-pages/"`)
-  for (const s of ['JavaScript', '50 MiB', 'aufsteigender Reihenfolge', 'keine sichere Schwärzung']) expect(html).toContain(s)
+  for (const s of ['JavaScript', '50 MiB', 'von dir angegebenen Reihenfolge', 'keine sichere Schwärzung']) expect(html).toContain(s)
   const context = await browser.newContext({ javaScriptEnabled: false })
   try {
     const page = await context.newPage()
@@ -33,7 +33,7 @@ test('PT-SEO-010: German Extract produces verified selected pages without data e
   const button = page.getByRole('button', { name: 'Ausgewählte Seiten extrahieren' })
   await expect(button).toBeDisabled()
   await page.locator('#page-selection').fill('4, 2')
-  await expect(page.getByText('Reihenfolge im Ergebnis: 2, 4')).toBeVisible()
+  await expect(page.getByText('Reihenfolge im Ergebnis: 4, 2')).toBeVisible()
   await expect(button).toBeEnabled()
   await button.click()
   await expect(page.getByRole('region', { name: 'Ergebnisse' })).toBeVisible()
@@ -42,8 +42,8 @@ test('PT-SEO-010: German Extract produces verified selected pages without data e
   const file = await download
   const output = await PDFDocument.load(await readFile((await file.path())!))
   expect(output.getPageCount()).toBe(2)
-  expect(output.getPage(0).getWidth()).toBe(310)
-  expect(output.getPage(1).getWidth()).toBe(330)
+  expect(output.getPage(0).getWidth()).toBe(330)
+  expect(output.getPage(1).getWidth()).toBe(310)
   expect(await page.locator('head').innerHTML()).not.toContain('PRIVATE-EXTRACT-SYNTHETIC')
   expect(outgoing).toEqual([])
   await page.getByRole('button', { name: 'Neu beginnen' }).click()
