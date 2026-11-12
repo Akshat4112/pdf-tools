@@ -68,7 +68,7 @@ export function applyMeta(meta: PageMeta): void {
       document.head.appendChild(link)
   }
   const desired = meta.canonical
-  const german = desired === GERMAN_CATALOG_META.canonical || desired === GERMAN_MERGE_META.canonical || desired === GERMAN_SPLIT_META.canonical || desired === GERMAN_ROTATE_META.canonical || desired === GERMAN_DELETE_META.canonical || desired === GERMAN_EXTRACT_META.canonical
+  const german = desired.startsWith(SITE_URL + 'de/') && approvedLanguageAlternates(desired).length > 0
   document.documentElement.lang = german ? 'de' : 'en'
   document.querySelector('.fl-footer-navigation')?.setAttribute('aria-label', german ? 'Links zu PDF Tools' : 'PDF Tools links')
   // The footer is outside React and survives SPA transitions. Route its
