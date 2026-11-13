@@ -12,6 +12,8 @@ import { GERMAN_EXTRACT_META } from './src/lib/germanExtractMeta.ts'
 import { germanExtractStaticHtml } from './src/lib/germanExtractContent.ts'
 import { GERMAN_ORGANIZE_META } from './src/lib/germanOrganizeMeta.ts'
 import { germanOrganizeStaticHtml } from './src/lib/germanOrganizeContent.ts'
+import { GERMAN_IMAGES_TO_PDF_META } from './src/lib/germanImagesToPdfMeta.ts'
+import { germanImagesToPdfStaticHtml } from './src/lib/germanImagesToPdfContent.ts'
 import { structuredDataScript } from './src/lib/structuredData.ts'
 import { guideHtml } from './src/lib/guideContent.ts'
 import { guideDirectoryHtml, relatedGuidesHtml } from './src/lib/guideCatalog.ts'
@@ -130,7 +132,8 @@ function prerenderRoutes(): Plugin {
           .replaceAll('href="/pdf-tools/delete-pages/"', 'href="/pdf-tools/de/delete-pages/"')
           .replaceAll('href="/pdf-tools/extract-pages/"', 'href="/pdf-tools/de/extract-pages/"')
           .replaceAll('href="/pdf-tools/organize/"', 'href="/pdf-tools/de/organize/"')
-          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:(?:merge|split|rotate|delete-pages|extract-pages|organize)\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
+          .replaceAll('href="/pdf-tools/images-to-pdf/"', 'href="/pdf-tools/de/images-to-pdf/"')
+          .replace(/<a\b[^>]*href="\/pdf-tools\/de\/(?:(?:merge|split|rotate|delete-pages|extract-pages|organize|images-to-pdf)\/)?"[^>]*>/g, tag => tag.replace(/\s+hreflang="[^"]*"/g, '').replace('>', ' hreflang="de">'))
           .replace('aria-label="PDF Tools links"', 'aria-label="Links zu PDF Tools"')
           .replace('<div id="root"></div>', `<div id="root"></div><noscript><main id="main-content" class="tool-workspace category-hub" tabindex="-1">${article}</main></noscript>`)
       writeFileSync(resolve(germanDir, 'index.html'), germanEntry(GERMAN_CATALOG_META, germanCatalogHtml()))
@@ -152,6 +155,9 @@ function prerenderRoutes(): Plugin {
       const germanOrganizeDir = resolve(germanDir, 'organize')
       mkdirSync(germanOrganizeDir, { recursive: true })
       writeFileSync(resolve(germanOrganizeDir, 'index.html'), germanEntry(GERMAN_ORGANIZE_META, germanOrganizeStaticHtml()))
+      const germanImagesToPdfDir = resolve(germanDir, 'images-to-pdf')
+      mkdirSync(germanImagesToPdfDir, { recursive: true })
+      writeFileSync(resolve(germanImagesToPdfDir, 'index.html'), germanEntry(GERMAN_IMAGES_TO_PDF_META, germanImagesToPdfStaticHtml()))
 
       // Invented public inputs only, generated at build time; no user documents.
       const examplesDir = resolve(dist, 'examples')
@@ -178,6 +184,7 @@ function prerenderRoutes(): Plugin {
         GERMAN_DELETE_META.canonical,
         GERMAN_EXTRACT_META.canonical,
         GERMAN_ORGANIZE_META.canonical,
+        GERMAN_IMAGES_TO_PDF_META.canonical,
       ]
       const sitemap =
         `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +

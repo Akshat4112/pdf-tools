@@ -9,7 +9,7 @@ export interface ImagePreviewItem {
 }
 
 /** Eight bounded canvases; image decoding runs sequentially and every bitmap is closed. */
-export function ImageLayoutPreviews({ items, onError }: { items: ImagePreviewItem[]; onError(id: number, error: ToolError): void }) {
+export function ImageLayoutPreviews({ items, onError, locale = 'en' }: { items: ImagePreviewItem[]; onError(id: number, error: ToolError): void; locale?: 'en' | 'de' }) {
   const canvases = useRef(new Map<number, HTMLCanvasElement>())
   const [rendered, setRendered] = useState<{ items: ImagePreviewItem[]; ids: number[] } | null>(null)
   const ready = rendered?.items === items ? rendered.ids : []
@@ -52,12 +52,12 @@ export function ImageLayoutPreviews({ items, onError }: { items: ImagePreviewIte
     return () => { disposed = true; for (const canvas of targets.values()) { canvas.width = 0; canvas.height = 0 } }
   }, [items, onError])
   return <div className="image-preview-grid">
-    {items.map(item => <figure key={item.id} className="image-preview-card" aria-label={`Preview of page ${item.position}: ${item.displayName}`}>
+    {items.map(item => <figure key={item.id} className="image-preview-card" aria-label={locale === 'de' ? `Vorschau der Seite ${item.position}: ${item.displayName}` : `Preview of page ${item.position}: ${item.displayName}`}>
       <div className="image-preview-paper">
         <canvas ref={node => { if (node) canvases.current.set(item.id, node); else canvases.current.delete(item.id) }} aria-hidden="true" />
-        {!ready.includes(item.id) ? <span className="page-placeholder">Loading preview…</span> : null}
+        {!ready.includes(item.id) ? <span className="page-placeholder">{locale === 'de' ? 'Vorschau wird geladen …' : 'Loading preview…'}</span> : null}
       </div>
-      <figcaption><strong>Page {item.position}</strong><span title={item.displayName}>{item.displayName}</span><small>{Math.round(item.plan.widthPt * 25.4 / 72)} × {Math.round(item.plan.heightPt * 25.4 / 72)} mm</small></figcaption>
+      <figcaption><strong>{locale === 'de' ? 'Seite' : 'Page'} {item.position}</strong><span title={item.displayName}>{item.displayName}</span><small>{Math.round(item.plan.widthPt * 25.4 / 72)} × {Math.round(item.plan.heightPt * 25.4 / 72)} mm</small></figcaption>
     </figure>)}
   </div>
 }

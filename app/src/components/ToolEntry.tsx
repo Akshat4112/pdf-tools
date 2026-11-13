@@ -26,6 +26,7 @@ const GermanRotateGuide = lazy(() => import('./GermanRotateGuide'))
 const GermanDeleteGuide = lazy(() => import('./GermanDeleteGuide'))
 const GermanExtractGuide = lazy(() => import('./GermanExtractGuide'))
 const GermanOrganizeGuide = lazy(() => import('./GermanOrganizeGuide'))
+const GermanImagesToPdfGuide = lazy(() => import('./GermanImagesToPdfGuide'))
 const EnglishToolGuide = lazy(() => import('./EnglishToolGuide'))
 const SplitTool = lazy(() => import('./SplitTool').then(module => ({ default: module.SplitTool })))
 const PageSelectionTool = lazy(() => import('./PageSelectionTool').then(module => ({ default: module.PageSelectionTool })))
@@ -98,23 +99,6 @@ function ToolContent({ tool, onExit }: { tool: ToolDefinition; onExit: () => voi
 }
 
 
-const TOOL_HELP: Record<ToolDefinition['id'], string> = {
-  merge: 'Select two or more PDFs, arrange them, merge and download the verified copy. Originals are unchanged.',
-  split: 'Choose a PDF, split by ranges, every N pages or single pages, review the parts and download the ZIP.',
-  rotate: 'Select PDF pages, rotate in 90-degree steps, review and save a new copy.',
-  'delete-pages': 'Mark PDF pages for removal, confirm the review and create a copy. Keep at least one page.',
-  'extract-pages': 'Choose a PDF and select pages using thumbnails or page ranges. Review the output order before creating a new PDF.',
-  organize: 'Reorder, rotate, duplicate or remove PDF pages. Undo, review and save a new copy.',
-  'images-to-pdf': 'Choose JPG/PNG images, set order, page size, fit and margins. Review, then create a PDF with one image per page.',
-  'pdf-to-jpg': 'Choose PDF pages, set JPG resolution and quality, then download individual images or a ZIP.',
-  'pdf-to-png': 'Choose PDF pages, set PNG resolution and background, then download images or a ZIP.',
-  reader: 'Choose a PDF to read, zoom, search its existing text, copy or print. Image-only pages cannot be searched without OCR.',
-  'page-numbers': 'Choose a PDF and pages to number, then set the starting number, position and style. Wait for the modified preview before applying it.',
-  watermark: 'Choose a PDF and watermark text, position, opacity and pages. Wait for the modified preview before applying it. A watermark does not remove underlying content.',
-  'pdf-to-text': 'Choose a PDF to export its existing text layer as UTF-8 TXT. Scanned pages need OCR, which is not available in this tool.',
-  'doc-info': 'Choose a PDF and select Inspect PDF to view metadata and page dimensions. Password-protected files show a limited report. Signature indicators do not validate authenticity.',
-}
-
 /** The same lightweight chrome wraps every shipped workspace without owning its state. */
 export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () => void }) {
   const { t, locale } = useLocale()
@@ -125,7 +109,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
         : <div dangerouslySetInnerHTML={{ __html: breadcrumbHtml(hubForTool(tool), tool) }} />}
       {tool.implemented ? <details className="workspace-help">
         <summary>{t("How to use this tool")}</summary>
-        <p>{t(TOOL_HELP[tool.id])}</p>
+        <p>{t(tool.description)}</p>
         <p>{t("Selected files are processed in this browser, not uploaded for conversion. Follow the file and page limits shown below.")}</p>
       </details> : null}
     </div>
@@ -135,7 +119,7 @@ export function ToolEntry({ tool, onExit }: { tool: ToolDefinition; onExit: () =
       </Suspense>
     </ToolLoadBoundary>
     {tool.implemented ? <ToolLoadBoundary key={`${tool.id}:${germanTool ? 'de' : 'en'}`} title={t('Usage guidance')} onExit={onExit} subject="guide" headingLevel={2}>
-      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : tool.id === 'rotate' ? <GermanRotateGuide /> : tool.id === 'delete-pages' ? <GermanDeleteGuide /> : tool.id === 'extract-pages' ? <GermanExtractGuide /> : <GermanOrganizeGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
+      <Suspense fallback={null}>{germanTool ? tool.id === 'merge' ? <GermanMergeGuide /> : tool.id === 'split' ? <GermanSplitGuide /> : tool.id === 'rotate' ? <GermanRotateGuide /> : tool.id === 'delete-pages' ? <GermanDeleteGuide /> : tool.id === 'extract-pages' ? <GermanExtractGuide /> : tool.id === 'organize' ? <GermanOrganizeGuide /> : <GermanImagesToPdfGuide /> : <EnglishToolGuide tool={tool} />}</Suspense>
     </ToolLoadBoundary> : null}
   </main>
 }
