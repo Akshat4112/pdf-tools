@@ -22,6 +22,7 @@ import { GERMAN_DELETE_META } from './germanDeleteMeta'
 import { GERMAN_EXTRACT_META } from './germanExtractMeta'
 import { GERMAN_ORGANIZE_META } from './germanOrganizeMeta'
 import { GERMAN_IMAGES_TO_PDF_META } from './germanImagesToPdfMeta'
+import { GERMAN_PDF_TO_JPG_META } from './germanPdfToJpgMeta'
 import { approvedLanguageAlternates, hasGermanPage } from './localizedRoutes'
 
 // ---------------------------------------------------------------------------
@@ -126,7 +127,7 @@ export function sitemapLastmod(date = new Date()): string {
  * Only canonical, indexable pages — no query/user URLs can ever appear.
  */
 export function buildSitemapXml(lastmod = sitemapLastmod()): string {
-  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical, GERMAN_MERGE_META.canonical, GERMAN_SPLIT_META.canonical, GERMAN_ROTATE_META.canonical, GERMAN_DELETE_META.canonical, GERMAN_EXTRACT_META.canonical, GERMAN_ORGANIZE_META.canonical, GERMAN_IMAGES_TO_PDF_META.canonical]
+  const urls = [...PUBLIC_PAGES.map(page => page.canonical), GERMAN_CATALOG_META.canonical, GERMAN_MERGE_META.canonical, GERMAN_SPLIT_META.canonical, GERMAN_ROTATE_META.canonical, GERMAN_DELETE_META.canonical, GERMAN_EXTRACT_META.canonical, GERMAN_ORGANIZE_META.canonical, GERMAN_IMAGES_TO_PDF_META.canonical, GERMAN_PDF_TO_JPG_META.canonical]
   const entries = urls
     .map(
       (u) =>
