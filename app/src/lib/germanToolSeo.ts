@@ -79,6 +79,14 @@ export const GERMAN_IMAGES_TO_PDF_COPY: GermanToolSeoCopy = {
   limitation: 'Bilder werden als Seiten eingebettet, ohne automatische Texterkennung. Transparente Bildbereiche werden weiß dargestellt.',
 }
 
+export const GERMAN_PDF_TO_JPG_COPY: GermanToolSeoCopy = {
+  title: 'PDF in JPG umwandeln — PDF Tools',
+  heading: 'PDF-Seiten als JPG exportieren',
+  description: 'Wandle ausgewählte PDF-Seiten in JPG-Bilder um, kostenlos und lokal im Browser.',
+  steps: ['PDF auswählen und Seiten markieren.', 'DPI und JPG-Qualität festlegen.', 'Bilder einzeln oder als ZIP herunterladen.'],
+  limitation: 'JPG-Bilder sind gerenderte Seiten, keine extrahierten Originalbilder oder durchsuchbare Texte.',
+}
+
 export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   merge: GERMAN_MERGE_COPY,
   split: GERMAN_SPLIT_COPY,
@@ -87,13 +95,7 @@ export const GERMAN_TOOL_SEO: Readonly<Record<ToolId, GermanToolSeoCopy>> = {
   'extract-pages': GERMAN_EXTRACT_COPY,
   organize: GERMAN_ORGANIZE_COPY,
   'images-to-pdf': GERMAN_IMAGES_TO_PDF_COPY,
-  'pdf-to-jpg': {
-    title: 'PDF-Seiten in JPG umwandeln — PDF Tools',
-    heading: 'PDF als JPG-Bilder exportieren',
-    description: 'Exportiere ausgewählte PDF-Seiten als JPG-Bilder mit wählbarer Qualität und Auflösung, direkt im Browser.',
-    steps: ['PDF auswählen und Seiten bestimmen.', 'Bildauflösung und JPG-Qualität einstellen.', 'Bilder einzeln oder als ZIP herunterladen.'],
-    limitation: 'JPG enthält Pixel statt durchsuchbarem PDF-Text; einzelne eingebettete Originalbilder werden nicht separat extrahiert.',
-  },
+  'pdf-to-jpg': GERMAN_PDF_TO_JPG_COPY,
   'pdf-to-png': {
     title: 'PDF-Seiten in PNG umwandeln — PDF Tools',
     heading: 'PDF als PNG-Bilder exportieren',
