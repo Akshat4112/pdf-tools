@@ -11,10 +11,11 @@ import { GERMAN_DELETE_META } from '../src/lib/germanDeleteMeta'
 import { GERMAN_EXTRACT_META } from '../src/lib/germanExtractMeta'
 import { GERMAN_ORGANIZE_META } from '../src/lib/germanOrganizeMeta'
 import { GERMAN_IMAGES_TO_PDF_META } from '../src/lib/germanImagesToPdfMeta'
+import { GERMAN_PDF_TO_JPG_META } from '../src/lib/germanPdfToJpgMeta'
 
 test('PT-SEO-004 hubs: static link graph has no orphaned or broken public routes', async ({ request, browser }) => {
   test.setTimeout(120_000)
-  const allPages = [...PUBLIC_PAGES, GERMAN_CATALOG_META, GERMAN_MERGE_META, GERMAN_SPLIT_META, GERMAN_ROTATE_META, GERMAN_DELETE_META, GERMAN_EXTRACT_META, GERMAN_ORGANIZE_META, GERMAN_IMAGES_TO_PDF_META]
+  const allPages = [...PUBLIC_PAGES, GERMAN_CATALOG_META, GERMAN_MERGE_META, GERMAN_SPLIT_META, GERMAN_ROTATE_META, GERMAN_DELETE_META, GERMAN_EXTRACT_META, GERMAN_ORGANIZE_META, GERMAN_IMAGES_TO_PDF_META, GERMAN_PDF_TO_JPG_META]
   const paths = new Set(allPages.map(p => new URL(p.canonical).pathname))
   const graph = new Map<string, string[]>()
   for (const meta of allPages) {
