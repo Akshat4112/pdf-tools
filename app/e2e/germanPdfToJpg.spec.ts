@@ -46,7 +46,8 @@ test('PT-SEO-010: German JPG conversion preserves selected page order, local-onl
     expect(entries.map(x => x.filename)).toEqual(['PRIVATE-GERMAN-JPG-SYNTHETIC-page-3.jpg', 'PRIVATE-GERMAN-JPG-SYNTHETIC-page-1.jpg'])
     const sizes = []
     for (const entry of entries) {
-      const bytes = await entry.getData!(new Uint8ArrayWriter(), { checkSignature: true })
+      if (!('getData' in entry) || !entry.getData) throw new Error(`Expected ZIP file entry: ${entry.filename}`)
+      const bytes = await entry.getData(new Uint8ArrayWriter(), { checkSignature: true })
       const image = readImageMetadata(bytes)
       expect(image.kind).toBe('jpeg')
       sizes.push([image.width, image.height])
