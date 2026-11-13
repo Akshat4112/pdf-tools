@@ -44,9 +44,18 @@ test('PT-SEO-010 German Images-to-PDF: keyboard reordering, verified PDF downloa
   const next = page.waitForEvent('download')
   await page.getByRole('button', { name: /^Herunterladen / }).click()
   const download = await next
-  const written = await PDFDocument.load(await readFile((await download.path())!))
+  const pdfBytes = await readFile((await download.path())!)
+  const written = await PDFDocument.load(pdfBytes)
   expect(written.getPageCount()).toBe(2)
   expect(written.getPages().map(p => Math.round(p.getWidth()))).toEqual([72, 60])
+  expect(written.getPages().map(p => Math.round(p.getHeight()))).toEqual([36, 30])
+  // Input filenames must not be embedded in exported PDF metadata or object streams.
+  for (const marker of ['PRIVATE-IMAGE-A', 'PRIVATE-IMAGE-B']) {
+    expect(pdfBytes.includes(Buffer.from(marker))).toBe(false)
+    expect(written.getTitle() ?? '').not.toContain(marker)
+    expect(written.getSubject() ?? '').not.toContain(marker)
+    expect(written.getKeywords() ?? '').not.toContain(marker)
+  }
   expect(outgoing).toEqual([])
   expect(await page.locator('head').innerHTML()).not.toContain('PRIVATE-IMAGE-')
   await page.getByRole('button', { name: 'Neu beginnen' }).click()
