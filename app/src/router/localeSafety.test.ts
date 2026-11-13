@@ -20,6 +20,8 @@ describe('PT-SEO-010 locale routing safety', () => {
     expect(parsePath('/pdf-tools/de/extract-pages/')).toEqual({ name: 'extract-pages', path: '/extract-pages', locale: 'de' })
     expect(parsePath('/pdf-tools/de/organize/')).toEqual({ name: 'organize', path: '/organize', locale: 'de' })
     expect(parsePath('/pdf-tools/de/images-to-pdf/')).toEqual({ name: 'images-to-pdf', path: '/images-to-pdf', locale: 'de' })
+    expect(parsePath('/pdf-tools/de/pdf-to-jpg/')).toEqual({ name: 'pdf-to-jpg', path: '/pdf-to-jpg', locale: 'de' })
+    expect(metaForRoute(parsePath('/pdf-tools/de/pdf-to-jpg/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/pdf-to-jpg/')
     expect(metaForRoute(parsePath('/pdf-tools/de/images-to-pdf/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/images-to-pdf/')
     expect(metaForRoute(parsePath('/pdf-tools/de/organize/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/organize/')
     expect(metaForRoute(parsePath('/pdf-tools/de/extract-pages/')).canonical).toBe('https://akshat4112.github.io/pdf-tools/de/extract-pages/')
