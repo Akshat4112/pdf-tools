@@ -25,6 +25,7 @@ test('PT-SEO-010: German catalog and seven reviewed German tool workflows are in
   expect(sitemap).toContain(`${SITE_URL}de/extract-pages/`)
   expect(sitemap).toContain(`${SITE_URL}de/organize/`)
   expect(sitemap).toContain(`${SITE_URL}de/images-to-pdf/`)
+  expect(sitemap).toContain(`${SITE_URL}de/pdf-to-jpg/`)
 
   await page.goto('de/')
   await expect(page.getByRole('heading', { name: 'PDF-Tools direkt im Browser verwenden' })).toBeVisible()
@@ -46,6 +47,7 @@ test('PT-SEO-010: only the approved Merge, Split and Rotate language pairs are p
   expect(existsSync('dist/de/extract-pages/index.html')).toBe(true)
   expect(existsSync('dist/de/organize/index.html')).toBe(true)
   expect(existsSync('dist/de/images-to-pdf/index.html')).toBe(true)
+  expect(existsSync('dist/de/pdf-to-jpg/index.html')).toBe(true)
   const enMerge = await request.get('merge/')
   expect(enMerge.ok()).toBe(true)
   const enHtml = await enMerge.text()
