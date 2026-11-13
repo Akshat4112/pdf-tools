@@ -379,7 +379,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
 // Only published German routes may initialize a German UI. Do not turn
 // unshipped aliases or sibling project paths into German tool workspaces.
 export function localeForPath(pathname: string): Locale {
-  return /^\/pdf-tools\/de(?:\/(?:merge|split|rotate|delete-pages|extract-pages|organize|images-to-pdf))?\/?$/.test(pathname) ? 'de' : 'en'
+  return /^\/pdf-tools\/de(?:\/(?:merge|split|rotate|delete-pages|extract-pages|organize|images-to-pdf|pdf-to-jpg))?\/?$/.test(pathname) ? 'de' : 'en'
 }
 
 let activeLocale: Locale =
