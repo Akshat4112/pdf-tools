@@ -12,7 +12,7 @@ for (const route of ['merge', 'split'] as const) {
       const create = URL.createObjectURL.bind(URL)
       const revoke = URL.revokeObjectURL.bind(URL)
       const active = new Map<string, { type: string; size: number; stack: string }>()
-      URL.createObjectURL = blob => { const url = create(blob); active.set(url, { type: blob.type, size: blob.size, stack: new Error().stack?.slice(0, 1200) ?? '' }); return url }
+      URL.createObjectURL = blob => { const url = create(blob); active.set(url, { type: blob instanceof Blob ? blob.type : 'MediaSource', size: blob instanceof Blob ? blob.size : 0, stack: new Error().stack?.slice(0, 1200) ?? '' }); return url }
       URL.revokeObjectURL = url => { active.delete(url); revoke(url) }
       Object.assign(window, { ptImp009ActiveUrls: () => active.size, ptImp009UrlDetails: () => [...active.values()] })
     })
