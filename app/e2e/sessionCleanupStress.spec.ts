@@ -25,7 +25,7 @@ for (const route of ['merge', 'split'] as const) {
       await page.locator('input[type=file]').setInputFiles(route === 'merge'
         ? [file, { ...file, name: `second-${cycle}.pdf` }] : file)
       await expect(page.locator('.file-row')).toHaveCount(route === 'merge' ? 2 : 1)
-      if (route === 'split') await page.getByRole('textbox', { name: 'Ranges (comma separated)' }).fill('1-3')
+      if (route === 'split') await page.getByRole('textbox', { name: 'Ranges (comma separated)' }).fill('1, 2-3')
       await expect(run).toBeEnabled()
       await run.click()
       const result = page.getByRole('region', { name: 'Results', exact: true })
