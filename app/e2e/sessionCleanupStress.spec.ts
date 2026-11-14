@@ -14,11 +14,12 @@ for (const route of ['merge', 'split'] as const) {
       const active = new Map<string, { type: string; size: number; stack: string }>()
       URL.createObjectURL = blob => { const url = create(blob); active.set(url, { type: blob instanceof Blob ? blob.type : 'MediaSource', size: blob instanceof Blob ? blob.size : 0, stack: new Error().stack?.slice(0, 1200) ?? '' }); return url }
       URL.revokeObjectURL = url => { active.delete(url); revoke(url) }
-      Object.assign(window, { ptImp009ActiveUrls: () => active.size, ptImp009UrlDetails: () => [...active.values()] })
+      Object.assign(window, { ptImp009ActiveUrls: () => active.size, ptImp009UrlDetails: () => [...active.entries()].map(([url, detail]) => ({ url, ...detail })) })
     })
     await page.goto(`${route}/`)
     const bytes = await fixture()
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
+    let sharedZipWorkerUrl: string | undefined
     const run = page.getByRole('button', { name: route === 'merge' ? 'Merge PDFs' : 'Split PDF', exact: true })
     for (let cycle = 0; cycle < 12; cycle++) {
       const file = { name: `synthetic-${cycle}.pdf`, mimeType: 'application/pdf', buffer: bytes }
@@ -37,7 +38,26 @@ for (const route of ['merge', 'split'] as const) {
       await page.getByRole('button', { name: 'Start over', exact: true }).click()
       await expect(result).toHaveCount(0)
       await expect(page.locator('.file-row')).toHaveCount(0)
-      await expect.poll(async () => { const state = await page.evaluate(() => { const audit = window as unknown as { ptImp009ActiveUrls(): number; ptImp009UrlDetails(): unknown[] }; return { count: audit.ptImp009ActiveUrls(), details: audit.ptImp009UrlDetails() } }); if (state.count !== baseline) console.log(`PT-IMP-009 ${route} cycle ${cycle} retained URLs: ${JSON.stringify(state.details)}`); return state.count }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(baseline)
+      // zip.js lazily creates a module-level worker script URL for Split ZIP exports.
+      // Allow only one *stable* worker URL; generated PDF/download URLs must be revoked.
+      // A growing set of worker URLs is still a failure, not an accepted baseline.
+      await expect.poll(async () => {
+        const details = await page.evaluate(() => (window as unknown as {
+          ptImp009UrlDetails(): Array<{ url: string; type: string; size: number; stack: string }>
+        }).ptImp009UrlDetails())
+        const unexpected = details.filter(item => !(
+          route === 'split' && item.type === 'text/javascript' &&
+          item.stack.includes('workerURI') && item.stack.includes('zip.js')
+        ))
+        if (unexpected.length) console.log(`PT-IMP-009 ${route} cycle ${cycle} unexpected URLs: ${JSON.stringify(unexpected)}`)
+        if (unexpected.length) return false
+        const workerUrls = details.filter(item => item.stack.includes('workerURI') && item.stack.includes('zip.js'))
+        if (route === 'split' && workerUrls.length === 1) {
+          if (sharedZipWorkerUrl && sharedZipWorkerUrl !== workerUrls[0].url) return false
+          sharedZipWorkerUrl = workerUrls[0].url
+        }
+        return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
+      }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     }
     await page.reload()
