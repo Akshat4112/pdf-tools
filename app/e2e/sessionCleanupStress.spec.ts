@@ -1,9 +1,35 @@
 import { test, expect } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
+import { PDFDocument } from 'pdf-lib'
+import { unzipSync } from 'fflate'
 
 // PT-IMP-009: synthetic browser lifecycle stress, complementary to FileSession unit stress.
 // Keep this bounded in CI; extended 100-cycle/memory profiling is a separate acceptance gate.
 const fixture = () => readFile('../fixtures/pdf/F-001-plain-text-3p.pdf')
+
+// Independently decode every sampled download instead of accepting nonempty bytes.
+async function verifySyntheticDownload(bytes: Uint8Array, route: 'merge' | 'split') {
+  if (bytes[0] === 0x25 && bytes[1] === 0x50 && bytes[2] === 0x44 && bytes[3] === 0x46) {
+    const pdf = await PDFDocument.load(bytes, { updateMetadata: false })
+    const pages = pdf.getPageCount()
+    if (route === 'merge') expect(pages).toBe(6)
+    else expect([1, 2]).toContain(pages)
+    return
+  }
+  // Split can package multiple PDFs into a ZIP. Validate every member.
+  expect(route).toBe('split')
+  expect(bytes[0]).toBe(0x50)
+  expect(bytes[1]).toBe(0x4b)
+  const entries = Object.entries(unzipSync(bytes)).filter(([name]) => !name.endsWith('/'))
+  expect(entries).toHaveLength(2)
+  const pageCounts: number[] = []
+  for (const [name, contents] of entries) {
+    expect(name.toLowerCase()).toMatch(/\.pdf$/)
+    const pdf = await PDFDocument.load(contents, { updateMetadata: false })
+    pageCounts.push(pdf.getPageCount())
+  }
+  expect(pageCounts.sort()).toEqual([1, 2])
+}
 
 for (const route of ['merge', 'split'] as const) {
   test(`PT-IMP-009 ${route}: repeated processing, download and reset leave no retained URLs or storage`, async ({ page }) => {
@@ -34,7 +60,7 @@ for (const route of ['merge', 'split'] as const) {
       const downloadPromise = page.waitForEvent('download')
       await result.getByRole('button', { name: /^Download / }).first().click()
       const download = await downloadPromise
-      expect((await readFile((await download.path())!)).byteLength).toBeGreaterThan(0)
+      await verifySyntheticDownload(await readFile((await download.path())!), route)
       await page.getByRole('button', { name: 'Start over', exact: true }).click()
       await expect(result).toHaveCount(0)
       await expect(page.locator('.file-row')).toHaveCount(0)
