@@ -70,6 +70,12 @@ for (const route of ['merge', 'split'] as const) {
     let sharedZipWorkerUrl: string | undefined
     const run = page.getByRole('button', { name: route === 'merge' ? 'Merge PDFs' : 'Split PDF', exact: true })
     const heapSamples: Array<{ cycle: number; bytes: number }> = []
+    // Include a pre-processing baseline; without it, cycle-one allocations are invisible.
+    if (extended) {
+      const initialHeap = await page.evaluate(() =>
+        (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize ?? null)
+      if (initialHeap !== null) heapSamples.push({ cycle: 0, bytes: initialHeap })
+    }
     for (let cycle = 0; cycle < cycleCount; cycle++) {
       const file = { name: `synthetic-${cycle}.pdf`, mimeType: 'application/pdf', buffer: bytes }
       await page.locator('input[type=file]').setInputFiles(route === 'merge'
@@ -118,8 +124,14 @@ for (const route of ['merge', 'split'] as const) {
       }
     }
     if (extended) {
-      console.log(`PT-IMP-009 ${route} 100-cycle Chromium JS heap samples (diagnostic only): ${JSON.stringify(heapSamples)}`)
-      expect(heapSamples.length, 'Extended Chromium profiling must expose JS heap samples').toBeGreaterThan(1)
+      expect(heapSamples.length, 'Extended Chromium profiling must expose baseline and repeated JS heap samples').toBeGreaterThan(2)
+      expect(heapSamples[0].cycle).toBe(0)
+      expect(heapSamples.at(-1)?.cycle).toBe(100)
+      expect(heapSamples.every(sample => Number.isFinite(sample.bytes) && sample.bytes > 0)).toBe(true)
+      const first = heapSamples[0].bytes
+      const last = heapSamples[heapSamples.length - 1].bytes
+      const peak = Math.max(...heapSamples.map(sample => sample.bytes))
+      console.log(`PT-IMP-009 ${route} 100-cycle Chromium JS heap profile (diagnostic, NOT a memory-safety pass): ${JSON.stringify({ baselineBytes: first, finalBytes: last, deltaBytes: last - first, peakBytes: peak, samples: heapSamples })}`)
     }
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
