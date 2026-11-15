@@ -3,6 +3,11 @@ on:
   push:
     paths:
       - '.github/workflows/pt-imp-009-extended.yml'
+      - 'app/e2e/sessionCleanupStress.spec.ts'
+  pull_request:
+    paths:
+      - '.github/workflows/pt-imp-009-extended.yml'
+      - 'app/e2e/sessionCleanupStress.spec.ts'
   workflow_dispatch:
 
 permissions:
