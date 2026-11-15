@@ -6,6 +6,10 @@ import { unzipSync } from 'fflate'
 // PT-IMP-009: synthetic browser lifecycle stress, complementary to FileSession unit stress.
 // Keep this bounded in CI; extended 100-cycle/memory profiling is a separate acceptance gate.
 const fixture = () => readFile('../fixtures/pdf/F-001-plain-text-3p.pdf')
+// Run PT_IMP009_EXTENDED=1 npx playwright test sessionCleanupStress.spec.ts --project=chromium
+// for the opt-in 100-cycle profile; normal CI stays bounded at 12 cycles.
+const extended = process.env.PT_IMP009_EXTENDED === '1'
+const cycleCount = extended ? 100 : 12
 
 // Independently decode every sampled download instead of accepting nonempty bytes.
 async function verifySyntheticDownload(bytes: Uint8Array, route: 'merge' | 'split') {
@@ -33,7 +37,7 @@ async function verifySyntheticDownload(bytes: Uint8Array, route: 'merge' | 'spli
 
 for (const route of ['merge', 'split'] as const) {
   test(`PT-IMP-009 ${route}: repeated processing, download and reset leave no retained URLs or storage`, async ({ page }) => {
-    test.setTimeout(180_000)
+    test.setTimeout(extended ? 1_200_000 : 180_000)
     await page.addInitScript(() => {
       const create = URL.createObjectURL.bind(URL)
       const revoke = URL.revokeObjectURL.bind(URL)
@@ -65,7 +69,8 @@ for (const route of ['merge', 'split'] as const) {
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
     let sharedZipWorkerUrl: string | undefined
     const run = page.getByRole('button', { name: route === 'merge' ? 'Merge PDFs' : 'Split PDF', exact: true })
-    for (let cycle = 0; cycle < 12; cycle++) {
+    const heapSamples: Array<{ cycle: number; bytes: number }> = []
+    for (let cycle = 0; cycle < cycleCount; cycle++) {
       const file = { name: `synthetic-${cycle}.pdf`, mimeType: 'application/pdf', buffer: bytes }
       await page.locator('input[type=file]').setInputFiles(route === 'merge'
         ? [file, { ...file, name: `second-${cycle}.pdf` }] : file)
@@ -103,6 +108,18 @@ for (const route of ['merge', 'split'] as const) {
         return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+      if (extended && (cycle === 0 || (cycle + 1) % 10 === 0)) {
+        // Chromium-only experimental JS heap metric. This is diagnostic, not total process RSS.
+        const bytesUsed = await page.evaluate(() => {
+          const memory = (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory
+          return memory?.usedJSHeapSize ?? null
+        })
+        if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
+      }
+    }
+    if (extended) {
+      console.log(`PT-IMP-009 ${route} 100-cycle Chromium JS heap samples (diagnostic only): ${JSON.stringify(heapSamples)}`)
+      expect(heapSamples.length, 'Extended Chromium profiling must expose JS heap samples').toBeGreaterThan(1)
     }
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
