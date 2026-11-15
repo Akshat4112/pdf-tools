@@ -48,7 +48,7 @@ for (const route of ['merge', 'split'] as const) {
     })
     // PT-IMP-009 privacy gate: no document-processing request may upload a body.
     // Static GETs for application assets are allowed; every other network method is recorded.
-    const outboundWrites: Array<{ method: string; url: string }> = []
+    // Unhandled browser exceptions during a long session are a lifecycle regression,\n    // even when the visible result and download appear successful.\n    const pageErrors: string[] = []\n    page.on('pageerror', error => pageErrors.push(error.message))\n    const outboundWrites: Array<{ method: string; url: string }> = []
     page.on('request', request => {
       if (!['GET', 'HEAD'].includes(request.method())) {
         outboundWrites.push({ method: request.method(), url: request.url() })
@@ -113,7 +113,7 @@ for (const route of ['merge', 'split'] as const) {
         }
         return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
-      expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+      expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])\n      expect(pageErrors, `Uncaught browser exceptions after ${route} cycle ${cycle + 1}`).toEqual([])
       if (extended && (cycle === 0 || (cycle + 1) % 10 === 0)) {
         // Chromium-only experimental JS heap metric. This is diagnostic, not total process RSS.
         const bytesUsed = await page.evaluate(() => {
@@ -133,7 +133,7 @@ for (const route of ['merge', 'split'] as const) {
       const peak = Math.max(...heapSamples.map(sample => sample.bytes))
       console.log(`PT-IMP-009 ${route} 100-cycle Chromium JS heap profile (diagnostic, NOT a memory-safety pass): ${JSON.stringify({ baselineBytes: first, finalBytes: last, deltaBytes: last - first, peakBytes: peak, samples: heapSamples })}`)
     }
-    expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
+    expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])\n    expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
