@@ -51,6 +51,16 @@ for (const route of ['merge', 'split'] as const) {
       }
     })
     await page.goto(`${route}/`)
+    // A read-only cross-origin request can still leak document details in its URL.
+    // Monitor the processing phase separately from initial application asset loading.
+    const appOrigin = new URL(page.url()).origin
+    const crossOriginRequests: Array<{ method: string; url: string }> = []
+    page.on('request', request => {
+      const url = new URL(request.url())
+      if (['http:', 'https:'].includes(url.protocol) && url.origin !== appOrigin) {
+        crossOriginRequests.push({ method: request.method(), url: request.url() })
+      }
+    })
     const bytes = await fixture()
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
     let sharedZipWorkerUrl: string | undefined
@@ -95,6 +105,7 @@ for (const route of ['merge', 'split'] as const) {
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     }
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
+    expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
