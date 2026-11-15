@@ -74,10 +74,15 @@ for (const route of ['merge', 'split'] as const) {
     let sharedZipWorkerUrl: string | undefined
     const run = page.getByRole('button', { name: route === 'merge' ? 'Merge PDFs' : 'Split PDF', exact: true })
     const heapSamples: Array<{ cycle: number; bytes: number }> = []
+    const cdp = extended ? await page.context().newCDPSession(page) : null
+    const measureHeap = async () => {
+      if (!cdp) return null
+      await cdp.send('HeapProfiler.collectGarbage')
+      return (await cdp.send('Runtime.getHeapUsage')).usedSize
+    }
     // Include a pre-processing baseline; without it, cycle-one allocations are invisible.
     if (extended) {
-      const initialHeap = await page.evaluate(() =>
-        (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory?.usedJSHeapSize ?? null)
+      const initialHeap = await measureHeap()
       if (initialHeap !== null) heapSamples.push({ cycle: 0, bytes: initialHeap })
     }
     for (let cycle = 0; cycle < cycleCount; cycle++) {
@@ -121,10 +126,7 @@ for (const route of ['merge', 'split'] as const) {
       expect(pageErrors, `Uncaught browser exceptions after ${route} cycle ${cycle + 1}`).toEqual([])
       if (extended && (cycle === 0 || (cycle + 1) % 10 === 0)) {
         // Chromium-only experimental JS heap metric. This is diagnostic, not total process RSS.
-        const bytesUsed = await page.evaluate(() => {
-          const memory = (performance as Performance & { memory?: { usedJSHeapSize?: number } }).memory
-          return memory?.usedJSHeapSize ?? null
-        })
+        const bytesUsed = await measureHeap()
         if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
       }
     }
@@ -136,7 +138,11 @@ for (const route of ['merge', 'split'] as const) {
       const first = heapSamples[0].bytes
       const last = heapSamples[heapSamples.length - 1].bytes
       const peak = Math.max(...heapSamples.map(sample => sample.bytes))
-      console.log(`PT-IMP-009 ${route} 100-cycle Chromium JS heap profile (diagnostic, NOT a memory-safety pass): ${JSON.stringify({ baselineBytes: first, finalBytes: last, deltaBytes: last - first, peakBytes: peak, samples: heapSamples })}`)
+      const growthLimit = Math.max(32 * 1024 * 1024, first * 2)
+      console.log(`PT-IMP-009 ${route} 100-cycle Chromium CDP post-GC heap profile: ${JSON.stringify({ baselineBytes: first, finalBytes: last, deltaBytes: last - first, peakBytes: peak, growthLimitBytes: growthLimit, samples: heapSamples })}`)
+      expect(new Set(heapSamples.map(sample => sample.bytes)).size, 'Constant heap readings are not meaningful').toBeGreaterThan(1)
+      expect(last - first, 'Post-GC V8 heap growth exceeds allowance').toBeLessThanOrEqual(growthLimit)
+      await cdp?.detach()
     }
     expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
