@@ -42,6 +42,14 @@ for (const route of ['merge', 'split'] as const) {
       URL.revokeObjectURL = url => { active.delete(url); revoke(url) }
       Object.assign(window, { ptImp009ActiveUrls: () => active.size, ptImp009UrlDetails: () => [...active.entries()].map(([url, detail]) => ({ url, ...detail })) })
     })
+    // PT-IMP-009 privacy gate: no document-processing request may upload a body.
+    // Static GETs for application assets are allowed; every other network method is recorded.
+    const outboundWrites: Array<{ method: string; url: string }> = []
+    page.on('request', request => {
+      if (!['GET', 'HEAD'].includes(request.method())) {
+        outboundWrites.push({ method: request.method(), url: request.url() })
+      }
+    })
     await page.goto(`${route}/`)
     const bytes = await fixture()
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
@@ -86,6 +94,7 @@ for (const route of ['merge', 'split'] as const) {
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     }
+    expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
