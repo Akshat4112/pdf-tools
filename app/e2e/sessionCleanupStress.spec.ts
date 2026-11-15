@@ -141,6 +141,19 @@ for (const route of ['merge', 'split'] as const) {
     expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
+    // Exercise browser history after repeated processing: returning to the tool must
+    // not resurrect selected files, generated results or private browser storage.
+    const toolUrl = page.url()
+    const homeUrl = new URL('../', toolUrl).href
+    await page.goto(homeUrl)
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    await page.goBack()
+    await expect(page).toHaveURL(toolUrl)
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    expect(pageErrors, 'History navigation must not trigger uncaught browser exceptions').toEqual([])
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
