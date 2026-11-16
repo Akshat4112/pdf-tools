@@ -50,6 +50,17 @@ for (const route of ['merge', 'split'] as const) {
     // Static GETs for application assets are allowed; every other network method is recorded.
     // Unhandled browser exceptions during a long session are a lifecycle regression,
     // even when the visible result and download appear successful.
+    // Observe real worker instances independently of zip.js's retained script Blob URL.
+    // A script URL alone cannot establish whether workers terminate after processing.
+    const liveWorkers = new Set<import('@playwright/test').Worker>()
+    let workersCreated = 0
+    let peakLiveWorkers = 0
+    page.on('worker', worker => {
+      workersCreated++
+      liveWorkers.add(worker)
+      peakLiveWorkers = Math.max(peakLiveWorkers, liveWorkers.size)
+      worker.on('close', () => liveWorkers.delete(worker))
+    })
     const pageErrors: string[] = []
     page.on('pageerror', error => pageErrors.push(error.message))
     const outboundWrites: Array<{ method: string; url: string }> = []
@@ -122,6 +133,7 @@ for (const route of ['merge', 'split'] as const) {
         }
         return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
+      expect(liveWorkers.size, `Worker instances accumulated after ${route} cycle ${cycle + 1}`).toBeLessThanOrEqual(2)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
       expect(pageErrors, `Uncaught browser exceptions after ${route} cycle ${cycle + 1}`).toEqual([])
       if (extended && (cycle === 0 || (cycle + 1) % 10 === 0)) {
@@ -130,6 +142,7 @@ for (const route of ['merge', 'split'] as const) {
         if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
       }
     }
+    console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size })}`)
     if (extended) {
       expect(heapSamples.length, 'Extended Chromium profiling must expose baseline and repeated JS heap samples').toBeGreaterThan(2)
       expect(heapSamples[0].cycle).toBe(0)
@@ -154,6 +167,7 @@ for (const route of ['merge', 'split'] as const) {
     await page.goto(homeUrl)
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    await expect.poll(() => liveWorkers.size, { timeout: 10_000 }).toBe(0)
     await page.goBack()
     await expect(page).toHaveURL(toolUrl)
     await expect(page.locator('.file-row')).toHaveCount(0)
