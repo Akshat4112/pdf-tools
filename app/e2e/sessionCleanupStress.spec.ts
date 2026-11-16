@@ -63,6 +63,9 @@ for (const route of ['merge', 'split'] as const) {
     })
     const pageErrors: string[] = []
     page.on('pageerror', error => pageErrors.push(error.message))
+    // Privacy regression: generated synthetic input filenames must not appear in browser console output.
+    const consoleMessages: string[] = []
+    page.on('console', message => consoleMessages.push(message.text()))
     const outboundWrites: Array<{ method: string; url: string }> = []
     page.on('request', request => {
       if (!['GET', 'HEAD'].includes(request.method())) {
@@ -157,6 +160,7 @@ for (const route of ['merge', 'split'] as const) {
       expect(last - first, 'Post-GC V8 heap growth exceeds allowance').toBeLessThanOrEqual(growthLimit)
       await cdp?.detach()
     }
+    expect(consoleMessages.filter(message => /(?:synthetic|second)-\\d+\\.pdf/.test(message)), 'Input filenames must not leak into browser console logs').toEqual([])
     expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
     expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
