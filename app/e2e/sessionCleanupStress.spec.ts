@@ -157,7 +157,22 @@ for (const route of ['merge', 'split'] as const) {
     console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size, workerOrigins: [...workerOrigins], workerCycleSamples })}`)
     // A transient burst can disappear before the per-cycle sample. Bound peak concurrency too.
     expect(peakLiveWorkers, `Unexpected concurrent workers during ${route} stress`).toBeLessThanOrEqual(2)
-    expect(workersCreated, `Worker creation grew unexpectedly during ${route} stress`).toBeLessThanOrEqual(cycleCount * 2)
+    // Exact-head CI diagnostics (2026-11-16) identified PDF.js worker churn:
+    // Merge creates three pdf.worker.min.mjs instances per cycle; Split creates four
+    // per cycle plus two initial workers, one being zip.js's shared Blob worker.
+    // These workers terminate (peak <=2); cumulative creation alone is not a leak.
+    // Keep a bounded per-cycle regression guard rather than the unsupported 2/cycle cap.
+    const maxWorkersPerCycle = route === 'merge' ? 3 : 4
+    const startupAllowance = route === 'split' ? 2 : 0
+    expect(workersCreated, `Unexpected ${route} worker churn`).toBeLessThanOrEqual(cycleCount * maxWorkersPerCycle + startupAllowance)
+    for (let i = 1; i < workerCycleSamples.length; i++) {
+      const createdThisCycle = workerCycleSamples[i].created - workerCycleSamples[i - 1].created
+      expect(createdThisCycle, `Unexpected worker churn in ${route} cycle ${i + 1}`).toBeLessThanOrEqual(maxWorkersPerCycle)
+    }
+    const unexpectedWorkerOrigins = [...workerOrigins.keys()].filter(url =>
+      !url.includes('/assets/pdf.worker.min.mjs') && !(route === 'split' && url.startsWith('blob:'))
+    )
+    expect(unexpectedWorkerOrigins, 'Unexpected worker scripts').toEqual([])
     if (extended) {
       expect(heapSamples.length, 'Extended Chromium profiling must expose baseline and repeated JS heap samples').toBeGreaterThan(2)
       expect(heapSamples[0].cycle).toBe(0)
