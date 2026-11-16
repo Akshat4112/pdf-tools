@@ -151,6 +151,9 @@ for (const route of ['merge', 'split'] as const) {
       }
     }
     console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size })}`)
+    // A transient burst can disappear before the per-cycle sample. Bound peak concurrency too.
+    expect(peakLiveWorkers, `Unexpected concurrent workers during ${route} stress`).toBeLessThanOrEqual(2)
+    expect(workersCreated, `Worker creation grew unexpectedly during ${route} stress`).toBeLessThanOrEqual(cycleCount * 2)
     if (extended) {
       expect(heapSamples.length, 'Extended Chromium profiling must expose baseline and repeated JS heap samples').toBeGreaterThan(2)
       expect(heapSamples[0].cycle).toBe(0)
