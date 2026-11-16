@@ -197,6 +197,20 @@ for (const route of ['merge', 'split'] as const) {
     const toolUrl = page.url()
     const homeUrl = new URL('../', toolUrl).href
     await page.goto(homeUrl)
+    // zip.js keeps a single module-scoped worker script URL while the Split tool
+    // document is alive. Independently verify that document navigation releases
+    // that URL: a Blob URL retained by the old document must not remain fetchable.
+    // This checks document-unload revocation, not same-document Start over cleanup.
+    if (sharedZipWorkerUrl) {
+      await expect.poll(async () => page.evaluate(async url => {
+        try {
+          const response = await fetch(url)
+          return response.ok
+        } catch {
+          return false
+        }
+      }, sharedZipWorkerUrl), { timeout: 10_000 }).toBe(false)
+    }
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     await expect.poll(() => liveWorkers.size, { timeout: 10_000 }).toBe(0)
