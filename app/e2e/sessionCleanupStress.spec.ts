@@ -55,7 +55,10 @@ for (const route of ['merge', 'split'] as const) {
     const liveWorkers = new Set<import('@playwright/test').Worker>()
     let workersCreated = 0
     let peakLiveWorkers = 0
+    const workerOrigins = new Map<string, number>()
+    const workerCycleSamples: Array<{ cycle: number; created: number; live: number }> = []
     page.on('worker', worker => {
+      workerOrigins.set(worker.url(), (workerOrigins.get(worker.url()) ?? 0) + 1)
       workersCreated++
       liveWorkers.add(worker)
       peakLiveWorkers = Math.max(peakLiveWorkers, liveWorkers.size)
@@ -141,6 +144,7 @@ for (const route of ['merge', 'split'] as const) {
         }
         return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
+      workerCycleSamples.push({ cycle: cycle + 1, created: workersCreated, live: liveWorkers.size })
       expect(liveWorkers.size, `Worker instances accumulated after ${route} cycle ${cycle + 1}`).toBeLessThanOrEqual(2)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
       expect(pageErrors, `Uncaught browser exceptions after ${route} cycle ${cycle + 1}`).toEqual([])
@@ -150,7 +154,7 @@ for (const route of ['merge', 'split'] as const) {
         if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
       }
     }
-    console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size })}`)
+    console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size, workerOrigins: [...workerOrigins], workerCycleSamples })}`)
     // A transient burst can disappear before the per-cycle sample. Bound peak concurrency too.
     expect(peakLiveWorkers, `Unexpected concurrent workers during ${route} stress`).toBeLessThanOrEqual(2)
     expect(workersCreated, `Worker creation grew unexpectedly during ${route} stress`).toBeLessThanOrEqual(cycleCount * 2)
