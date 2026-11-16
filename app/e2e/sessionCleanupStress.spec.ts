@@ -202,6 +202,7 @@ for (const route of ['merge', 'split'] as const) {
     // that URL: a Blob URL retained by the old document must not remain fetchable.
     // This checks document-unload revocation, not same-document Start over cleanup.
     if (sharedZipWorkerUrl) {
+      const workerUrl = sharedZipWorkerUrl
       await expect.poll(async () => page.evaluate(async url => {
         try {
           const response = await fetch(url)
@@ -209,7 +210,7 @@ for (const route of ['merge', 'split'] as const) {
         } catch {
           return false
         }
-      }, sharedZipWorkerUrl), { timeout: 10_000 }).toBe(false)
+      }, workerUrl), { timeout: 10_000 }).toBe(false)
     }
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
