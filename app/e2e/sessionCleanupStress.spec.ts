@@ -144,6 +144,12 @@ for (const route of ['merge', 'split'] as const) {
         }
         return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
       }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
+      // After Start over, PDF.js job workers must terminate in the same document.
+      // zip.js may retain one shared worker for subsequent Split ZIP operations;
+      // do not mistake that known shared worker for an accumulating job worker.
+      await expect.poll(() => liveWorkers.size, {
+        timeout: 10_000, intervals: [100, 250, 1000],
+      }).toBeLessThanOrEqual(route === 'split' ? 1 : 0)
       workerCycleSamples.push({ cycle: cycle + 1, created: workersCreated, live: liveWorkers.size })
       expect(liveWorkers.size, `Worker instances accumulated after ${route} cycle ${cycle + 1}`).toBeLessThanOrEqual(2)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
