@@ -161,6 +161,17 @@ for (const route of ['merge', 'split'] as const) {
         if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
       }
     }
+    // Independently characterize the zip.js module-scoped script URL lifetime.
+    // It is intentionally reusable within the same document after Start over;
+    // the following navigation check must prove it becomes inaccessible on unload.
+    // This is a bounded document-lifetime policy, NOT same-document revocation.
+    if (route === 'split') {
+      expect(sharedZipWorkerUrl, 'Split must expose exactly one stable zip.js worker script URL').toBeTruthy()
+      const accessible = await page.evaluate(async url => {
+        try { return (await fetch(url)).ok } catch { return false }
+      }, sharedZipWorkerUrl!)
+      expect(accessible, 'The shared zip.js worker URL should remain usable in its owning document').toBe(true)
+    }
     console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size, workerOrigins: [...workerOrigins], workerCycleSamples })}`)
     // A transient burst can disappear before the per-cycle sample. Bound peak concurrency too.
     expect(peakLiveWorkers, `Unexpected concurrent workers during ${route} stress`).toBeLessThanOrEqual(2)
