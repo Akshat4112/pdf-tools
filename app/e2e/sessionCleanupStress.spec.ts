@@ -80,17 +80,18 @@ for (const route of ['merge', 'split'] as const) {
         outboundWrites.push({ method: request.method(), url: request.url() })
       }
     })
-    await page.goto(`${route}/`)
-    // A read-only cross-origin request can still leak document details in its URL.
-    // Monitor the processing phase separately from initial application asset loading.
-    const appOrigin = new URL(page.url()).origin
-    const crossOriginRequests: Array<{ method: string; url: string }> = []
+    // Install the privacy observer BEFORE initial navigation. A third-party
+    // request during bootstrap must not escape detection merely because it
+    // happened before the tool's first render.
+    const observedHttpRequests: Array<{ method: string; url: string }> = []
     page.on('request', request => {
       const url = new URL(request.url())
-      if (['http:', 'https:'].includes(url.protocol) && url.origin !== appOrigin) {
-        crossOriginRequests.push({ method: request.method(), url: request.url() })
+      if (['http:', 'https:'].includes(url.protocol)) {
+        observedHttpRequests.push({ method: request.method(), url: request.url() })
       }
     })
+    await page.goto(`${route}/`)
+    const appOrigin = new URL(page.url()).origin
     const bytes = await fixture()
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
     let sharedZipWorkerUrl: string | undefined
@@ -197,7 +198,7 @@ for (const route of ['merge', 'split'] as const) {
     expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])
     expect(filenameUrlLeaks, 'Input filenames must not appear in any network URL, including same-origin GETs').toEqual([])
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
-    expect(crossOriginRequests, 'PDF processing must not send even read-only requests to third-party origins').toEqual([])
+    expect(observedHttpRequests.filter(request => new URL(request.url).origin !== appOrigin), 'Initial loading and PDF processing must not send even read-only requests to third-party origins').toEqual([])
     // Exercise browser history after repeated processing: returning to the tool must
     // not resurrect selected files, generated results or private browser storage.
     const toolUrl = page.url()
