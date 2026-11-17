@@ -236,5 +236,13 @@ for (const route of ['merge', 'split'] as const) {
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    // The request observers remain attached through home navigation, history
+    // restoration and reload. Check again here: a late navigation-time request
+    // must not bypass the earlier processing-only privacy assertions.
+    expect(filenameUrlLeaks, 'Navigation must not disclose input filenames in request URLs').toEqual([])
+    expect(outboundWrites, 'Navigation must not issue unexpected network writes').toEqual([])
+    expect(observedHttpRequests.filter(request => new URL(request.url).origin !== appOrigin),
+      'Navigation and history restoration must not contact third-party origins').toEqual([])
+    expect(pageErrors, 'Reload must not raise uncaught browser exceptions').toEqual([])
   })
 }
