@@ -269,7 +269,7 @@ for (const route of ['merge', 'split'] as const) {
     expect(outboundWrites, 'Navigation must not issue unexpected network writes').toEqual([])
     expect(observedHttpRequests.filter(request => new URL(request.url).origin !== appOrigin),
       'Navigation and history restoration must not contact third-party origins').toEqual([])
-    expect(consoleMessages.filter(message => /(?:synthetic|second)-\\d+\\.pdf/.test(message)),
+    expect(consoleMessages.filter(message => /(?:synthetic|second)-\d+\.pdf/.test(message)),
       'Late navigation or locale logs must not disclose synthetic input filenames').toEqual([])
     expect(pageErrors, 'Reload must not raise uncaught browser exceptions').toEqual([])
   })
