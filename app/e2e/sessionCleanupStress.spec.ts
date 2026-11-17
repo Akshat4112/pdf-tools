@@ -254,6 +254,11 @@ for (const route of ['merge', 'split'] as const) {
       await expect(page.locator('input[type=file]')).toHaveCount(1)
       await expect(page.locator('.file-row')).toHaveCount(0)
       await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+      // Locale navigation creates a new document; old result and worker Blob
+      // URLs must not appear in the new page's URL registry.
+      await expect.poll(() => page.evaluate(() => (window as unknown as {
+        ptImp009UrlDetails(): Array<{ url: string }>
+      }).ptImp009UrlDetails().length)).toBe(0)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
       expect(pageErrors, `Locale transition to ${localePath} must not raise uncaught errors`).toEqual([])
     }
@@ -264,6 +269,8 @@ for (const route of ['merge', 'split'] as const) {
     expect(outboundWrites, 'Navigation must not issue unexpected network writes').toEqual([])
     expect(observedHttpRequests.filter(request => new URL(request.url).origin !== appOrigin),
       'Navigation and history restoration must not contact third-party origins').toEqual([])
+    expect(consoleMessages.filter(message => /(?:synthetic|second)-\\d+\\.pdf/.test(message)),
+      'Late navigation or locale logs must not disclose synthetic input filenames').toEqual([])
     expect(pageErrors, 'Reload must not raise uncaught browser exceptions').toEqual([])
   })
 }
