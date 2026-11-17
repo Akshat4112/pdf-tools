@@ -49,4 +49,40 @@ describe('PT-IMP-009 cancellation and late-result isolation', () => {
     expect(current.result).toBe('fresh-output')
     expect(session.audit()).toEqual(empty)
   })
+  it('isolates a failed synthetic job and permits a clean subsequent run', async () => {
+    const session = new FileSession()
+    const failed = session.jobs.track(runJob('synthetic-failure', 1, async () => {
+      throw new Error('synthetic private failure detail')
+    }))
+    await failed.completion
+    expect(failed.state).toBe('failed')
+    expect(failed.result).toBeUndefined()
+    expect(failed.error?.code).toBe('E-PROC-01')
+    expect(JSON.stringify(failed.error)).not.toContain('synthetic private failure detail')
+    expect(session.audit()).toEqual(empty)
+
+    const recovered = session.jobs.track(runJob('synthetic-recovery', 2, async () => 'verified synthetic output'))
+    await recovered.completion
+    expect(recovered.state).toBe('done')
+    expect(recovered.result).toBe('verified synthetic output')
+    expect(session.audit()).toEqual(empty)
+  })
+
+  it('discards an executor rejection after reset without exposing failure details', async () => {
+    const session = new FileSession()
+    let rejectLate!: (reason: Error) => void
+    const stale = session.jobs.track(runJob('synthetic-rejected-after-reset', 1, async () =>
+      new Promise<string>((_resolve, reject) => { rejectLate = reject })
+    ))
+    await Promise.resolve()
+    expect(session.audit().activeJobs).toBe(1)
+    session.resetSession()
+    rejectLate(new Error('synthetic private late rejection'))
+    await stale.completion
+    expect(stale.state).toBe('cancelled')
+    expect(stale.result).toBeUndefined()
+    expect(stale.error).toBeUndefined()
+    expect(session.audit()).toEqual(empty)
+  })
+
 })
