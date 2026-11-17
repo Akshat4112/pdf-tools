@@ -236,9 +236,6 @@ for (const route of ['merge', 'split'] as const) {
     await page.reload()
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
-    // EN/DE route transitions after a long synthetic session must not restore
-    // files/results or leak session state. Test both localized tool routes,
-    // not just the catalog home page.
     const origin = new URL(page.url()).origin
     const basePath = new URL(page.url()).pathname.replace(new RegExp(`(?:de/)?${route}/?import { test, expect } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
