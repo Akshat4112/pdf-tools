@@ -226,6 +226,11 @@ for (const route of ['merge', 'split'] as const) {
     await expect(page).toHaveURL(toolUrl)
     await expect(page.locator('.file-row')).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+    // Back/forward-cache restoration must not resurrect the previous document's
+    // retained zip.js script URL or any generated download URL.
+    await expect.poll(async () => page.evaluate(() => (window as unknown as {
+      ptImp009UrlDetails(): Array<{ url: string }>
+    }).ptImp009UrlDetails().length)).toBe(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     expect(pageErrors, 'History navigation must not trigger uncaught browser exceptions').toEqual([])
     await page.reload()
