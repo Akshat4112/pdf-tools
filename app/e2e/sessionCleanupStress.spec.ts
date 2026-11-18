@@ -278,9 +278,16 @@ for (const route of ['merge', 'split'] as const) {
 
 test('PT-IMP-009: locale navigation discards selected synthetic files before processing', async ({ page }) => {
   const leakedRequests: string[] = []
+  const unexpectedNetwork: string[] = []
+  const leakedConsole: string[] = []
   const errors: string[] = []
   page.on('request', request => {
     if (/locale-switch-synthetic\.pdf/i.test(request.url())) leakedRequests.push(request.url())
+    // Record all HTTP requests, including those during the initial page load.
+    if (/^https?:/.test(request.url())) unexpectedNetwork.push(request.url())
+  })
+  page.on('console', message => {
+    if (/locale-switch-synthetic\.pdf/i.test(message.text())) leakedConsole.push(message.text())
   })
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('merge/')
@@ -297,11 +304,16 @@ test('PT-IMP-009: locale navigation discards selected synthetic files before pro
   await expect(page.locator('input[type=file]')).toHaveCount(1)
   await expect(page.locator('.file-row')).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+  expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
   await page.goBack()
   await expect(page).toHaveURL(original)
   await expect(page.locator('.file-row')).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
   expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
   expect(leakedRequests).toEqual([])
+  expect(leakedConsole, 'Locale navigation must not log selected filenames').toEqual([])
+  const origin = new URL(original).origin
+  expect(unexpectedNetwork.filter(url => new URL(url).origin !== origin),
+    'Selected-file locale navigation must not contact third-party origins').toEqual([])
   expect(errors).toEqual([])
 })
