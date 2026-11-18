@@ -274,3 +274,34 @@ for (const route of ['merge', 'split'] as const) {
     expect(pageErrors, 'Reload must not raise uncaught browser exceptions').toEqual([])
   })
 }
+
+
+test('PT-IMP-009: locale navigation discards selected synthetic files before processing', async ({ page }) => {
+  const leakedRequests: string[] = []
+  const errors: string[] = []
+  page.on('request', request => {
+    if (/locale-switch-synthetic\.pdf/i.test(request.url())) leakedRequests.push(request.url())
+  })
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto('merge/')
+  const original = page.url()
+  const input = page.locator('input[type=file]')
+  await input.setInputFiles({
+    name: 'locale-switch-synthetic.pdf',
+    mimeType: 'application/pdf',
+    buffer: await fixture(),
+  })
+  await expect(page.locator('.file-row')).toHaveCount(1)
+  const germanUrl = new URL('../de/merge/', original).href
+  await page.goto(germanUrl)
+  await expect(page.locator('input[type=file]')).toHaveCount(1)
+  await expect(page.locator('.file-row')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+  await page.goBack()
+  await expect(page).toHaveURL(original)
+  await expect(page.locator('.file-row')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+  expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+  expect(leakedRequests).toEqual([])
+  expect(errors).toEqual([])
+})
