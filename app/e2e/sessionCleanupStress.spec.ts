@@ -319,3 +319,53 @@ for (const route of ['merge', 'split'] as const) {
   expect(errors).toEqual([])
   })
 }
+
+
+// Cover the remaining PDF-input workflows at the selection/navigation boundary.
+// This does not replace each engine's processing/output-validation acceptance.
+for (const route of [
+  'rotate', 'delete-pages', 'extract-pages', 'organize', 'pdf-to-jpg',
+  'pdf-to-png', 'reader', 'page-numbers', 'watermark', 'pdf-to-text', 'doc-info',
+] as const) {
+  test(`PT-IMP-009 ${route}: locale/history clears selected PDF without network disclosure`, async ({ page }) => {
+    const outbound: string[] = []
+    const consoleLeaks: string[] = []
+    const errors: string[] = []
+    const selectedName = 'pt-imp009-private-selection.pdf'
+    page.on('request', request => {
+      if (/pt-imp009-private-selection/i.test(request.url()) ||
+        !['GET', 'HEAD'].includes(request.method())) outbound.push(`${request.method()} ${request.url()}`)
+    })
+    page.on('console', message => {
+      if (message.text().includes(selectedName)) consoleLeaks.push(message.text())
+    })
+    page.on('pageerror', error => errors.push(error.message))
+    await page.goto(`${route}/`)
+    const original = page.url()
+    const origin = new URL(original).origin
+    const thirdParty: string[] = []
+    // The request listener above is installed before navigation; verify every
+    // request via the browser's performance entries as an additional read-only guard.
+    const input = page.locator('input[type=file]')
+    await expect(input).toHaveCount(1)
+    await input.setInputFiles({ name: selectedName, mimeType: 'application/pdf', buffer: await fixture() })
+    await expect(page.locator('.file-row')).toHaveCount(1)
+    const germanUrl = new URL(`../de/${route}/`, original).href
+    await page.goto(germanUrl)
+    await expect(page.locator('input[type=file]')).toHaveCount(1)
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    await page.goBack()
+    await expect(page).toHaveURL(original)
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    thirdParty.push(...await page.evaluate(() => performance.getEntriesByType('resource')
+      .map(entry => entry.name).filter(url => /^https?:/.test(url))))
+    expect(thirdParty.filter(url => new URL(url).origin !== origin)).toEqual([])
+    expect(outbound).toEqual([])
+    expect(consoleLeaks).toEqual([])
+    expect(errors).toEqual([])
+  })
+}
