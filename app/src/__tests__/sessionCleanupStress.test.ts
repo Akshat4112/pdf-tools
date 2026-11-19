@@ -129,4 +129,47 @@ describe('PT-IMP-009 repeated session lifecycle stress', () => {
     expect(second.audit()).toEqual(empty)
   })
 
+  it('isolates a late rejected job in one session while a second session finishes and retains its download', async () => {
+    const revoked: string[] = []
+    let serial = 0
+    vi.spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:synthetic-rejection-isolation-${++serial}`)
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(url => { revoked.push(url) })
+
+    const cancelled = new FileSession()
+    const surviving = new FileSession()
+    const cancelledOutput = cancelled.addOutput('cancelled.pdf', 'application/pdf', pdf)
+    const survivingOutput = surviving.addOutput('surviving.pdf', 'application/pdf', pdf)
+    const cancelledUrl = cancelled.objectUrlFor(cancelledOutput.id)
+    const survivingUrl = surviving.objectUrlFor(survivingOutput.id)
+
+    let rejectCancelled!: (error: Error) => void
+    let releaseSurvivor!: () => void
+    const cancelledJob = cancelled.jobs.track(runJob('synthetic-rejected', 1, async () =>
+      new Promise<string>((_resolve, reject) => { rejectCancelled = reject }),
+    ))
+    const survivingJob = surviving.jobs.track(runJob('synthetic-survivor', 2, async () => {
+      await new Promise<void>(resolve => { releaseSurvivor = resolve })
+      return 'verified-survivor'
+    }))
+    await Promise.resolve()
+    cancelled.resetSession()
+    rejectCancelled(new Error('synthetic confidential failure from discarded document'))
+    releaseSurvivor()
+    await Promise.all([cancelledJob.completion, survivingJob.completion])
+
+    expect(cancelledJob.state).toBe('cancelled')
+    expect(cancelledJob.result).toBeUndefined()
+    expect(cancelledJob.error).toBeUndefined()
+    expect(cancelled.audit()).toEqual(empty)
+    expect(revoked).toEqual([cancelledUrl])
+
+    expect(survivingJob.state).toBe('done')
+    expect(survivingJob.result).toBe('verified-survivor')
+    expect(surviving.objectUrlFor(survivingOutput.id)).toBe(survivingUrl)
+    expect(surviving.audit()).toEqual({ files: 0, outputs: 1, objectUrls: 1, activeJobs: 0 })
+    surviving.resetSession()
+    expect(revoked).toEqual([cancelledUrl, survivingUrl])
+    expect(surviving.audit()).toEqual(empty)
+  })
+
 })
