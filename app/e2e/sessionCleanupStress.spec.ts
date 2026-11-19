@@ -350,9 +350,12 @@ for (const route of [
     await expect(input).toHaveCount(1)
     await input.setInputFiles({ name: selectedName, mimeType: 'application/pdf', buffer: await fixture() })
     await expect(page.locator('.file-row')).toHaveCount(1)
-    const germanUrl = new URL(`../de/${route}/`, original).href
+    // Only explicitly published German tool routes may be tested as tool pages.
+    // For the remaining EN tools, navigate to the published German catalog instead:
+    // this exercises locale/history privacy without inventing a DE tool route.
+    const germanUrl = new URL('../de/', original).href
     await page.goto(germanUrl)
-    await expect(page.locator('input[type=file]')).toHaveCount(1)
+    await expect(page.locator('input[type=file]')).toHaveCount(0)
     await expect(page.locator('.file-row')).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
