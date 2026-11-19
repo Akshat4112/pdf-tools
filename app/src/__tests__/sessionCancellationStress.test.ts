@@ -138,4 +138,51 @@ describe('PT-IMP-009 cancellation and late-result isolation', () => {
     }
   })
 
+
+  it('revokes downloadable output URLs before a cancelled executor settles, across 100 cycles', async () => {
+    const created: string[] = []
+    const revoked: string[] = []
+    const originalCreate = URL.createObjectURL
+    const originalRevoke = URL.revokeObjectURL
+    try {
+      URL.createObjectURL = (() => {
+        const url = `blob:synthetic-cancel-${created.length + 1}`
+        created.push(url)
+        return url
+      }) as typeof URL.createObjectURL
+      URL.revokeObjectURL = (url: string) => { revoked.push(url) }
+
+      const session = new FileSession()
+      for (let cycle = 0; cycle < 100; cycle++) {
+        const file = session.addFile(`private-${cycle}.pdf`, new Uint8Array([37, 80, 68, 70]), 'pdf')
+        const output = session.addOutput(`result-${cycle}.pdf`, 'application/pdf', file.bytes)
+        const downloadUrl = session.objectUrlFor(output.id)
+        let release!: () => void
+        const stale = session.jobs.track(runJob('synthetic-cancelled-output', cycle, async () => {
+          await new Promise<void>(resolve => { release = resolve })
+          return `private-late-${cycle}`
+        }))
+        await Promise.resolve()
+        expect(session.audit()).toEqual({ files: 1, outputs: 1, objectUrls: 1, activeJobs: 1 })
+        if (cycle % 2 === 0) session.clearFiles()
+        else session.resetSession()
+        expect(revoked).toContain(downloadUrl)
+        expect(session.audit()).toEqual(empty)
+        release()
+        await stale.completion
+        expect(stale.state).toBe('cancelled')
+        expect(stale.result).toBeUndefined()
+        expect(stale.error).toBeUndefined()
+        expect(session.getOutput(output.id)).toBeUndefined()
+        expect(session.audit()).toEqual(empty)
+      }
+      expect(created).toHaveLength(100)
+      expect(revoked).toHaveLength(100)
+      expect(new Set(revoked)).toEqual(new Set(created))
+    } finally {
+      URL.createObjectURL = originalCreate
+      URL.revokeObjectURL = originalRevoke
+    }
+  })
+
 })
