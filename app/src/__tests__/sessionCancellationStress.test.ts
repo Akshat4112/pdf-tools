@@ -114,4 +114,28 @@ describe('PT-IMP-009 cancellation and late-result isolation', () => {
     expect(fresh.result).toBe('safe-result')
     expect(session.audit()).toEqual(empty)
   })
+  it('repeats 100 clearFiles cancellation and fresh-job cycles without retaining private results', async () => {
+    const session = new FileSession()
+    for (let cycle = 0; cycle < 100; cycle++) {
+      let release!: () => void
+      const stale = session.jobs.track(runJob('synthetic-navigation-stale', cycle, async () => {
+        await new Promise<void>(resolve => { release = resolve })
+        return { privateDocumentMarker: `synthetic-private-${cycle}` }
+      }))
+      await Promise.resolve()
+      expect(session.audit().activeJobs).toBe(1)
+      session.clearFiles()
+      expect(stale.state).toBe('cancelled')
+      release()
+      await stale.completion
+      expect(stale.result).toBeUndefined()
+      expect(stale.error).toBeUndefined()
+      const fresh = session.jobs.track(runJob('synthetic-navigation-fresh', cycle, async () => cycle))
+      await fresh.completion
+      expect(fresh.state).toBe('done')
+      expect(fresh.result).toBe(cycle)
+      expect(session.audit()).toEqual(empty)
+    }
+  })
+
 })
