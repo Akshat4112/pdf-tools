@@ -329,10 +329,12 @@ for (const route of [
 ] as const) {
   test(`PT-IMP-009 ${route}: locale/history clears selected PDF without network disclosure`, async ({ page }) => {
     const outbound: string[] = []
+    const requests: string[] = []
     const consoleLeaks: string[] = []
     const errors: string[] = []
     const selectedName = 'pt-imp009-private-selection.pdf'
     page.on('request', request => {
+      if (/^https?:/.test(request.url())) requests.push(request.url())
       if (/pt-imp009-private-selection/i.test(request.url()) ||
         !['GET', 'HEAD'].includes(request.method())) outbound.push(`${request.method()} ${request.url()}`)
     })
@@ -343,9 +345,8 @@ for (const route of [
     await page.goto(`${route}/`)
     const original = page.url()
     const origin = new URL(original).origin
-    const thirdParty: string[] = []
-    // The request listener above is installed before navigation; verify every
-    // request via the browser's performance entries as an additional read-only guard.
+    // Capture requests from initial load, processing, locale navigation and history.
+    // Performance entries alone omit previous documents after navigation.
     const input = page.locator('input[type=file]')
     await expect(input).toHaveCount(1)
     await input.setInputFiles({ name: selectedName, mimeType: 'application/pdf', buffer: await fixture() })
@@ -364,9 +365,8 @@ for (const route of [
     await expect(page.locator('.file-row')).toHaveCount(0)
     await expect(page.getByRole('region', { name: 'Results', exact: true })).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
-    thirdParty.push(...await page.evaluate(() => performance.getEntriesByType('resource')
-      .map(entry => entry.name).filter(url => /^https?:/.test(url))))
-    expect(thirdParty.filter(url => new URL(url).origin !== origin)).toEqual([])
+    expect(requests.filter(url => new URL(url).origin !== origin),
+      'Cross-tool locale/history navigation must not contact third-party origins').toEqual([])
     expect(outbound).toEqual([])
     expect(consoleLeaks).toEqual([])
     expect(errors).toEqual([])
