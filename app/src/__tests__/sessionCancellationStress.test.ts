@@ -85,4 +85,33 @@ describe('PT-IMP-009 cancellation and late-result isolation', () => {
     expect(session.audit()).toEqual(empty)
   })
 
+
+  it('isolates 100 late executor failures after reset and accepts a fresh job', async () => {
+    const session = new FileSession()
+    const rejectors: Array<(reason: Error) => void> = []
+    const staleJobs = Array.from({ length: 100 }, (_, index) =>
+      session.jobs.track(runJob('synthetic-late-failure', index, async () =>
+        new Promise<string>((_resolve, reject) => {
+          rejectors.push(reject)
+        }),
+      )),
+    )
+    await Promise.resolve()
+    expect(rejectors).toHaveLength(100)
+    expect(session.audit().activeJobs).toBe(100)
+    session.resetSession()
+    expect(session.audit()).toEqual(empty)
+    for (const reject of rejectors) reject(new Error('synthetic confidential rejection'))
+    await Promise.all(staleJobs.map(job => job.completion))
+    for (const job of staleJobs) {
+      expect(job.state).toBe('cancelled')
+      expect(job.result).toBeUndefined()
+      expect(job.error).toBeUndefined()
+    }
+    const fresh = session.jobs.track(runJob('synthetic-post-reset', 101, async () => 'safe-result'))
+    await fresh.completion
+    expect(fresh.state).toBe('done')
+    expect(fresh.result).toBe('safe-result')
+    expect(session.audit()).toEqual(empty)
+  })
 })
