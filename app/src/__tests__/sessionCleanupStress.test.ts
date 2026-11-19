@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { FileSession } from '../session/fileSession'
+import { runJob } from '../jobs/orchestrator'
 
 const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x37])
 const empty = { files: 0, outputs: 0, objectUrls: 0, activeJobs: 0 }
@@ -77,6 +78,53 @@ describe('PT-IMP-009 repeated session lifecycle stress', () => {
     expect(second.objectUrlFor(secondOutput.id)).toBe(secondUrl)
 
     second.clearFiles()
+    expect(revoked).toEqual([firstUrl, secondUrl])
+    expect(second.audit()).toEqual(empty)
+  })
+
+  it('isolates active jobs and download URLs between two sessions during reset', async () => {
+    let serial = 0
+    const revoked: string[] = []
+    vi.spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:synthetic-cross-session-${++serial}`)
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(url => { revoked.push(url) })
+
+    const first = new FileSession()
+    const second = new FileSession()
+    const firstOutput = first.addOutput('private-first.pdf', 'application/pdf', pdf)
+    const secondOutput = second.addOutput('private-second.pdf', 'application/pdf', pdf)
+    const firstUrl = first.objectUrlFor(firstOutput.id)
+    const secondUrl = second.objectUrlFor(secondOutput.id)
+
+    let releaseFirst!: () => void
+    let releaseSecond!: () => void
+    const firstJob = first.jobs.track(runJob('synthetic-first', 1, async () => {
+      await new Promise<void>(resolve => { releaseFirst = resolve })
+      return 'stale-first'
+    }))
+    const secondJob = second.jobs.track(runJob('synthetic-second', 2, async () => {
+      await new Promise<void>(resolve => { releaseSecond = resolve })
+      return 'valid-second'
+    }))
+    await Promise.resolve()
+    expect(first.audit().activeJobs).toBe(1)
+    expect(second.audit().activeJobs).toBe(1)
+
+    first.resetSession()
+    expect(first.audit()).toEqual(empty)
+    expect(revoked).toEqual([firstUrl])
+    expect(firstJob.state).toBe('cancelled')
+    expect(secondJob.state).not.toBe('cancelled')
+    expect(second.objectUrlFor(secondOutput.id)).toBe(secondUrl)
+    expect(second.audit().objectUrls).toBe(1)
+
+    releaseFirst()
+    releaseSecond()
+    await Promise.all([firstJob.completion, secondJob.completion])
+    expect(firstJob.result).toBeUndefined()
+    expect(secondJob.state).toBe('done')
+    expect(secondJob.result).toBe('valid-second')
+    expect(second.audit()).toEqual({ files: 0, outputs: 1, objectUrls: 1, activeJobs: 0 })
+    second.resetSession()
     expect(revoked).toEqual([firstUrl, secondUrl])
     expect(second.audit()).toEqual(empty)
   })
