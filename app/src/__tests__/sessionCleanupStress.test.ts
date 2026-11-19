@@ -57,4 +57,28 @@ describe('PT-IMP-009 repeated session lifecycle stress', () => {
     expect(revoked).toEqual(['blob:synthetic-orphan-output'])
     expect(session.audit()).toEqual(empty)
   })
+  it('keeps another active workspace download alive while clearing the first', () => {
+    let serial = 0
+    const revoked: string[] = []
+    vi.spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:synthetic-independent-${++serial}`)
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(url => { revoked.push(url) })
+
+    const first = new FileSession()
+    const second = new FileSession()
+    const firstOutput = first.addOutput('first.pdf', 'application/pdf', pdf)
+    const secondOutput = second.addOutput('second.pdf', 'application/pdf', pdf)
+    const firstUrl = first.objectUrlFor(firstOutput.id)
+    const secondUrl = second.objectUrlFor(secondOutput.id)
+
+    first.resetSession()
+    expect(revoked).toEqual([firstUrl])
+    expect(first.audit()).toEqual(empty)
+    expect(second.audit()).toEqual({ files: 0, outputs: 1, objectUrls: 1, activeJobs: 0 })
+    expect(second.objectUrlFor(secondOutput.id)).toBe(secondUrl)
+
+    second.clearFiles()
+    expect(revoked).toEqual([firstUrl, secondUrl])
+    expect(second.audit()).toEqual(empty)
+  })
+
 })
