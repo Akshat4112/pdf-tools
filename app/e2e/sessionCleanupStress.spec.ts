@@ -402,3 +402,64 @@ test('PT-IMP-009 Split: larger stored archive yields to browser and verifies eve
   expect(origins.filter(url => !url.includes('/assets/pdf.worker.min.mjs'))).toEqual([])
   console.log('PT-IMP-009 larger archive heartbeat', timing)
 })
+
+test('PT-IMP-009 images-to-pdf: repeated verified downloads and reset release local resources', async ({ page }) => {
+  await page.addInitScript(() => {
+    const active = new Set<string>()
+    const create = URL.createObjectURL.bind(URL)
+    const revoke = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = blob => { const url = create(blob); active.add(url); return url }
+    URL.revokeObjectURL = url => { active.delete(url); revoke(url) }
+    Object.assign(window, { ptImp009ImageUrls: () => active.size })
+  })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+  const requests: Array<{ url: string; method: string }> = []
+  const errors: string[] = []
+  const logs: string[] = []
+  const sockets: string[] = []
+  page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+  page.on('pageerror', error => errors.push(error.message))
+  page.on('console', message => logs.push(message.text()))
+  page.on('websocket', socket => sockets.push(socket.url()))
+  await page.goto('images-to-pdf/')
+  const original = page.url()
+  const origin = new URL(original).origin
+  const bytes = await readFile('e2e/images-engine/corners.jpg')
+  const urlCount = () => page.evaluate(() => (window as unknown as { ptImp009ImageUrls(): number }).ptImp009ImageUrls())
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await page.locator('input[type=file]').setInputFiles({
+      name: `pt-imp009-image-private-${cycle}.jpg`, mimeType: 'image/jpeg', buffer: bytes,
+    })
+    await expect(page.locator('.file-row')).toHaveCount(1)
+    const run = page.getByRole('button', { name: 'Create PDF', exact: true })
+    await expect(run).toBeEnabled()
+    await run.click()
+    const result = page.getByRole('region', { name: 'Results', exact: true })
+    await expect(result).toBeVisible()
+    const pending = page.waitForEvent('download')
+    await result.getByRole('button', { name: /^Download / }).first().click()
+    const download = await pending
+    const pdf = await PDFDocument.load(await readFile((await download.path())!), { updateMetadata: false })
+    expect(pdf.getPageCount()).toBe(1)
+    expect(pdf.getPage(0).getWidth()).toBeGreaterThan(0)
+    expect(pdf.getPage(0).getHeight()).toBeGreaterThan(0)
+    if (cycle < 2) await page.getByRole('button', { name: 'Start over', exact: true }).click()
+    else {
+      await page.goto(new URL('../de/', original).href)
+      await page.goBack()
+      await expect(page).toHaveURL(original)
+    }
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(result).toHaveCount(0)
+    await expect.poll(urlCount).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+  }
+  expect(requests.filter(r => !['GET', 'HEAD'].includes(r.method) ||
+    (/^https?:/.test(r.url) && new URL(r.url).origin !== origin) ||
+    /pt-imp009-image-private/i.test(r.url))).toEqual([])
+  expect(logs.filter(log => /pt-imp009-image-private/i.test(log))).toEqual([])
+  expect(errors).toEqual([])
+  expect(sockets).toEqual([])
+})
