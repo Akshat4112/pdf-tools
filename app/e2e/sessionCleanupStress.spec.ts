@@ -330,6 +330,10 @@ for (const route of [
   test(`PT-IMP-009 ${route}: locale/history clears selected PDF without network disclosure`, async ({ page }) => {
     const outbound: string[] = []
     const requests: string[] = []
+    // A WebSocket can disclose data without appearing as a normal HTTP request.
+    // Track the handshake throughout selection, locale navigation and history.
+    const webSockets: string[] = []
+    page.on('websocket', socket => webSockets.push(socket.url()))
     const consoleLeaks: string[] = []
     const errors: string[] = []
     const selectedName = 'pt-imp009-private-selection.pdf'
@@ -368,6 +372,7 @@ for (const route of [
     expect(requests.filter(url => new URL(url).origin !== origin),
       'Cross-tool locale/history navigation must not contact third-party origins').toEqual([])
     expect(outbound).toEqual([])
+    expect(webSockets, 'PDF selection/navigation must not open WebSocket connections').toEqual([])
     expect(consoleLeaks).toEqual([])
     expect(errors).toEqual([])
   })
