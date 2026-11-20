@@ -49,7 +49,17 @@ test('PT-IMP-009 German Rotate: repeated verified output and reset', async ({ pa
     expect(output.getPageCount()).toBe(2)
     expect(output.getPages().map(p => p.getRotation().angle)).toEqual([180, 0])
     expect(output.getPages().map(p => p.getSize())).toEqual([{ width: 300, height: 400 }, { width: 400, height: 300 }])
-    await page.getByRole('button', { name: 'Neu beginnen' }).click()
+    if (cycle === 2) {
+      // Abandon a completed result without Start over; history must not
+      // restore the private selection or its download after navigation.
+      const toolUrl = page.url()
+      await page.goto(new URL('../', toolUrl).href)
+      await expect.poll(() => workers.size).toBe(0)
+      await page.goBack()
+      await expect(page).toHaveURL(toolUrl)
+    } else {
+      await page.getByRole('button', { name: 'Neu beginnen' }).click()
+    }
     await expect(page.locator('.file-row')).toHaveCount(0)
     await expect(page.getByRole('button', { name: /^Herunterladen / })).toHaveCount(0)
     await expect.poll(() => page.evaluate(() =>
