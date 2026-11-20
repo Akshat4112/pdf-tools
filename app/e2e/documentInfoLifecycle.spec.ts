@@ -15,6 +15,20 @@ test('PT-IMP-009 document information: repeated inspection, reset and privacy', 
   page.on('console', message => {
     if (message.text().includes(filename)) consoleLeaks.push(message.text())
   })
+  await page.addInitScript(() => {
+    const urls = new Set<string>()
+    const workers = new Set<Worker>()
+    const create = URL.createObjectURL.bind(URL)
+    const revoke = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+    URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+    const NativeWorker = window.Worker
+    window.Worker = class extends NativeWorker {
+      constructor(url: string | URL, options?: WorkerOptions) { super(url, options); workers.add(this) }
+      terminate() { workers.delete(this); super.terminate() }
+    }
+    Object.assign(window, { documentInfoResources: { urls, workers } })
+  })
   await page.goto('doc-info/')
   const origin = new URL(page.url()).origin
   const bytes = await readFile('../fixtures/pdf/F-001-plain-text-3p.pdf')
@@ -34,6 +48,10 @@ test('PT-IMP-009 document information: repeated inspection, reset and privacy', 
     await expect(summary).toHaveCount(0)
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+    await expect.poll(() => page.evaluate(() => {
+      const state = (window as unknown as { documentInfoResources: { urls: Set<string>; workers: Set<Worker> } }).documentInfoResources
+      return { urls: state.urls.size, workers: state.workers.size }
+    })).toEqual({ urls: 0, workers: 0 })
   }
   expect(requests.filter(request => !['GET', 'HEAD'].includes(request.method))).toEqual([])
   expect(requests.filter(request => new URL(request.url).origin !== origin)).toEqual([])
@@ -41,4 +59,8 @@ test('PT-IMP-009 document information: repeated inspection, reset and privacy', 
   expect(sockets).toEqual([])
   expect(consoleLeaks).toEqual([])
   expect(errors).toEqual([])
+  await page.reload()
+  await expect(page.locator('.file-row')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Document summary' })).toHaveCount(0)
+  expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
 })
