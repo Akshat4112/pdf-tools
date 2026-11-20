@@ -19,6 +19,11 @@ test('PT-IMP-009 German Rotate: repeated verified output and reset', async ({ pa
   page.on('websocket', socket => sockets.push(socket.url()))
   page.on('pageerror', error => errors.push(error.message))
   page.on('console', message => { if (message.text().includes(name)) leaks.push(message.text()) })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => {
+    workers.add(worker)
+    worker.on('close', () => workers.delete(worker))
+  })
   await page.addInitScript(() => {
     const urls = new Set<string>()
     const create = URL.createObjectURL.bind(URL)
@@ -50,6 +55,7 @@ test('PT-IMP-009 German Rotate: repeated verified output and reset', async ({ pa
     await expect.poll(() => page.evaluate(() =>
       (window as unknown as { rotateLifecycleUrls: Set<string> }).rotateLifecycleUrls.size
     )).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
     expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
   }
   await page.reload()
