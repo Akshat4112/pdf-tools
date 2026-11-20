@@ -488,12 +488,13 @@ test('PT-IMP-009 pdf-to-text: repeated UTF-8 exports and abandoned results relea
   await page.goto('pdf-to-text/')
   const original = page.url(), origin = new URL(original).origin
   const report = page.getByRole('region', { name: 'Text extraction report', exact: true })
-  const downloadButton = page.getByRole('button', { name: /^Download .*\\.txt/ })
+  const downloadButton = page.getByRole('button', { name: /^Download .*\.txt/ })
   for (let cycle = 0; cycle < 3; cycle++) {
     await page.locator('input[type=file]').setInputFiles({ name: marker + '.pdf', mimeType: 'application/pdf', buffer })
     await expect(page.locator('.file-row')).toHaveCount(1)
     await page.getByRole('button', { name: 'Export text', exact: true }).click()
     await expect(report).toBeVisible()
+    await expect(downloadButton).toBeVisible()
     const pending = page.waitForEvent('download')
     await downloadButton.click()
     const result = await pending
