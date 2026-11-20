@@ -1,0 +1,37 @@
+name: PT-IMP-009 extended Chromium profiling
+on:
+  push:
+    paths:
+      - '.github/workflows/pt-imp-009-extended.yml'
+      - 'app/e2e/sessionCleanupStress.spec.ts'
+  pull_request:
+    paths:
+      - '.github/workflows/pt-imp-009-extended.yml'
+      - 'app/e2e/sessionCleanupStress.spec.ts'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  extended-memory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: 100-cycle synthetic browser processing and heap diagnostics
+        env:
+          PT_IMP009_EXTENDED: '1'
+          CI: 'true'
+        run: npx playwright test sessionCleanupStress.spec.ts --project=desktop-chromium --workers=1 --reporter=line

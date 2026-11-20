@@ -192,7 +192,9 @@ export async function buildZip(entries: ZipEntry[]): Promise<Uint8Array> {
 
   // stream each entry into the archive; zip.js v2: close() RETURNS the Blob
   const blobWriter = new BlobWriter('application/zip')
-  const writer = new ZipWriter(blobWriter, { level: 0 }) // stored; outputs are already compressed media
+  // Stored outputs need no compression worker. Avoid zip.js's document-lifetime
+  // worker pool and script Blob URL without globally changing other ZIP consumers.
+  const writer = new ZipWriter(blobWriter, { level: 0, useWebWorkers: false })
   for (const e of entries) {
     const ab = new ArrayBuffer(e.bytes.byteLength)
     new Uint8Array(ab).set(e.bytes)
