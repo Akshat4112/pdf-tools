@@ -1,82 +1,112 @@
+<div align="center">
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="app/public/brand/logo-dark.svg">
-  <img src="app/public/brand/logo-light.svg" alt="PDF Tools" width="280">
+  <img src="app/public/brand/logo-light.svg" alt="PDF Tools" width="260">
 </picture>
 
 # PDF Tools
 
-**Free PDF tools. On your device.**
+**Your documents. Your device. Your privacy.**
 
-Merge, split, organize, read and convert PDFs in your browser. PDF Tools is open source, requires no account, and processes your selected documents on your device instead of uploading them to a conversion server.
+Free, open-source tools for working with PDFs in your browser.<br>
+Merge, split, organize and convert documents without uploading them to a conversion server.
 
-**[Open PDF Tools](https://akshat4112.github.io/pdf-tools/)** · [All working tools](https://akshat4112.github.io/pdf-tools/#tool-catalog) · [Guides](https://akshat4112.github.io/pdf-tools/guides/) · [Help](https://akshat4112.github.io/pdf-tools/help/) · [Privacy](https://akshat4112.github.io/pdf-tools/privacy/) · [Trust and evidence](https://akshat4112.github.io/pdf-tools/trust/) · [Contribute](#contributing-and-feedback)
+**[Launch PDF Tools →](https://akshat4112.github.io/pdf-tools/)**
 
-[![Checks on main](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml) [![Cross-browser CI](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml) [![Startup performance](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml)
+[English](https://akshat4112.github.io/pdf-tools/) · [Deutsch](https://akshat4112.github.io/pdf-tools/de/) · [User guides](https://akshat4112.github.io/pdf-tools/guides/) · [Help](https://akshat4112.github.io/pdf-tools/help/) · [Privacy](https://akshat4112.github.io/pdf-tools/privacy/)
 
-These badges show live GitHub Actions outcomes; they are not independent security or accessibility certifications.
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Build and tests](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/checks.yml)
+[![Browser tests](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/compatibility.yml)
+[![Startup performance](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml/badge.svg?branch=main)](https://github.com/Akshat4112/pdf-tools/actions/workflows/performance.yml)
 
-The repository and site path are `pdf-tools`.
+[![PDF Tools project artwork](app/public/brand/social-card.png)](https://akshat4112.github.io/pdf-tools/)
 
-### See the project before choosing a tool
+<sub>Project artwork. Explore the live application to see the actual interface.</sub>
 
-[![Branded PDF Tools preview, not an interface screenshot](app/public/brand/social-card.png)](https://akshat4112.github.io/pdf-tools/)
-
-*Original project artwork, not a screenshot or a tested device claim.* Explore the [real homepage](https://akshat4112.github.io/pdf-tools/), the [14 working tools](#available-tools), and [practical guides with synthetic examples](https://akshat4112.github.io/pdf-tools/guides/).
+</div>
 
 ## Why PDF Tools?
 
-- **Free forever for the browser-based tools we release:** no subscriptions, paid exports, account requirements or forced watermarks. File and browser limits apply.
-- **Local document processing:** file contents are handled in your browser, with no document-processing backend.
-- **Open source:** inspect the implementation, run it yourself, or contribute under the MIT license.
-- **Originals stay intact:** transformations create new downloads. Review the result before sharing it.
+| Private by design | Free to use | Open source |
+| :--- | :--- | :--- |
+| Document processing takes place on your device. | No account, subscription, paid export or forced watermark for released browser tools. | Inspect the code, run it locally or contribute under the MIT license. |
+
+PDF Tools creates new output files rather than modifying your originals. Browser and file limits apply; always review the exported result before sharing it.
 
 ## Available tools
 
-All 14 tools below are implemented in the [tool registry](app/src/registry.ts). Later roadmap features are not included in this list.
+All 14 tools listed here are implemented in the [tool registry](app/src/registry.ts) and available from the application.
 
-| Tool | What you can do |
-| --- | --- |
-| [Merge PDF](https://akshat4112.github.io/pdf-tools/merge/) | Combine PDFs in the order you choose. |
-| [Split PDF](https://akshat4112.github.io/pdf-tools/split/) | Split by ranges, every N pages, or one file per page; download a ZIP. |
+### Organize and manage
+
+| Tool | What it does |
+| :--- | :--- |
+| [Merge PDF](https://akshat4112.github.io/pdf-tools/merge/) | Combine PDFs in your chosen order. |
+| [Split PDF](https://akshat4112.github.io/pdf-tools/split/) | Split by ranges, every N pages or individual pages; download a ZIP. |
 | [Rotate PDF](https://akshat4112.github.io/pdf-tools/rotate/) | Rotate selected or all pages in 90° steps. |
 | [Delete pages](https://akshat4112.github.io/pdf-tools/delete-pages/) | Remove selected pages into a new PDF. |
 | [Extract pages](https://akshat4112.github.io/pdf-tools/extract-pages/) | Create a PDF from selected pages in your chosen order. |
 | [Organize PDF](https://akshat4112.github.io/pdf-tools/organize/) | Reorder, duplicate, rotate and delete pages, with undo. |
-| [JPG/PNG to PDF](https://akshat4112.github.io/pdf-tools/images-to-pdf/) | Create one PDF with one image per page and page-size, fit and margin options. |
-| [PDF to JPG](https://akshat4112.github.io/pdf-tools/pdf-to-jpg/) | Render selected pages as JPG images, individually or in a ZIP. |
+
+### Convert and export
+
+| Tool | What it does |
+| :--- | :--- |
+| [JPG/PNG to PDF](https://akshat4112.github.io/pdf-tools/images-to-pdf/) | Turn images into a PDF with page-size, fit and margin controls. |
+| [PDF to JPG](https://akshat4112.github.io/pdf-tools/pdf-to-jpg/) | Render selected pages as JPG images or a ZIP. |
 | [PDF to PNG](https://akshat4112.github.io/pdf-tools/pdf-to-png/) | Render selected pages as PNG images with background options. |
+| [PDF to text](https://akshat4112.github.io/pdf-tools/pdf-to-text/) | Export the existing text layer as UTF-8 text. |
+
+### Enhance, read and inspect
+
+| Tool | What it does |
+| :--- | :--- |
+| [Page numbers](https://akshat4112.github.io/pdf-tools/page-numbers/) | Add page numbers with position and starting-number controls. |
+| [Text watermark](https://akshat4112.github.io/pdf-tools/watermark/) | Add text with position, opacity and page-selection controls. |
 | [PDF reader](https://akshat4112.github.io/pdf-tools/reader/) | Navigate, zoom, search existing text, copy and print. |
-| [Page numbers](https://akshat4112.github.io/pdf-tools/page-numbers/) | Add numbering with a starting number, position and page selection. |
-| [Text watermark](https://akshat4112.github.io/pdf-tools/watermark/) | Add text with position, opacity and page-selection options. |
-| [PDF to text](https://akshat4112.github.io/pdf-tools/pdf-to-text/) | Export the existing text layer as UTF-8 TXT. |
 | [Document information](https://akshat4112.github.io/pdf-tools/doc-info/) | Inspect metadata, page dimensions and document indicators. |
 
-Choose a tool, select your files, configure the operation, then review and download the result. Use **Clear files** or **Start over** to remove the current workspace's files and results.
+Choose a tool, select your files, configure the operation, and download the result. Use **Clear files** or **Start over** to clear the workspace.
+
+[Browse all tools →](https://akshat4112.github.io/pdf-tools/#tool-catalog)
 
 ## Privacy and security
 
-Selected documents, filenames, previews, extracted text and generated results are handled in browser memory. The released application does not intentionally persist document data in browser storage and does not include analytics or crash-reporting services.
+Document contents stay within the browser's processing boundary. There is no document-processing backend in the released application.
 
-Loading the website still requests static assets from GitHub Pages. GitHub Pages logs visitor IP addresses for security, as explained in its [data-collection documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection). Local processing does not mean offline operation or anonymity.
+![Local processing: select files, process them in browser memory, and download results. Static hosting serves application assets.](docs/architecture/local-processing-overview.svg)
 
-Clearing a workspace releases application-managed state and resources. It does not securely overwrite memory or delete your original files, downloaded files, clipboard contents or printed copies. Reader protections also do not sanitize exported PDFs for use in other viewers.
+| Data handling | Current application |
+| :--- | :--- |
+| Document uploads to a processing server | Not required by released tools |
+| Accounts | Not required |
+| In-app analytics and crash reporting | Not included |
+| Document persistence in browser storage | Not intentionally persisted |
+| Website hosting requests | Subject to GitHub Pages' data collection policy |
+| Source code and tests | Publicly inspectable |
 
-For a user-facing explanation of the current release, read the [public privacy notice](https://akshat4112.github.io/pdf-tools/privacy/), [limitations](https://akshat4112.github.io/pdf-tools/limitations/), [help and FAQ](https://akshat4112.github.io/pdf-tools/help/) and [trust evidence page](https://akshat4112.github.io/pdf-tools/trust/).
+Selected documents, filenames, previews, extracted text and generated results are handled in browser memory. Loading the website still requests static assets; GitHub Pages logs visitor IP addresses for security ([hosting policy](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)). Local processing does not imply offline availability or anonymity.
 
-Read the [local data lifecycle](docs/product/PT-PD-003-data-lifecycle.md), [rendering and filename protections](docs/security/PT-SEC-001-rendering-and-filenames.md), and [all-tool local-processing audit](docs/security/PT-SEC-002-local-processing-audit.md) for implementation details and test boundaries. These are project documentation and CI evidence, not an independent security certification.
+Clearing a workspace releases application-managed state and resources. It is not secure memory erasure and does not remove original or downloaded files, clipboard contents or printed copies. Reader protections do not sanitize exported PDFs for other viewers.
 
-## Current limits
+**Inspect the evidence:** [Privacy notice](https://akshat4112.github.io/pdf-tools/privacy/) · [Trust and evidence](https://akshat4112.github.io/pdf-tools/trust/) · [Data lifecycle](docs/product/PT-PD-003-data-lifecycle.md) · [Local-processing audit](docs/security/PT-SEC-002-local-processing-audit.md) · [Rendering protections](docs/security/PT-SEC-001-rendering-and-filenames.md) · [Security reporting](SECURITY.md)
 
-- PDF, JPEG and PNG inputs only, depending on the tool. Current baseline quotas are **50 MiB per file** and **300 PDF pages**; individual workflows also enforce batch, pixel and processing limits. See the limits displayed in each tool.
-- PDF-to-image tools render pages; they do not extract original embedded images.
-- Text export and reader search use existing PDF text. Image-only scans need OCR, which is not currently available. Reading order may vary in complex documents.
-- Password unlocking, OCR, compression, redaction, Office conversion and certificate signing are not shipped features. Document-information indicators do not validate a signature or certificate chain.
-- Modified copies may not preserve interactive forms, annotations, bookmarks, accessibility tags or signatures. Review the export warning and the resulting document, especially before modifying signed PDFs. Deleting a page or covering text is not secure redaction.
-- Browser memory and device performance affect capacity. CI covers Chromium, Firefox and Linux WebKit browser engines, plus mobile browser emulation. This is **not** a claim of testing on physical iOS/Android devices, native macOS Safari, Windows Edge or assistive-technology hardware.
+## Browser support and known limitations
+
+Automated compatibility checks cover Chromium, Firefox and Linux WebKit engines, plus mobile browser emulation. These checks are not equivalent to testing physical iOS/Android devices, native macOS Safari, Windows Edge or assistive-technology hardware.
+
+- **Inputs and limits:** PDF, JPEG and PNG as supported by each tool. Baseline quotas are 50 MiB per file and 300 PDF pages; tool-specific batch, pixel and processing limits also apply.
+- **Text and images:** PDF-to-image renders pages rather than extracting embedded images; PDF-to-text uses existing text, not OCR. Complex reading order may vary.
+- **Document fidelity:** modified copies may lose forms, bookmarks, annotations, accessibility tags or signatures. Document indicators do not validate certificate chains or signatures. Deleting pages or covering content is not secure redaction.
+- **Not shipped:** password unlocking, OCR, compression, redaction, Office conversion and certificate signing.
+
+See the [full limitations](https://akshat4112.github.io/pdf-tools/limitations/) and [help](https://akshat4112.github.io/pdf-tools/help/) before processing important documents.
 
 ## Run locally
 
-Use **Node.js 24** and npm. No API keys or backend services are required.
+**Requirements:** Node.js 24, npm. No API key, account or backend service is required.
 
 ```bash
 git clone https://github.com/Akshat4112/pdf-tools.git
@@ -86,13 +116,41 @@ npm run build
 npm run preview -- --host 127.0.0.1
 ```
 
-Open **http://127.0.0.1:4173/pdf-tools/**. The build copies the PDF.js worker, fonts and supporting assets needed for document workflows.
+Open [http://127.0.0.1:4173/pdf-tools/](http://127.0.0.1:4173/pdf-tools/).
 
-For UI development, run `npm run dev` from `app/` and open **http://localhost:5173/pdf-tools/**. Use the built preview for complete processing checks. More commands and browser-test prerequisites are in the [app development guide](app/README.md).
+For UI development, run `npm run dev` from `app/` and open [http://localhost:5173/pdf-tools/](http://localhost:5173/pdf-tools/). Use the built preview for complete processing checks.
 
-## Development and verification
+The production output in `app/dist/` is a static site. For self-hosting, serve the complete build at the configured `/pdf-tools/` base path (including worker, font and other assets). See [app development documentation](app/README.md) for commands and prerequisites.
 
-The app uses React, TypeScript and Vite, with PDF.js for reading/rendering, pdf-lib for PDF generation, and zip.js/fflate for archive handling. PDF.js assets are served with the application.
+## Built for the browser
+
+| Layer | Technology |
+| :--- | :--- |
+| Interface | React, TypeScript, Vite |
+| PDF reading and rendering | PDF.js |
+| PDF generation and manipulation | pdf-lib |
+| Archive handling | zip.js, fflate |
+| Automated testing | Vitest, Playwright, PyMuPDF, qpdf |
+| Hosting | GitHub Pages |
+
+PDF.js assets are served with the application. No document conversion service is required.
+
+<details>
+<summary><strong>Repository structure</strong></summary>
+
+| Directory | Purpose |
+| :--- | :--- |
+| [app/](app/) | Browser application and automated tests |
+| [docs/](docs/) | Architecture, product decisions, security and QA |
+| [fixtures/](fixtures/) | Synthetic sample documents and expected outputs |
+| [scripts/](scripts/) | Fixture generation, validation and security checks |
+| [spike/](spike/) | Experimental prototypes; not production features |
+
+</details>
+
+## Quality and verification
+
+The project uses automated checks to validate behavior, compatibility and output correctness. Real browser-generated downloads are independently read back with PyMuPDF and qpdf. CI also checks dependency licenses, integrity, vulnerabilities, privacy boundaries and startup budgets.
 
 From `app/`:
 
@@ -102,26 +160,39 @@ npm test
 npm run build
 ```
 
-CI also checks browser workflows, privacy boundaries, dependency licenses/integrity and vulnerabilities. Real browser-generated downloads are checked with PyMuPDF and qpdf. See the [output-validation matrix](docs/testing/PT-QA-001-independent-output-matrix.md), [synthetic fixture corpus](docs/testing/PT-PD-005-benchmark-corpus.md), and [CI workflow](.github/workflows/checks.yml) for coverage and prerequisites.
+See [CI results](https://github.com/Akshat4112/pdf-tools/actions), the [output-validation matrix](docs/testing/PT-QA-001-independent-output-matrix.md), [synthetic fixture corpus](docs/testing/PT-PD-005-benchmark-corpus.md) and [supply-chain policy](docs/security/PT-SEC-003-supply-chain.md). The badges show actual workflow outcomes, not independent security or accessibility certifications.
 
-| Path | Contents |
-| --- | --- |
-| [`app/`](app/) | Browser application, unit tests and Playwright suites. |
-| [`docs/`](docs/) | Product decisions, tool contracts, brand, security and QA evidence. |
-| [`fixtures/`](fixtures/) | Synthetic PDFs/images and expected properties. |
-| [`scripts/`](scripts/) | Fixture generation, output validation, privacy and supply-chain checks. |
-| [`spike/`](spike/) | Prototype investigations; not the production app. |
+## Project development
 
-## Contributing and feedback
+The live application contains the current released tools. The broader roadmap is subject to implementation and verification; planned features are not availability promises.
 
-Bug reports, documentation improvements and focused pull requests are welcome. [Review the source](https://github.com/Akshat4112/pdf-tools), the [contributor workflow](docs/operations/PT-OPS-001-pr-task-workflow.md) and [the live task tracker](https://docs.google.com/spreadsheets/d/1m3iyaksGD-hY51JwFfIzb-JS5S3GSp0uJqS4Ae77-lg/edit) for task dependencies, acceptance criteria and progress. Planned features are not availability promises. Small changes to documentation, tested examples and accessibility are useful first contributions.
+[Roadmap](ROADMAP.md) · [Changelog](CHANGELOG.md) · [GitHub releases](https://github.com/Akshat4112/pdf-tools/releases) · [Deployment history](https://github.com/Akshat4112/pdf-tools/actions/workflows/deploy-pages.yml)
 
-For public bug reports, include the tool, browser/version, reproduction steps and expected result. Use a small synthetic example. [Choose a bug or feature report](https://github.com/Akshat4112/pdf-tools/issues/new/choose), or read the [security reporting options](https://github.com/Akshat4112/pdf-tools/security) first if the report is sensitive. **Do not attach private PDFs, personal information, credentials or sensitive screenshots to public issues or pull requests.** Private vulnerability reporting may not be enabled; public issues are not a confidential support channel.
+A versioned GitHub release history has not yet been established; deployment and commit history provide the current release evidence.
 
-Keep contributions scoped to one task, verify relevant checks, and preserve the local-processing boundary. New dependencies need license and security review.
+## Contributing and support
 
-## License and brand assets
+Focused bug fixes, accessibility improvements, documentation and test cases are welcome.
 
-Application code is [MIT licensed](LICENSE). Third-party libraries and fonts retain their own licenses and distribution requirements; see the [dependency decisions](docs/architecture/PT-PD-006-dependency-decisions.md) and [supply-chain policy](docs/security/PT-SEC-003-supply-chain.md).
+- [Contributing guide](CONTRIBUTING.md)
+- [Report a bug or suggest an improvement](https://github.com/Akshat4112/pdf-tools/issues/new/choose)
+- [Support and troubleshooting](SUPPORT.md)
+- [Security reporting policy](SECURITY.md)
 
-The original PDF Tools artwork, editable SVGs, export files and font notices are in the [brand asset kit](app/public/brand/README.md).
+Use small synthetic examples for reports. **Never attach private documents, personal information, credentials or sensitive screenshots to public issues or pull requests.**
+
+## License and acknowledgements
+
+The application code is [MIT licensed](LICENSE). Libraries and fonts retain their own licenses and distribution requirements; see the [dependency decisions](docs/architecture/PT-PD-006-dependency-decisions.md) and [brand assets](app/public/brand/README.md).
+
+Thanks to the open-source communities behind React, TypeScript, Vite, PDF.js, pdf-lib, zip.js, fflate, and the testing tools that make this project possible.
+
+---
+
+<div align="center">
+
+[Launch PDF Tools](https://akshat4112.github.io/pdf-tools/) · [Documentation](https://akshat4112.github.io/pdf-tools/guides/) · [GitHub](https://github.com/Akshat4112/pdf-tools)
+
+<sub>Free PDF tools. On your device.</sub>
+
+</div>
