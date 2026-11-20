@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 270" role="img" aria-labelledby="title desc">
+<title id="title">Local PDF processing architecture</title><desc id="desc">Select files, process them in the browser, and download results on the device. Static hosting delivers application assets only and may log website requests.</desc>
+<rect width="920" height="270" rx="16" fill="#f8fafc"/>
+<rect x="24" y="20" width="872" height="173" rx="14" fill="#fff" stroke="#94a3b8" stroke-dasharray="6 5"/>
+<g font-family="system-ui, sans-serif" fill="#172033">
+<text x="44" y="47" font-size="15" font-weight="700" letter-spacing="1.2">YOUR DEVICE · BROWSER</text>
+<g fill="#f1f5f9" stroke="#cbd5e1"><rect x="44" y="65" width="242" height="106" rx="10"/><rect x="339" y="65" width="242" height="106" rx="10"/><rect x="634" y="65" width="242" height="106" rx="10"/></g>
+<g font-size="20" font-weight="700" text-anchor="middle"><text x="165" y="101">1. Select files</text><text x="460" y="101">2. Process locally</text><text x="755" y="101">3. Download result</text></g>
+<g font-size="14" text-anchor="middle" fill="#475569"><text x="165" y="128">PDFs and images</text><text x="165" y="148">from your device</text><text x="460" y="128">Browser memory</text><text x="460" y="148">PDF libraries and workers</text><text x="755" y="128">New file or archive</text><text x="755" y="148">Originals remain intact</text></g>
+<g stroke="#c24135" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M296 118h33m-7-6 7 6-7 6"/><path d="M591 118h33m-7-6 7 6-7 6"/></g>
+<path d="M460 215V193" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 3"/>
+<rect x="279" y="215" width="362" height="39" rx="8" fill="#e2e8f0"/>
+<text x="460" y="239" text-anchor="middle" font-size="14" font-weight="600">Static hosting · application assets and requests</text>
+</g></svg>
