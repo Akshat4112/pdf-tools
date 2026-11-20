@@ -44,6 +44,33 @@ describe('PT-IMP-009 repeated session lifecycle stress', () => {
     expect(new Set(revoked)).toEqual(new Set(created))
   })
 
+  it('makes repeated reset and clear idempotent without revoking another session URL', () => {
+    let serial = 0
+    const revoked: string[] = []
+    vi.spyOn(URL, 'createObjectURL').mockImplementation(() => `blob:synthetic-idempotent-${++serial}`)
+    vi.spyOn(URL, 'revokeObjectURL').mockImplementation(url => { revoked.push(url) })
+
+    const first = new FileSession()
+    const second = new FileSession()
+    const firstOutput = first.addOutput('synthetic-first.pdf', 'application/pdf', pdf)
+    const secondOutput = second.addOutput('synthetic-second.pdf', 'application/pdf', pdf)
+    const firstUrl = first.objectUrlFor(firstOutput.id)
+    const secondUrl = second.objectUrlFor(secondOutput.id)
+
+    for (let i = 0; i < 100; i++) {
+      if (i % 2 === 0) first.resetSession()
+      else first.clearFiles()
+      expect(first.audit()).toEqual(empty)
+      expect(second.objectUrlFor(secondOutput.id)).toBe(secondUrl)
+      expect(second.audit().objectUrls).toBe(1)
+    }
+    expect(revoked).toEqual([firstUrl])
+    second.resetSession()
+    second.clearFiles()
+    expect(revoked).toEqual([firstUrl, secondUrl])
+    expect(second.audit()).toEqual(empty)
+  })
+
   it('cleans up URL registry even when the session has no remaining input files', () => {
     const revoked: string[] = []
     vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:synthetic-orphan-output')
