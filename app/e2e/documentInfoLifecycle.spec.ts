@@ -64,3 +64,42 @@ test('PT-IMP-009 document information: repeated inspection, reset and privacy', 
   await expect(page.getByRole('region', { name: 'Document summary' })).toHaveCount(0)
   expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
 })
+
+test('PT-IMP-009 document information: malformed PDF failure and recovery release resources', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.addInitScript(() => {
+    const active = new Set<Worker>()
+    const NativeWorker = window.Worker
+    window.Worker = class extends NativeWorker {
+      constructor(url: string | URL, options?: WorkerOptions) { super(url, options); active.add(this) }
+      terminate() { active.delete(this); super.terminate() }
+    }
+    Object.assign(window, { activeDocumentWorkers: active })
+  })
+  await page.goto('doc-info/')
+  const good = await readFile('../fixtures/pdf/F-001-plain-text-3p.pdf')
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'synthetic-corrupt.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-broken'),
+    })
+    await page.getByRole('button', { name: 'Inspect PDF', exact: true }).click()
+    await expect(page.getByRole('alert')).toContainText('could not be read')
+    await expect.poll(() => page.evaluate(() =>
+      (window as unknown as { activeDocumentWorkers: Set<Worker> }).activeDocumentWorkers.size
+    )).toBe(0)
+    await page.getByRole('button', { name: 'Review settings', exact: true }).click()
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'synthetic-recovered.pdf', mimeType: 'application/pdf', buffer: good,
+    })
+    await page.getByRole('button', { name: 'Inspect PDF', exact: true }).click()
+    await expect(page.getByRole('region', { name: 'Document summary' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Page dimensions' }).locator('tbody tr')).toHaveCount(3)
+    await page.getByRole('button', { name: 'Start over', exact: true }).click()
+    await expect.poll(() => page.evaluate(() =>
+      (window as unknown as { activeDocumentWorkers: Set<Worker> }).activeDocumentWorkers.size
+    )).toBe(0)
+    expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+  }
+  expect(errors).toEqual([])
+})
