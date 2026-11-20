@@ -67,6 +67,15 @@ test('PT-IMP-009 document information: repeated inspection, reset and privacy', 
 
 test('PT-IMP-009 document information: malformed PDF failure and recovery release resources', async ({ page }) => {
   const errors: string[] = []
+  const requests: Array<{ method: string; url: string }> = []
+  const sockets: string[] = []
+  const consoleLeaks: string[] = []
+  const filenames = ['synthetic-corrupt.pdf', 'synthetic-recovered.pdf']
+  page.on('request', request => requests.push({ method: request.method(), url: request.url() }))
+  page.on('websocket', socket => sockets.push(socket.url()))
+  page.on('console', message => {
+    if (filenames.some(filename => message.text().includes(filename))) consoleLeaks.push(message.text())
+  })
   page.on('pageerror', error => errors.push(error.message))
   await page.addInitScript(() => {
     const active = new Set<Worker>()
@@ -78,6 +87,7 @@ test('PT-IMP-009 document information: malformed PDF failure and recovery releas
     Object.assign(window, { activeDocumentWorkers: active })
   })
   await page.goto('doc-info/')
+  const origin = new URL(page.url()).origin
   const good = await readFile('../fixtures/pdf/F-001-plain-text-3p.pdf')
   for (let cycle = 0; cycle < 3; cycle++) {
     await page.locator('input[type=file]').setInputFiles({
@@ -101,5 +111,14 @@ test('PT-IMP-009 document information: malformed PDF failure and recovery releas
     )).toBe(0)
     expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
   }
+  await page.reload()
+  await expect(page.locator('.file-row')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Document summary' })).toHaveCount(0)
+  expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+  expect(requests.filter(request => !['GET', 'HEAD'].includes(request.method))).toEqual([])
+  expect(requests.filter(request => new URL(request.url).origin !== origin)).toEqual([])
+  expect(requests.filter(request => filenames.some(filename => request.url.includes(filename)))).toEqual([])
+  expect(sockets).toEqual([])
+  expect(consoleLeaks).toEqual([])
   expect(errors).toEqual([])
 })
