@@ -155,6 +155,11 @@ for (const route of ['merge', 'split'] as const) {
       await expect.poll(() => liveWorkers.size, {
         timeout: 10_000, intervals: [100, 250, 1000],
       }).toBeLessThanOrEqual(route === 'split' ? 1 : 0)
+      // A count of one is insufficient: ensure the retained instance is actually
+      // the shared ZIP worker, not a leaked PDF.js document worker.
+      expect([...liveWorkers].filter(worker =>
+        route !== 'split' || !worker.url().startsWith('blob:')
+      ).map(worker => worker.url()), 'Only the shared ZIP worker may remain after reset').toEqual([])
       workerCycleSamples.push({ cycle: cycle + 1, created: workersCreated, live: liveWorkers.size })
       expect(liveWorkers.size, `Worker instances accumulated after ${route} cycle ${cycle + 1}`).toBeLessThanOrEqual(2)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
