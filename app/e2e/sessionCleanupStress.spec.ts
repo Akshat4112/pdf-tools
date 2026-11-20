@@ -335,3 +335,70 @@ for (const route of [
     expect(errors).toEqual([])
   })
 }
+
+
+test('PT-IMP-009 Split: larger stored archive yields to browser and verifies every PDF', async ({ page }) => {
+  test.setTimeout(180_000)
+  const source = await PDFDocument.create()
+  const count = 24
+  for (let i = 0; i < count; i++) {
+    const p = source.addPage([300 + i, 400])
+    p.drawText('Synthetic page ' + (i + 1), { x: 20, y: 350 })
+  }
+  const workers = new Set<import('@playwright/test').Worker>()
+  const origins: string[] = []
+  page.on('worker', worker => {
+    workers.add(worker)
+    origins.push(worker.url())
+    worker.on('close', () => workers.delete(worker))
+  })
+  await page.goto('split/')
+  await page.locator('input[type=file]').setInputFiles({
+    name: 'synthetic-large-archive.pdf', mimeType: 'application/pdf',
+    buffer: Buffer.from(await source.save()),
+  })
+  await page.getByRole('textbox', { name: 'Ranges (comma separated)' }).fill(
+    Array.from({ length: count }, (_, i) => String(i + 1)).join(', '),
+  )
+  const run = page.getByRole('button', { name: 'Split PDF', exact: true })
+  await expect(run).toBeEnabled()
+  await page.evaluate(() => {
+    const timing = { ticks: 0, maxGap: 0, last: performance.now(), timer: 0 }
+    timing.timer = window.setInterval(() => {
+      const now = performance.now()
+      timing.maxGap = Math.max(timing.maxGap, now - timing.last)
+      timing.last = now
+      timing.ticks++
+    }, 20)
+    Object.assign(window, { ptImp009ArchiveTiming: timing })
+  })
+  await run.click()
+  const result = page.getByRole('region', { name: 'Results', exact: true })
+  await expect(result).toBeVisible()
+  const pending = page.waitForEvent('download')
+  await result.getByRole('button', { name: /^Download / }).first().click()
+  const download = await pending
+  const timing = await page.evaluate(() => {
+    const t = (window as unknown as { ptImp009ArchiveTiming: { ticks: number; maxGap: number; last: number; timer: number } }).ptImp009ArchiveTiming
+    clearInterval(t.timer)
+    return { ticks: t.ticks, maxGap: Math.max(t.maxGap, performance.now() - t.last) }
+  })
+  expect(timing.ticks).toBeGreaterThan(0)
+  // Generous CI watchdog, not a native-device performance certification.
+  expect(timing.maxGap).toBeLessThan(2000)
+  const entries = Object.entries(unzipSync(await readFile((await download.path())!)))
+  expect(entries).toHaveLength(count)
+  const widths: number[] = []
+  for (const [name, bytes] of entries) {
+    expect(name).toMatch(/\.pdf$/i)
+    const pdf = await PDFDocument.load(bytes, { updateMetadata: false })
+    expect(pdf.getPageCount()).toBe(1)
+    widths.push(pdf.getPage(0).getWidth())
+  }
+  expect(widths.sort((a, b) => a - b)).toEqual(Array.from({ length: count }, (_, i) => 300 + i))
+  await page.getByRole('button', { name: 'Start over', exact: true }).click()
+  await expect(result).toHaveCount(0)
+  await expect.poll(() => workers.size, { timeout: 10_000 }).toBe(0)
+  expect(origins.filter(url => !url.includes('/assets/pdf.worker.min.mjs'))).toEqual([])
+  console.log('PT-IMP-009 larger archive heartbeat', timing)
+})
