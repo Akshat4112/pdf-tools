@@ -64,6 +64,10 @@ for (const route of ['merge', 'split'] as const) {
       peakLiveWorkers = Math.max(peakLiveWorkers, liveWorkers.size)
       worker.on('close', () => liveWorkers.delete(worker))
     })
+    // WebSocket traffic is not represented by ordinary HTTP request events.
+    // Observe the complete document lifetime, including bootstrap and navigation.
+    const unexpectedWebSockets: string[] = []
+    page.on('websocket', socket => unexpectedWebSockets.push(socket.url()))
     const pageErrors: string[] = []
     page.on('pageerror', error => pageErrors.push(error.message))
     // Privacy regression: generated synthetic input filenames must not appear in browser console output.
@@ -206,6 +210,7 @@ for (const route of ['merge', 'split'] as const) {
       await cdp?.detach()
     }
     expect(consoleMessages.filter(message => /(?:synthetic|second)-\d+\.pdf/.test(message)), 'Input filenames must not leak into browser console logs').toEqual([])
+    expect(unexpectedWebSockets, 'PDF processing must not open WebSocket connections').toEqual([])
     expect(pageErrors, 'PDF workflows must not raise uncaught browser exceptions').toEqual([])
     expect(filenameUrlLeaks, 'Input filenames must not appear in any network URL, including same-origin GETs').toEqual([])
     expect(outboundWrites, 'PDF workflows must not upload data via network writes').toEqual([])
@@ -271,6 +276,7 @@ for (const route of ['merge', 'split'] as const) {
       'Navigation and history restoration must not contact third-party origins').toEqual([])
     expect(consoleMessages.filter(message => /(?:synthetic|second)-\d+\.pdf/.test(message)),
       'Late navigation or locale logs must not disclose synthetic input filenames').toEqual([])
+    expect(unexpectedWebSockets, 'Navigation must not open WebSocket connections').toEqual([])
     expect(pageErrors, 'Reload must not raise uncaught browser exceptions').toEqual([])
   })
 }
