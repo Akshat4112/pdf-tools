@@ -98,7 +98,6 @@ for (const route of ['merge', 'split'] as const) {
     const appOrigin = new URL(page.url()).origin
     const bytes = await fixture()
     const baseline = await page.evaluate(() => (window as unknown as { ptImp009ActiveUrls(): number }).ptImp009ActiveUrls())
-    let sharedZipWorkerUrl: string | undefined
     const run = page.getByRole('button', { name: route === 'merge' ? 'Merge PDFs' : 'Split PDF', exact: true })
     const heapSamples: Array<{ cycle: number; bytes: number }> = []
     const cdp = extended ? await page.context().newCDPSession(page) : null
@@ -129,37 +128,11 @@ for (const route of ['merge', 'split'] as const) {
       await page.getByRole('button', { name: 'Start over', exact: true }).click()
       await expect(result).toHaveCount(0)
       await expect(page.locator('.file-row')).toHaveCount(0)
-      // zip.js lazily creates a module-level worker script URL for Split ZIP exports.
-      // Allow only one *stable* worker URL; generated PDF/download URLs must be revoked.
-      // A growing set of worker URLs is still a failure, not an accepted baseline.
-      await expect.poll(async () => {
-        const details = await page.evaluate(() => (window as unknown as {
-          ptImp009UrlDetails(): Array<{ url: string; type: string; size: number; stack: string }>
-        }).ptImp009UrlDetails())
-        const unexpected = details.filter(item => !(
-          route === 'split' && item.type === 'text/javascript' &&
-          item.stack.includes('workerURI') && item.stack.includes('zip.js')
-        ))
-        if (unexpected.length) console.log(`PT-IMP-009 ${route} cycle ${cycle} unexpected URLs: ${JSON.stringify(unexpected)}`)
-        if (unexpected.length) return false
-        const workerUrls = details.filter(item => item.stack.includes('workerURI') && item.stack.includes('zip.js'))
-        if (route === 'split' && workerUrls.length === 1) {
-          if (sharedZipWorkerUrl && sharedZipWorkerUrl !== workerUrls[0].url) return false
-          sharedZipWorkerUrl = workerUrls[0].url
-        }
-        return workerUrls.length <= (route === 'split' ? 1 : 0) && details.length <= baseline + (route === 'split' ? 1 : 0)
-      }, { timeout: 10_000, intervals: [250, 1000, 2000] }).toBe(true)
-      // After Start over, PDF.js job workers must terminate in the same document.
-      // zip.js may retain one shared worker for subsequent Split ZIP operations;
-      // do not mistake that known shared worker for an accumulating job worker.
-      await expect.poll(() => liveWorkers.size, {
-        timeout: 10_000, intervals: [100, 250, 1000],
-      }).toBeLessThanOrEqual(route === 'split' ? 1 : 0)
-      // A count of one is insufficient: ensure the retained instance is actually
-      // the shared ZIP worker, not a leaked PDF.js document worker.
-      expect([...liveWorkers].filter(worker =>
-        route !== 'split' || worker.url() !== sharedZipWorkerUrl
-      ).map(worker => worker.url()), 'Only the shared ZIP worker may remain after reset').toEqual([])
+      // Stored ZIP packaging runs without zip.js workers; all job URLs and workers must be released.
+      await expect.poll(async () => page.evaluate(() => (window as unknown as {
+        ptImp009UrlDetails(): Array<{ url: string }>
+      }).ptImp009UrlDetails().length), { timeout: 10_000 }).toBe(baseline)
+      await expect.poll(() => liveWorkers.size, { timeout: 10_000 }).toBe(0)
       workerCycleSamples.push({ cycle: cycle + 1, created: workersCreated, live: liveWorkers.size })
       expect(liveWorkers.size, `Worker instances accumulated after ${route} cycle ${cycle + 1}`).toBeLessThanOrEqual(2)
       expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
@@ -170,34 +143,23 @@ for (const route of ['merge', 'split'] as const) {
         if (bytesUsed !== null) heapSamples.push({ cycle: cycle + 1, bytes: bytesUsed })
       }
     }
-    // Independently characterize the zip.js module-scoped script URL lifetime.
-    // It is intentionally reusable within the same document after Start over;
-    // the following navigation check must prove it becomes inaccessible on unload.
-    // This is a bounded document-lifetime policy, NOT same-document revocation.
-    if (route === 'split') {
-      expect(sharedZipWorkerUrl, 'Split must expose exactly one stable zip.js worker script URL').toBeTruthy()
-      const accessible = await page.evaluate(async url => {
-        try { return (await fetch(url)).ok } catch { return false }
-      }, sharedZipWorkerUrl!)
-      expect(accessible, 'The shared zip.js worker URL should remain usable in its owning document').toBe(true)
-    }
     console.log(`PT-IMP-009 ${route} worker lifecycle: ${JSON.stringify({ workersCreated, peakLiveWorkers, liveAfterCycles: liveWorkers.size, workerOrigins: [...workerOrigins], workerCycleSamples })}`)
     // A transient burst can disappear before the per-cycle sample. Bound peak concurrency too.
     expect(peakLiveWorkers, `Unexpected concurrent workers during ${route} stress`).toBeLessThanOrEqual(2)
     // Exact-head CI diagnostics (2026-11-16) identified PDF.js worker churn:
     // Merge creates three pdf.worker.min.mjs instances per cycle; Split creates four
-    // per cycle plus two initial workers, one being zip.js's shared Blob worker.
+    // per cycle; allow one initial PDF.js worker. ZIP packaging must not spawn workers.
     // These workers terminate (peak <=2); cumulative creation alone is not a leak.
     // Keep a bounded per-cycle regression guard rather than the unsupported 2/cycle cap.
     const maxWorkersPerCycle = route === 'merge' ? 3 : 4
-    const startupAllowance = route === 'split' ? 2 : 0
+    const startupAllowance = route === 'split' ? 1 : 0
     expect(workersCreated, `Unexpected ${route} worker churn`).toBeLessThanOrEqual(cycleCount * maxWorkersPerCycle + startupAllowance)
     for (let i = 1; i < workerCycleSamples.length; i++) {
       const createdThisCycle = workerCycleSamples[i].created - workerCycleSamples[i - 1].created
       expect(createdThisCycle, `Unexpected worker churn in ${route} cycle ${i + 1}`).toBeLessThanOrEqual(maxWorkersPerCycle)
     }
     const unexpectedWorkerOrigins = [...workerOrigins.keys()].filter(url =>
-      !url.includes('/assets/pdf.worker.min.mjs') && !(route === 'split' && url.startsWith('blob:'))
+      !url.includes('/assets/pdf.worker.min.mjs')
     )
     expect(unexpectedWorkerOrigins, 'Unexpected worker scripts').toEqual([])
     if (extended) {
@@ -225,21 +187,6 @@ for (const route of ['merge', 'split'] as const) {
     const toolUrl = page.url()
     const homeUrl = new URL('../', toolUrl).href
     await page.goto(homeUrl)
-    // zip.js keeps a single module-scoped worker script URL while the Split tool
-    // document is alive. Independently verify that document navigation releases
-    // that URL: a Blob URL retained by the old document must not remain fetchable.
-    // This checks document-unload revocation, not same-document Start over cleanup.
-    if (sharedZipWorkerUrl) {
-      const workerUrl = sharedZipWorkerUrl
-      await expect.poll(async () => page.evaluate(async url => {
-        try {
-          const response = await fetch(url)
-          return response.ok
-        } catch {
-          return false
-        }
-      }, workerUrl), { timeout: 10_000 }).toBe(false)
-    }
     await expect(page.locator('.file-row')).toHaveCount(0)
     expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
     await expect.poll(() => liveWorkers.size, { timeout: 10_000 }).toBe(0)
