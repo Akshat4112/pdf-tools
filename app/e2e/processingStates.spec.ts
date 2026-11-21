@@ -16,6 +16,19 @@ async function configure(page: Page, tool: 'merge' | 'split') {
 
 for (const tool of ['merge', 'split'] as const) {
   test(`PT-UI-006 ${tool}: cancel delayed work and discard late completion`, async ({ page }) => {
+    await page.addInitScript(() => {
+      const urls = new Set<string>()
+      const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+      URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+      URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+      Object.assign(window, { cancelledSessionUrls: () => urls.size })
+    })
+    const workers = new Set<import('@playwright/test').Worker>()
+    page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+    const requests: Array<{ url: string; method: string }> = []
+    const errors: string[] = []
+    page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+    page.on('pageerror', error => errors.push(error.message))
     const run = await configure(page, tool)
     let release!: () => void
     const gate = new Promise<void>(resolve => { release = resolve })
@@ -46,6 +59,14 @@ for (const tool of ['merge', 'split'] as const) {
     await expect(page.locator('.file-row')).toHaveCount(0)
     await expect(result).toHaveCount(0)
     await expect(run).toBeDisabled()
+    await expect.poll(() => page.evaluate(() => (window as unknown as { cancelledSessionUrls(): number }).cancelledSessionUrls())).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
+    expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+    const origin = new URL(page.url()).origin
+    expect(requests.filter(request => !['GET', 'HEAD'].includes(request.method) ||
+      (/^https?:/.test(request.url) && new URL(request.url).origin !== origin) ||
+      /(?:first|second|source)\.pdf/i.test(request.url))).toEqual([])
+    expect(errors).toEqual([])
   })
 }
 
