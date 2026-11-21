@@ -16,12 +16,17 @@ export function sanitizeFileName(raw: string, fallback = 'document'): string {
   // Preserve a short extension when bounding the name, without splitting a surrogate pair.
   const extension = name.match(/\.[a-z0-9]{1,10}$/i)?.[0] ?? ''
   const stem = extension ? name.slice(0, -extension.length) : name
-  name = Array.from(stem).slice(0, 120 - extension.length).join('') + extension
-  // UTF-16 bound too (some platforms count code units rather than code points).
-  while (name.length > 120) {
-    const characters = Array.from(name.slice(0, name.length - extension.length))
-    characters.pop(); name = characters.join('') + extension
+  // Bound both UTF-16 units and UTF-8 bytes (common filesystem component limit).
+  const encoder = new TextEncoder()
+  let bounded = ''
+  let bytes = encoder.encode(extension).length
+  for (const character of stem) {
+    const size = encoder.encode(character).length
+    if (bounded.length + character.length + extension.length > 120 || bytes + size > 255) break
+    bounded += character
+    bytes += size
   }
+  name = bounded + extension
   return name.replace(/[\s.]+$/g, '') || 'document'
 }
 

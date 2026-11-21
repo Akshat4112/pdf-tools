@@ -32,6 +32,20 @@ describe('PT-SEC-001 filename boundaries', () => {
     expect(sanitizeFileName('', '../../CON.')).toBe('_CON')
   })
 
+  it.each(['報告', 'नमस्ते', '📄'])('bounds UTF-8 filename bytes for %s', (unit) => {
+    const raw = unit.repeat(150) + '.pdf'
+    for (const [mime, ext] of [
+      ['application/pdf', 'pdf'], ['application/zip', 'zip'],
+      ['image/png', 'png'], ['image/jpeg', 'jpg'], ['text/plain', 'txt'],
+    ]) {
+      const name = safeDownloadName(raw, mime)
+      expect(new TextEncoder().encode(name).length).toBeLessThanOrEqual(255)
+      expect(name.length).toBeLessThanOrEqual(120)
+      expect(name.endsWith('.' + ext)).toBe(true)
+      expect(name).toBe(sanitizeFileName(name))
+    }
+  })
+
   it.each([
     ['application/pdf', 'pdf'], ['text/plain', 'txt'], ['application/zip', 'zip'],
     ['image/png', 'png'], ['image/jpeg', 'jpg'],
