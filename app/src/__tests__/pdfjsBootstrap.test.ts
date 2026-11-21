@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { openDocument } from '../engines/pdfjs'
 
 const mocks = vi.hoisted(() => ({ getDocument: vi.fn(), destroy: vi.fn() }))
-vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({ getDocument: mocks.getDocument }))
+vi.mock('pdfjs-dist/legacy/build/pdf.mjs', () => ({ getDocument: mocks.getDocument, PDFWorker: class { destroy() {} } }))
 
 describe('PDF.js bootstrap recovery', () => {
   beforeEach(() => {
