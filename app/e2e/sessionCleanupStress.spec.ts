@@ -583,3 +583,58 @@ for (const format of ['png', 'jpg'] as const) {
     expect(sockets).toEqual([])
   })
 }
+
+
+test('PT-IMP-009 reader: repeated viewing and abandoned workspace release resources', async ({ page }) => {
+  await page.addInitScript(() => {
+    const urls = new Set<string>()
+    const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+    URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+    Object.assign(window, { readerLifecycleUrls: () => urls.size })
+  })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+  const marker = 'pt-imp009-reader-private'
+  const requests: Array<{ url: string; method: string }> = []
+  const leaks: string[] = [], errors: string[] = [], sockets: string[] = []
+  page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+  page.on('console', message => { if (message.text().includes(marker)) leaks.push(message.text()) })
+  page.on('pageerror', error => errors.push(error.message))
+  page.on('websocket', socket => sockets.push(socket.url()))
+  const source = await PDFDocument.create()
+  source.addPage([600, 400]).drawText(marker, { x: 20, y: 350, size: 12 })
+  const buffer = Buffer.from(await source.save())
+  await page.goto('reader/')
+  const original = page.url(), origin = new URL(original).origin
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await page.locator('input[type=file]').setInputFiles({ name: marker + '.pdf', mimeType: 'application/pdf', buffer })
+    await expect(page.locator('.file-row')).toHaveCount(1)
+    await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled()
+    const canvas = page.locator('.reader-viewport canvas')
+    await expect(canvas).toBeVisible()
+    await expect.poll(() => canvas.evaluate(element => {
+      const c = element as HTMLCanvasElement
+      return c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data.some((value, i) => i % 4 !== 3 && value < 200)
+    })).toBe(true)
+    await page.getByRole('button', { name: 'Prepare print pages', exact: true }).click()
+    await expect(page.getByRole('button', { name: 'Open print dialog', exact: true })).toBeVisible()
+    if (cycle < 2) await page.getByRole('button', { name: 'Start over', exact: true }).click()
+    else {
+      await page.goto(new URL('../de/', original).href)
+      await page.goBack()
+      await expect(page).toHaveURL(original)
+    }
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(page.locator('.reader-viewport')).toHaveCount(0)
+    await expect(page.locator('.reader-print-frame')).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => (window as unknown as { readerLifecycleUrls(): number }).readerLifecycleUrls())).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
+    expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+  }
+  expect(requests.filter(r => !['GET', 'HEAD'].includes(r.method) ||
+    (/^https?:/.test(r.url) && new URL(r.url).origin !== origin) || r.url.includes(marker))).toEqual([])
+  expect(leaks).toEqual([])
+  expect(errors).toEqual([])
+  expect(sockets).toEqual([])
+})
