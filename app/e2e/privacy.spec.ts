@@ -134,11 +134,11 @@ test('cancelled text extraction terminates workers and cannot expose held late o
   const audit = await installPrivacyAudit(page, context, 'pdf-to-text')
   await page.addInitScript(() => {
     const send = Worker.prototype.postMessage
-    const gate = { pending: [] as (() => void)[] }
+    const gate = { pending: [] as (() => void)[], hold: true }
     Object.assign(window, { privacyGate: gate })
     Worker.prototype.postMessage = function(message: unknown, transfer?: Transferable[] | StructuredSerializeOptions) {
       const forward = () => Reflect.apply(send, this, [message, transfer])
-      if ((message as { action?: string })?.action === 'GetTextContent') gate.pending.push(forward)
+      if (gate.hold && (message as { action?: string })?.action === 'GetTextContent') gate.pending.push(forward)
       else forward()
     }
   })
@@ -152,6 +152,21 @@ test('cancelled text extraction terminates workers and cannot expose held late o
   await page.getByRole('button', { name: 'Start over', exact: true }).click()
   await audit.assertClean()
   await page.evaluate(() => { (window as unknown as { privacyGate: { pending: (() => void)[] } }).privacyGate.pending.splice(0).forEach(send => send()) })
+  await audit.assertClean()
+  await audit.assertPrivate(baseline)
+  // Disable the deterministic gate only after the cancelled job is discarded.
+  await page.evaluate(() => { (window as unknown as { privacyGate: { hold: boolean } }).privacyGate.hold = false })
+  await select(page, 'pdf-to-text')
+  await page.getByRole('button', { name: 'Export text', exact: true }).click()
+  await expect(page.getByRole('region', { name: 'Text extraction report', exact: true })).toBeVisible()
+  const button = page.getByRole('button', { name: /^Download .*\.txt/ })
+  await expect(button).toBeVisible()
+  const pending = page.waitForEvent('download')
+  await button.click()
+  const file = await pending
+  expect(new TextDecoder('utf-8', { fatal: true }).decode(await readFile((await file.path())!))).toContain(TEXT)
+  await audit.assertPrivate(baseline)
+  await page.getByRole('button', { name: 'Start over', exact: true }).click()
   await audit.assertClean()
   await audit.assertPrivate(baseline)
 })
