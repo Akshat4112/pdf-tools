@@ -234,6 +234,31 @@ test('German Split: unavailable processing asset has safe reload guidance and a 
   await verifyDownload(page, [[1, 2], [3, 4, 5]])
 })
 
+test('German Split: transient worker bootstrap failure retries without losing selection', async ({ page }) => {
+  test.setTimeout(90_000)
+  await configureRanges(page)
+  const initialTimeOrigin = await page.evaluate(() => performance.timeOrigin)
+  let failures = 0
+  await page.route('**/assets/pdf.worker.min.mjs', async route => {
+    if (failures === 0) {
+      failures++
+      await route.abort('failed')
+    } else {
+      await route.continue()
+    }
+  })
+  try {
+    await page.getByRole('button', { name: 'PDF teilen', exact: true }).click()
+    await verifyDownload(page, [[5], [1, 2], [2]])
+    expect(failures).toBe(1)
+    // Successful processing replaces the configuration UI with results.
+    await expect(page.getByRole('region', { name: 'Ergebnisse', exact: true })).toBeVisible()
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(initialTimeOrigin)
+  } finally {
+    await page.unrouteAll({ behavior: 'wait' })
+  }
+})
+
 test('German Split: missing guidance remains isolated from the usable workspace', async ({ page }) => {
   const manifest = JSON.parse(readFileSync('dist/.vite/manifest.json', 'utf8'))
   await page.route(`**/${manifest['src/components/GermanSplitGuide.tsx'].file}`, route => route.abort('failed'))
