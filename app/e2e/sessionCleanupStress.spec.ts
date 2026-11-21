@@ -638,3 +638,54 @@ test('PT-IMP-009 reader: repeated viewing and abandoned workspace release resour
   expect(errors).toEqual([])
   expect(sockets).toEqual([])
 })
+
+
+test('PT-IMP-009 document information: repeated inspection and history discard private metadata', async ({ page }) => {
+  await page.addInitScript(() => {
+    const urls = new Set<string>()
+    const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+    URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+    Object.assign(window, { infoLifecycleUrls: () => urls.size })
+  })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+  const marker = 'pt-imp009-private-metadata'
+  const requests: Array<{ url: string; method: string }> = []
+  const leaks: string[] = [], errors: string[] = [], sockets: string[] = []
+  page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+  page.on('console', message => { if (message.text().includes(marker)) leaks.push(message.text()) })
+  page.on('pageerror', error => errors.push(error.message))
+  page.on('websocket', socket => sockets.push(socket.url()))
+  await page.goto('doc-info/')
+  const original = page.url(), origin = new URL(original).origin
+  for (let cycle = 0; cycle < 3; cycle++) {
+    const title = marker + '-' + cycle
+    const source = await PDFDocument.create()
+    source.setTitle(title)
+    source.addPage([600, 400])
+    await page.locator('input[type=file]').setInputFiles({ name: title + '.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await source.save()) })
+    const inspect = page.getByRole('button', { name: 'Inspect PDF', exact: true })
+    await expect(inspect).toBeEnabled()
+    await inspect.click()
+    await expect(page.getByRole('region', { name: 'Document metadata', exact: true })).toContainText(title)
+    await expect(page.getByRole('region', { name: 'Page dimensions', exact: true })).toContainText('600.00 × 400.00 pt')
+    if (cycle < 2) await page.getByRole('button', { name: 'Start over', exact: true }).click()
+    else {
+      await page.goto(new URL('../de/', original).href)
+      await page.goBack()
+      await expect(page).toHaveURL(original)
+    }
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Document metadata', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('region', { name: 'Document summary', exact: true })).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => (window as unknown as { infoLifecycleUrls(): number }).infoLifecycleUrls())).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
+    expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+  }
+  expect(requests.filter(r => !['GET', 'HEAD'].includes(r.method) ||
+    (/^https?:/.test(r.url) && new URL(r.url).origin !== origin) || r.url.includes(marker))).toEqual([])
+  expect(leaks).toEqual([])
+  expect(errors).toEqual([])
+  expect(sockets).toEqual([])
+})
