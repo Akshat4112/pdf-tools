@@ -220,6 +220,11 @@ test('German Split: unavailable processing asset has safe reload guidance and a 
   await expect(page.locator('.btn-download')).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Originale, Datenschutz und Neu beginnen', exact: true })).toContainText('Dabei gehen die Auswahl und Einstellungen')
   await page.unrouteAll({ behavior: 'wait' })
+  // A failed bootstrap must not discard the source or custom ranges.
+  await page.getByRole('alert', { name: 'Etwas ist schiefgelaufen', exact: true }).getByRole('button', { name: 'Einstellungen überprüfen', exact: true }).click()
+  await expect(page.locator('.file-row .file-name')).toHaveText(sourceName)
+  await expect(page.getByRole('textbox', { name: 'Seitenbereiche (kommagetrennt)', exact: true })).toHaveValue('5, 1-2, 2')
+  await expect(page.locator('.btn-download')).toHaveCount(0)
   await page.reload()
   await expect(page.locator('.file-row')).toHaveCount(0)
   await selectPdf(page)
