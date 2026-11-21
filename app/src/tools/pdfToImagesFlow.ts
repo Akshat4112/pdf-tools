@@ -42,7 +42,7 @@ export function startPdfToImages(input: PdfToImagesInput, events: JobEvents = {}
     const meta = validateFile(inp.file.displayName, inp.file.bytes, 'pdf')
     const doc = await openDocument(inp.file.bytes, { strict: true, maxCanvasBytes: PDF_IMAGE_LIMITS.maxPixels * 4 })
     const images: VerifiedPageImage[] = []
-    const stem = meta.displayName.replace(/\.[^.]*$/, '').replace(/[^\w.-]+/g, '_').slice(0, 50) || 'document'
+    const stem = meta.displayName.replace(/\.[^.]*$/, '').replace(/\s+/g, '_') || 'document'
     const ext = options.format === 'jpeg' ? 'jpg' : 'png'
     try {
       check()
@@ -64,7 +64,7 @@ export function startPdfToImages(input: PdfToImagesInput, events: JobEvents = {}
         check()
         encodedBytes += bytes.length
         if (encodedBytes > PDF_IMAGE_LIMITS.maxEncodedBytes) throw toolError('E-PROC-02', 'The images exceed 50 MB in total. Reduce DPI, JPEG quality or the selected pages.', 'reduce-scope')
-        const verified = await verifyRasterImage({ name: zipEntryName(`${stem}-page`, plan.sourcePage, doc.numPages, ext), mimeType: options.format === 'jpeg' ? 'image/jpeg' : 'image/png', bytes }, plan)
+        const verified = await verifyRasterImage({ name: zipEntryName(`${stem}-page.pdf`, plan.sourcePage, doc.numPages, ext), mimeType: options.format === 'jpeg' ? 'image/jpeg' : 'image/png', bytes }, plan)
         check()
         images.push({ ...verified, sourcePage: plan.sourcePage, width: plan.width, height: plan.height, dpi: options.dpi, background: options.background, ...(options.format === 'jpeg' ? { quality: options.quality } : {}) })
         ctx.reportProgress(0.1 + 0.7 * (i + 1) / plans.length, `Rendered and verified page ${i + 1} of ${plans.length}`)
