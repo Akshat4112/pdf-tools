@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
 import { PDFDocument } from 'pdf-lib'
 import { unzipSync } from 'fflate'
+import { readImageMetadata } from '../src/engines/imageMetadata'
 
 // PT-IMP-009: synthetic browser lifecycle stress, complementary to FileSession unit stress.
 // Keep this bounded in CI; extended 100-cycle/memory profiling is a separate acceptance gate.
@@ -520,3 +521,65 @@ test('PT-IMP-009 pdf-to-text: repeated UTF-8 exports and abandoned results relea
   expect(errors).toEqual([])
   expect(sockets).toEqual([])
 })
+
+
+for (const format of ['png', 'jpg'] as const) {
+  test(`PT-IMP-009 pdf-to-${format}: repeated raster exports and history release resources`, async ({ page }) => {
+    test.setTimeout(90_000)
+    await page.addInitScript(() => {
+      const urls = new Set<string>()
+      const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+      URL.createObjectURL = blob => { const url = create(blob); urls.add(url); return url }
+      URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
+      Object.assign(window, { rasterLifecycleUrls: () => urls.size })
+    })
+    const workers = new Set<import('@playwright/test').Worker>()
+    page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+    const marker = 'pt-imp009-private-raster'
+    const requests: Array<{ url: string; method: string }> = []
+    const leaks: string[] = [], errors: string[] = [], sockets: string[] = []
+    page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+    page.on('console', message => { if (message.text().includes(marker)) leaks.push(message.text()) })
+    page.on('pageerror', error => errors.push(error.message))
+    page.on('websocket', socket => sockets.push(socket.url()))
+    const source = await PDFDocument.create()
+    source.addPage([72, 36]).drawText('Synthetic', { x: 2, y: 10, size: 8 })
+    const buffer = Buffer.from(await source.save())
+    await page.goto(`pdf-to-${format}/`)
+    const original = page.url(), origin = new URL(original).origin
+    const result = page.getByRole('region', { name: 'Results' })
+    for (let cycle = 0; cycle < 3; cycle++) {
+      await page.locator('input[type=file]').setInputFiles({ name: marker + '.pdf', mimeType: 'application/pdf', buffer })
+      await expect(page.getByRole('button', { name: 'Page 1', exact: true })).toBeVisible()
+      await page.getByRole('combobox', { name: 'Resolution', exact: true }).selectOption('96')
+      await page.getByRole('button', { name: 'Create images', exact: true }).click()
+      await expect(result).toBeVisible()
+      await expect.poll(() => result.locator('.page-placeholder').count()).toBe(0)
+      const pending = page.waitForEvent('download')
+      await page.getByRole('button', { name: 'Download all as ZIP', exact: true }).click()
+      const file = await pending
+      const entries = Object.entries(unzipSync(new Uint8Array(await readFile((await file.path())!))))
+      expect(entries).toHaveLength(1)
+      expect(entries[0][0]).toBe(`${marker}-page-1.${format}`)
+      const metadata = readImageMetadata(entries[0][1])
+      expect(metadata).toMatchObject({ kind: format === 'jpg' ? 'jpeg' : 'png', width: 96, height: 48 })
+      if (cycle < 2) await page.getByRole('button', { name: 'Start over', exact: true }).click()
+      else {
+        await page.goto(new URL('../de/', original).href)
+        await page.goBack()
+        await expect(page).toHaveURL(original)
+      }
+      await expect(result).toHaveCount(0)
+      await expect(page.locator('.file-row')).toHaveCount(0)
+      await expect(page.locator('canvas')).toHaveCount(0)
+      await expect.poll(() => page.evaluate(() => (window as unknown as { rasterLifecycleUrls(): number }).rasterLifecycleUrls())).toBe(0)
+      await expect.poll(() => workers.size).toBe(0)
+      expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+    }
+    expect(requests.filter(r => !['GET', 'HEAD'].includes(r.method) ||
+      (/^https?:/.test(r.url) && new URL(r.url).origin !== origin) || r.url.includes(marker))).toEqual([])
+    expect(leaks).toEqual([])
+    expect(errors).toEqual([])
+    expect(sockets).toEqual([])
+  })
+}
