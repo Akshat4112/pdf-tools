@@ -155,7 +155,15 @@ test('downloads reuse correct URLs and adjust/reset/exit revoke them',async({pag
 })
 
 test('cancellation during image verification discards late output and a new job succeeds',async({page})=>{
+  const workers=new Set<import('@playwright/test').Worker>()
+  page.on('worker',worker=>{workers.add(worker);worker.on('close',()=>workers.delete(worker))})
+  const requests:Array<{url:string;method:string}>=[]
+  page.on('request',request=>requests.push({url:request.url(),method:request.method()}))
   await page.addInitScript(()=>{
+    const urls=new Set<string>(),create=URL.createObjectURL.bind(URL),revoke=URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL=blob=>{const url=create(blob);urls.add(url);return url}
+    URL.revokeObjectURL=url=>{urls.delete(url);revoke(url)}
+    Object.assign(window,{rasterCancelUrls:urls})
     const decode=createImageBitmap.bind(window)
     Object.assign(window,{holdRasterDecode:false,pendingRasterDecodes:[]})
     window.createImageBitmap=((...args:Parameters<typeof createImageBitmap>)=>{
@@ -173,4 +181,14 @@ test('cancellation during image verification discards late output and a new job 
   await expect(page.getByRole('region',{name:'Results'})).toHaveCount(0);await expect(page.locator('.file-row .file-name')).toHaveText('demo.pdf')
   await expect(page.getByRole('textbox',{name:'Pages to convert',exact:true})).toHaveValue('1')
   await create(page);expect((await archive((await download(page,'Download all as ZIP')).bytes))[0].name).toBe('demo-page-1.png')
+  await page.getByRole('button',{name:'Start over',exact:true}).click()
+  await expect(page.locator('.file-row, canvas')).toHaveCount(0)
+  await expect(page.getByRole('button',{name:/^Download /})).toHaveCount(0)
+  await expect.poll(()=>page.evaluate(()=>(window as unknown as {rasterCancelUrls:Set<string>}).rasterCancelUrls.size)).toBe(0)
+  await expect.poll(()=>workers.size).toBe(0)
+  expect(await page.evaluate(()=>[localStorage.length,sessionStorage.length])).toEqual([0,0])
+  const origin=new URL(page.url()).origin
+  expect(requests.filter(request=>!['GET','HEAD'].includes(request.method) ||
+    (/^https?:/.test(request.url) && new URL(request.url).origin!==origin) ||
+    request.url.toLowerCase().includes('demo.pdf'))).toEqual([])
 })
