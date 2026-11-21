@@ -162,3 +162,33 @@ test('PT-IMP-007: Unicode archive names and same-name inputs roundtrip', async (
   const merged = await PDFDocument.load(await readFile((await (await merging).path())!))
   expect(merged.getPages().map(p => p.getWidth())).toEqual([288, 300, 320])
 })
+
+test('PT-IMP-007: RTL controls and multibyte archive filename corpus', async ({ page }) => {
+  test.setTimeout(90_000)
+  const doc = await PDFDocument.create()
+  doc.addPage([288, 432])
+  doc.addPage([300, 432])
+  const buffer = Buffer.from(await doc.save())
+  for (const [raw, stem] of [
+    ['report\u202e.2026\u2069.pdf', 'report.2026'],
+    ['नमस्ते.2026.pdf', 'नमस्ते.2026'],
+  ]) {
+    await page.goto('split/')
+    await pick(page, [{ name: raw, mimeType: 'application/pdf', buffer }])
+    await page.getByRole('textbox', { name: 'Ranges (comma separated)' }).fill('1, 2')
+    await page.getByRole('button', { name: 'Split PDF', exact: true }).click()
+    const result = page.getByRole('region', { name: 'Results', exact: true })
+    await expect(result).toBeVisible()
+    const pending = page.waitForEvent('download')
+    await result.getByRole('button', { name: /^Download / }).first().click()
+    const download = await pending
+    expect(download.suggestedFilename()).toBe(stem + '-split.zip')
+    const entries = unzipSync(await readFile((await download.path())!))
+    expect(Object.keys(entries).sort()).toEqual([stem + '-1.pdf', stem + '-2.pdf'])
+    for (const [index, suffix] of ['-1.pdf', '-2.pdf'].entries()) {
+      const output = await PDFDocument.load(entries[stem + suffix])
+      expect(output.getPageCount()).toBe(1)
+      expect(output.getPage(0).getWidth()).toBe(index === 0 ? 288 : 300)
+    }
+  }
+})
