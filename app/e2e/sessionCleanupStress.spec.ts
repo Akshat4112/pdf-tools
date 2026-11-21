@@ -483,7 +483,8 @@ test('PT-IMP-009 pdf-to-text: repeated UTF-8 exports and abandoned results relea
   page.on('console', message => { if (message.text().includes(marker)) leaks.push(message.text()) })
   page.on('websocket', socket => sockets.push(socket.url()))
   const source = await PDFDocument.create()
-  source.addPage([300, 400]).drawText(marker, { x: 20, y: 350 })
+  // Keep the full marker inside the PDF page at the default font size.
+  source.addPage([600, 400]).drawText(marker, { x: 20, y: 350, size: 12 })
   const buffer = Buffer.from(await source.save())
   await page.goto('pdf-to-text/')
   const original = page.url(), origin = new URL(original).origin
