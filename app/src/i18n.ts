@@ -290,6 +290,7 @@ const TRANSLATIONS: Readonly<Record<string, string>> = {
   "counting pages…": "Seiten werden gezählt …",
   "Select at least one file to continue.": "Wähle mindestens eine Datei aus, um fortzufahren.",
   "This file could not be read as a PDF.": "Diese Datei konnte nicht als PDF gelesen werden.",
+  "The PDF engine could not start. Retry the operation or reload the page if the problem persists.": "Die PDF-Verarbeitung konnte nicht gestartet werden. Versuche es erneut oder lade die Seite neu, falls das Problem weiterhin besteht.",
   "The generated file is empty and did not pass verification.": "Die erzeugte Datei ist leer und hat die Prüfung nicht bestanden.",
   "The generated output did not pass verification.": "Das erzeugte Ergebnis hat die Prüfung nicht bestanden.",
   "Internal progress error.": "Interner Fehler bei der Fortschrittsanzeige.",

@@ -216,7 +216,7 @@ test('German Split: unavailable processing asset has safe reload guidance and a 
   await configureRanges(page)
   await page.route('**/assets/pdf.worker.min.mjs', route => route.abort('failed'))
   await page.getByRole('button', { name: 'PDF teilen', exact: true }).click()
-  await expect(page.getByRole('alert', { name: 'Etwas ist schiefgelaufen', exact: true })).toContainText('Diese Datei konnte nicht als PDF gelesen werden.')
+  await expect(page.getByRole('alert', { name: 'Etwas ist schiefgelaufen', exact: true })).toContainText('Die PDF-Verarbeitung konnte nicht gestartet werden. Versuche es erneut oder lade die Seite neu, falls das Problem weiterhin besteht.')
   await expect(page.locator('.btn-download')).toHaveCount(0)
   await expect(page.getByRole('region', { name: 'Originale, Datenschutz und Neu beginnen', exact: true })).toContainText('Dabei gehen die Auswahl und Einstellungen')
   await page.unrouteAll({ behavior: 'wait' })

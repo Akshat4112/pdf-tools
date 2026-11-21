@@ -100,9 +100,10 @@ export function assertPixelBudget(widthPx: number, heightPx: number, heldBitmaps
   }
 }
 
-export async function openDocument(
+async function openDocumentAttempt(
   data: Uint8Array | ArrayBuffer,
   opts: { maxPages?: number; maxBytes?: number; strict?: boolean; maxCanvasBytes?: number; signal?: AbortSignal; quiet?: boolean } = {},
+  retryBootstrap = true,
 ): Promise<PdfjsDocument> {
   if (opts.signal?.aborted) throw new CancelledError()
   const { getDocument, PDFWorker } = await getPdfjs()
@@ -174,6 +175,11 @@ export async function openDocument(
     // so check for our string codes explicitly — never re-throw raw exceptions.
     if (typeof e.code === 'string' && e.code.startsWith('E-')) throw e
     const name = e.name ?? ''
+    // Only known bootstrap failures are retried; malformed or encrypted PDFs are not.
+    if (/setting up fake worker failed|failed to (?:load|initialize|start) (?:the )?(?:pdf\.js )?worker|worker initialization failed/i.test(String(e.message))) {
+      if (retryBootstrap) return openDocumentAttempt(input, opts, false)
+      throw toolError('E-PROC-01', 'The PDF engine could not start. Retry the operation or reload the page if the problem persists.', 'retry-job')
+    }
     if (/password/i.test(name + String(e.message))) {
       throw toolError(
         'E-INPUT-02',
@@ -183,6 +189,13 @@ export async function openDocument(
     }
     throw toolError('E-INPUT-03', 'This file could not be read as a PDF.', 'retry-file')
   }
+}
+
+export function openDocument(
+  data: Uint8Array | ArrayBuffer,
+  opts: Parameters<typeof openDocumentAttempt>[1] = {},
+): Promise<PdfjsDocument> {
+  return openDocumentAttempt(data, opts)
 }
 
 /** PT-FT-010/013: page text joined with separators; empty pages reported. */
