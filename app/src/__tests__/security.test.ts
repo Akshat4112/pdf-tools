@@ -41,6 +41,17 @@ describe('PT-SEC-001 filename boundaries', () => {
     expect(new FileSession().addOutput('../../CON.html', mime, pdf).name).toBe(name)
   })
 
+  it('preserves Unicode and multiple dots in indexed archive filenames', async () => {
+    expect(zipEntryName('Re\u0301sume\u0301.2026📄.pdf', 1, 2, 'pdf')).toBe('Résumé.2026📄-1.pdf')
+    expect(zipEntryName('報告\u202e.2026.pdf', 2, 2, 'png')).toBe('報告.2026-2.png')
+    const long = zipEntryName('📄'.repeat(100) + '.pdf', 1, 2, 'pdf')
+    expect(long).toMatch(/^(?:📄)+-1\.pdf$/u)
+    await expect(buildZip([
+      { name: 'Résumé.pdf', mimeType: 'application/pdf', bytes: pdf },
+      { name: 'RÉSUMÉ.pdf', mimeType: 'application/pdf', bytes: pdf },
+    ])).rejects.toMatchObject({ code: 'E-OUT-01' })
+  })
+
   it('normalizes before publishing verified names and rejects unsafe archive members', async () => {
     const verified = await verifyOutput({ name: '../../evil\u202e.html', mimeType: 'application/pdf', bytes: pdf })
     expect(verified.name).toBe('evil.pdf')

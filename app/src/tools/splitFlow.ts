@@ -61,11 +61,10 @@ export interface SplitOutcome extends VerifiedOutput {
 function namesFor(input: SplitInput, total: number) {
   const stem = (input.file.displayName ?? 'document')
     .replace(/\.[^.]*$/, '')
-    .replace(/[^\w.-]+/g, '_')
-    .slice(0, 50) || 'document'
+    .replace(/\s+/g, '_') || 'document'
   return {
     zipName: `${stem}-split.zip`,
-    entryName: (i: number) => zipEntryName(stem, i + 1, total, 'pdf'),
+    entryName: (i: number) => zipEntryName(`${stem}.pdf`, i + 1, total, 'pdf'),
   }
 }
 

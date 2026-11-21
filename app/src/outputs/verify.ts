@@ -154,11 +154,15 @@ export function zipEntryName(base: string, index: number, total: number, ext: st
   const stem =
     nameOnly
       .replace(/\.[^.]*$/, '')
-      .replace(/[^\w.-]+/g, '_')
-      .replace(/^_+|_+$/g, '')
-      .slice(0, 60) || 'output'
+      .replace(/\s+/g, '_')
+      .replace(/^_+|_+$/g, '') || 'output'
   const pad = String(total).length
-  return sanitizeFileName(`${stem}-${String(index).padStart(pad, '0')}.${ext}`)
+  let bounded = ''
+  for (const character of stem) {
+    if (bounded.length + character.length > 60) break
+    bounded += character
+  }
+  return sanitizeFileName(`${bounded}-${String(index).padStart(pad, '0')}.${ext}`)
 }
 
 /**
@@ -182,10 +186,11 @@ export async function buildZip(entries: ZipEntry[]): Promise<Uint8Array> {
     if (e.name !== safeDownloadName(e.name, e.mimeType)) {
       throw toolError('E-OUT-01', 'An archive filename failed safety verification.', 'retry-job')
     }
-    if (names.has(e.name)) {
+    const collisionKey = e.name.normalize('NFC').toLowerCase()
+    if (names.has(collisionKey)) {
       throw toolError('E-OUT-01', `Duplicate output name '${e.name}'.`, 'retry-job')
     }
-    names.add(e.name)
+    names.add(collisionKey)
   }
 
   const { BlobWriter, ZipWriter } = await import('@zip.js/zip.js')
