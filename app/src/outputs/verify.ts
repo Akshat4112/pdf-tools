@@ -157,8 +157,11 @@ export function zipEntryName(base: string, index: number, total: number, ext: st
       .replace(/\s+/g, '_')
       .replace(/^_+|_+$/g, '') || 'output'
   const pad = String(total).length
-  const bounded = Array.from(stem).reduce((value, character) =>
-    value.length + character.length <= 60 ? value + character : value, '')
+  let bounded = ''
+  for (const character of stem) {
+    if (bounded.length + character.length > 60) break
+    bounded += character
+  }
   return sanitizeFileName(`${bounded}-${String(index).padStart(pad, '0')}.${ext}`)
 }
 
