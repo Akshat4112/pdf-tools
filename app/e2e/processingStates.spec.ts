@@ -141,7 +141,7 @@ test('PT-UI-006 merge: recover from failure, show actual size and revoke reused 
   const origin = new URL(page.url()).origin
   expect(requests.filter(request => !['GET', 'HEAD'].includes(request.method) ||
     (/^https?:/.test(request.url) && new URL(request.url).origin !== origin) ||
-    /(?:first|second|broken)\.pdf/i.test(request.url))).toEqual([])
+    ['first.pdf', 'second.pdf', 'broken.pdf'].some(name => request.url.toLowerCase().includes(name)))).toEqual([])
   expect(errors).toEqual([])
 })
 
