@@ -6,6 +6,7 @@
  */
 import { test, expect, type Page } from '@playwright/test'
 import { PDFDocument, StandardFonts } from 'pdf-lib'
+import { unzipSync } from 'fflate'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -122,4 +123,42 @@ test('PT-QA-002: selection quota and two-tab isolation', async ({ page, context 
   } finally {
     await other.close()
   }
+})
+
+test('PT-IMP-007: Unicode archive names and same-name inputs roundtrip', async ({ page }) => {
+  test.setTimeout(90_000)
+  const doc = await PDFDocument.create()
+  doc.addPage([288, 432])
+  doc.addPage([300, 432])
+  const buffer = Buffer.from(await doc.save())
+  await page.goto('split/')
+  await pick(page, [{ name: 'Re\u0301sume\u0301.報告📄.pdf', mimeType: 'application/pdf', buffer }])
+  await page.getByRole('textbox', { name: 'Ranges (comma separated)' }).fill('1, 2')
+  await page.getByRole('button', { name: 'Split PDF', exact: true }).click()
+  const result = page.getByRole('region', { name: 'Results', exact: true })
+  await expect(result).toBeVisible()
+  const pending = page.waitForEvent('download')
+  await result.getByRole('button', { name: /^Download / }).first().click()
+  const download = await pending
+  expect(download.suggestedFilename()).toBe('Résumé.報告📄-split.zip')
+  const entries = unzipSync(await readFile((await download.path())!))
+  expect(Object.keys(entries).sort()).toEqual(['Résumé.報告📄-1.pdf', 'Résumé.報告📄-2.pdf'])
+  for (const [index, name] of ['Résumé.報告📄-1.pdf', 'Résumé.報告📄-2.pdf'].entries()) {
+    const output = await PDFDocument.load(entries[name])
+    expect(output.getPageCount()).toBe(1)
+    expect(output.getPage(0).getWidth()).toBe(index === 0 ? 288 : 300)
+  }
+  await page.goto('merge/')
+  const other = await PDFDocument.create()
+  other.addPage([320, 432])
+  await pick(page, [
+    { name: 'same.pdf', mimeType: 'application/pdf', buffer },
+    { name: 'same.pdf', mimeType: 'application/pdf', buffer: Buffer.from(await other.save()) },
+  ])
+  await page.getByRole('button', { name: 'Merge PDFs', exact: true }).click()
+  await expect(result).toBeVisible()
+  const merging = page.waitForEvent('download')
+  await result.getByRole('button', { name: /^Download / }).click()
+  const merged = await PDFDocument.load(await readFile((await (await merging).path())!))
+  expect(merged.getPages().map(p => p.getWidth())).toEqual([288, 300, 320])
 })
