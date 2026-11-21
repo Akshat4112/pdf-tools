@@ -463,3 +463,60 @@ test('PT-IMP-009 images-to-pdf: repeated verified downloads and reset release lo
   expect(errors).toEqual([])
   expect(sockets).toEqual([])
 })
+
+test('PT-IMP-009 pdf-to-text: repeated UTF-8 exports and abandoned results release resources', async ({ page }) => {
+  test.setTimeout(90_000)
+  await page.addInitScript(() => {
+    const active = new Set<string>()
+    const create = URL.createObjectURL.bind(URL), revoke = URL.revokeObjectURL.bind(URL)
+    URL.createObjectURL = blob => { const url = create(blob); active.add(url); return url }
+    URL.revokeObjectURL = url => { active.delete(url); revoke(url) }
+    Object.assign(window, { ptImp009TextUrls: () => active.size })
+  })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+  const requests: Array<{ url: string; method: string }> = []
+  const errors: string[] = [], leaks: string[] = [], sockets: string[] = []
+  const marker = 'PT-IMP009-SYNTHETIC-TEXT'
+  page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+  page.on('pageerror', error => errors.push(error.message))
+  page.on('console', message => { if (message.text().includes(marker)) leaks.push(message.text()) })
+  page.on('websocket', socket => sockets.push(socket.url()))
+  const source = await PDFDocument.create()
+  // Keep the full marker inside the PDF page at the default font size.
+  source.addPage([600, 400]).drawText(marker, { x: 20, y: 350, size: 12 })
+  const buffer = Buffer.from(await source.save())
+  await page.goto('pdf-to-text/')
+  const original = page.url(), origin = new URL(original).origin
+  const report = page.getByRole('region', { name: 'Text extraction report', exact: true })
+  const downloadButton = page.getByRole('button', { name: /^Download .*\.txt/ })
+  for (let cycle = 0; cycle < 3; cycle++) {
+    await page.locator('input[type=file]').setInputFiles({ name: marker + '.pdf', mimeType: 'application/pdf', buffer })
+    await expect(page.locator('.file-row')).toHaveCount(1)
+    await page.getByRole('button', { name: 'Export text', exact: true }).click()
+    await expect(report).toBeVisible()
+    await expect(downloadButton).toBeVisible()
+    const pending = page.waitForEvent('download')
+    await downloadButton.click()
+    const result = await pending
+    expect(new TextDecoder('utf-8', { fatal: true }).decode(await readFile((await result.path())!))).toContain(marker)
+    if (cycle < 2) await page.getByRole('button', { name: 'Start over', exact: true }).click()
+    else {
+      await page.goto(new URL('../de/', original).href)
+      await page.goBack()
+      await expect(page).toHaveURL(original)
+    }
+    await expect(page.locator('.file-row')).toHaveCount(0)
+    await expect(report).toHaveCount(0)
+    await expect(downloadButton).toHaveCount(0)
+    await expect.poll(() => page.evaluate(() => (window as unknown as { ptImp009TextUrls(): number }).ptImp009TextUrls())).toBe(0)
+    await expect.poll(() => workers.size).toBe(0)
+    expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+  }
+  expect(requests.filter(r => !['GET', 'HEAD'].includes(r.method) ||
+    (/^https?:/.test(r.url) && new URL(r.url).origin !== origin) ||
+    r.url.includes(marker))).toEqual([])
+  expect(leaks).toEqual([])
+  expect(errors).toEqual([])
+  expect(sockets).toEqual([])
+})
