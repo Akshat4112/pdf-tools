@@ -22,7 +22,8 @@ async function verifyArchive(bytes: Uint8Array, images: VerifiedPageImage[], che
       check()
       const entry = entries[i], expected = images[i]
       if (entry.directory || entry.filename !== expected.name || entry.uncompressedSize !== expected.bytes.length || !entry.getData) throw new Error('Incorrect archive entry')
-      const extracted = await entry.getData(new Uint8ArrayWriter(), { checkSignature: true })
+      // The archive contains stored images; verify without creating a pooled ZIP worker.
+      const extracted = await entry.getData(new Uint8ArrayWriter(), { checkSignature: true, useWebWorkers: false })
       if (extracted.length !== expected.bytes.length || !extracted.every((b, at) => b === expected.bytes[at])) throw new Error('Archive image differs')
     }
   } catch {
