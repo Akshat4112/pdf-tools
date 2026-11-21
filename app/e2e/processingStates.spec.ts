@@ -95,6 +95,12 @@ test('PT-UI-006 merge: recover from failure, show actual size and revoke reused 
     URL.revokeObjectURL = url => { urls.delete(url); revoke(url) }
     Object.assign(window, { testOutputUrls: () => urls.size })
   })
+  const workers = new Set<import('@playwright/test').Worker>()
+  page.on('worker', worker => { workers.add(worker); worker.on('close', () => workers.delete(worker)) })
+  const requests: Array<{ url: string; method: string }> = []
+  const errors: string[] = []
+  page.on('request', request => requests.push({ url: request.url(), method: request.method() }))
+  page.on('pageerror', error => errors.push(error.message))
   const run = await configure(page, 'merge')
   await page.locator('input[type="file"]').setInputFiles({ name: 'broken.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7\nnot a PDF body\n%%EOF') })
   await expect(page.locator('.file-row')).toHaveCount(3)
@@ -124,6 +130,19 @@ test('PT-UI-006 merge: recover from failure, show actual size and revoke reused 
   expect(await urls()).toBe(before)
   await expect(result).toHaveCount(0)
   await expect(run).toBeEnabled()
+  await run.click()
+  await expect(result).toBeVisible()
+  await result.getByRole('button', { name: 'Start over', exact: true }).click()
+  await expect(page.locator('.file-row')).toHaveCount(0)
+  await expect(result).toHaveCount(0)
+  await expect.poll(urls).toBe(0)
+  await expect.poll(() => workers.size).toBe(0)
+  expect(await page.evaluate(() => [localStorage.length, sessionStorage.length])).toEqual([0, 0])
+  const origin = new URL(page.url()).origin
+  expect(requests.filter(request => !['GET', 'HEAD'].includes(request.method) ||
+    (/^https?:/.test(request.url) && new URL(request.url).origin !== origin) ||
+    ['first.pdf', 'second.pdf', 'broken.pdf'].some(name => request.url.toLowerCase().includes(name)))).toEqual([])
+  expect(errors).toEqual([])
 })
 
 test('PT-UI-006 result actions remain reachable at 320px in both themes', async ({ page }) => {
