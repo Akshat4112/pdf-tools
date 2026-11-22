@@ -3,7 +3,6 @@ import { useSyncExternalStore } from 'react'
 
 export type Locale = 'en' | 'de'
 const TRANSLATIONS: Readonly<Record<string, string>> = {
-  "On a phone or tablet, tap Download, then check your browser’s downloads or Files app. You can share the saved file from there.": "Tippe auf einem Smartphone oder Tablet auf Herunterladen und öffne anschließend die Downloads deines Browsers oder die Dateien-App. Von dort kannst du die gespeicherte Datei teilen.",
   "Menu": "Menü",
   "Close": "Schließen",
   "The generated PDF did not pass structure verification.": "Die erzeugte PDF-Datei hat die Strukturprüfung nicht bestanden.",
