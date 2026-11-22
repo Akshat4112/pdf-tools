@@ -185,7 +185,7 @@ export function ResultPanel({
   onContinue?(): void
   retryLabel?: string
 }) {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const heading = usePanelHeading()
   const ready = outputs.length > 0 && outputs.every(output => output.verified && output.actualBytes > 0 && output.actualBytes === output.bytes.byteLength)
   if (!ready) return <section className="panel state-panel" aria-label={t("Results")}><h2 ref={heading} tabIndex={-1} className="panel-title">{t("No verified result available")}</h2><p>{t("Start over and create a new result before downloading.")}</p><button type="button" className="btn-ghost" onClick={onReset}>{t("Start over")}</button></section>
@@ -198,6 +198,7 @@ export function ResultPanel({
           : t(`${outputs.length} files were generated and verified.`)}
       </p>
       <p className="panel-hint" role="status">{t('Ready to download')} · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} {t('total. Sizes are the actual generated files, not estimates.')}</p>
+      <p className="panel-hint">{locale === 'de' ? 'Tippe auf einem Smartphone oder Tablet auf Herunterladen und öffne anschließend die Downloads deines Browsers oder die Dateien-App. Von dort kannst du die gespeicherte Datei teilen.' : 'On a phone or tablet, tap Download, then check your browser’s downloads or Files app. You can share the saved file from there.'}</p>
       <ul className="result-list">
         {outputs.map((o) => (
           <li key={o.name} className="result-row">
