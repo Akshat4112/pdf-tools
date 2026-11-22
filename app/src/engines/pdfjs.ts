@@ -176,7 +176,7 @@ async function openDocumentAttempt(
     if (typeof e.code === 'string' && e.code.startsWith('E-')) throw e
     const name = e.name ?? ''
     // Only known bootstrap failures are retried; malformed or encrypted PDFs are not.
-    if (/setting up fake worker failed|failed to (?:load|initialize|start) (?:the )?(?:pdf\.js )?worker|worker initialization failed/i.test(String(e.message))) {
+    if (/setting up fake worker failed|failed to (?:load|initialize|start) (?:the )?(?:pdf\.js )?worker|worker initialization failed|failed to (?:load|initialize) (?:the )?(?:standard |pdf\.js )?font (?:asset|data)|font (?:asset|data) initialization failed/i.test(String(e.message))) {
       if (retryBootstrap) return openDocumentAttempt(input, opts, false)
       throw toolError('E-PROC-01', 'The PDF engine could not start. Retry the operation or reload the page if the problem persists.', 'retry-job')
     }
