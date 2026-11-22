@@ -198,6 +198,7 @@ export function ResultPanel({
           : t(`${outputs.length} files were generated and verified.`)}
       </p>
       <p className="panel-hint" role="status">{t('Ready to download')} · {formatBytes(outputs.reduce((sum, output) => sum + output.actualBytes, 0))} {t('total. Sizes are the actual generated files, not estimates.')}</p>
+      <p className="panel-hint">{t("On a phone or tablet, tap Download, then check your browser’s downloads or Files app. You can share the saved file from there.")}</p>
       <ul className="result-list">
         {outputs.map((o) => (
           <li key={o.name} className="result-row">
