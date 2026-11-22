@@ -29,6 +29,12 @@ describe('PT-UI-006 shared panel contracts', () => {
       expect(html).not.toContain('files are ready')
     }
   })
+  it('provides mobile save guidance alongside the verified download', () => {
+    const outputs = [{ name: 'test.pdf', verified: true, actualBytes: 1, bytes: new Uint8Array(1) }] as VerifiedOutput[]
+    const html = renderToStaticMarkup(createElement(ResultPanel, { outputs, onDownload: noop, onRetry: noop, onReset: noop }))
+    expect(html).toContain('browser’s downloads or Files app')
+    expect(html).toContain('btn-download')
+  })
   it('offers the appropriate recovery guidance rather than a generic retry promise', () => {
     const html = renderToStaticMarkup(createElement(FailurePanel, { error: toolError('E-INPUT-04', 'Too large', 'reduce-scope'), onRetry: noop, onReset: noop }))
     expect(html).toContain('Try fewer pages or a lower resolution')
