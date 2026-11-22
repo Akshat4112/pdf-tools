@@ -10,6 +10,9 @@ const assets = new Set([
   ...files(new URL('../../dist/assets/', import.meta.url), '/pdf-tools/assets/'),
   '/pdf-tools/brand/apple-touch-icon.png', '/pdf-tools/favicon.svg', '/pdf-tools/brand/logo-light.svg', '/pdf-tools/brand/logo-dark.svg',
 ])
+const origin = process.env.PDF_TOOLS_PRODUCTION_SMOKE === '1'
+  ? 'https://akshat4112.github.io' : 'http://127.0.0.1:4178'
+
 interface AuditState {
   urls: Set<string>; workers: Set<Worker>; writes: string[]; channels: string[]
   workerVerbosity: number[]
@@ -30,7 +33,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
   await context.route('**/*', request => {
     const req = request.request(), url = new URL(req.url())
     if (['blob:', 'data:'].includes(url.protocol)) return request.continue()
-    const allowed = url.origin === 'http://127.0.0.1:4178' && !url.search &&
+    const allowed = url.origin === origin && !url.search &&
       (assets.has(url.pathname) || url.pathname === '/pdf-tools/' || url.pathname === `/pdf-tools/${route}/`)
     // No POST/Beacon/form bodies, query strings, private path names, or telemetry URLs.
     if (!allowed || req.method() !== 'GET' || req.postDataBuffer() !== null) {
@@ -108,7 +111,7 @@ export async function installPrivacyAudit(page: Page, context: BrowserContext, r
     expect(logs).toEqual([])
     expect(await page.evaluate(() => ({ writes: window.privacyAudit.writes, channels: window.privacyAudit.channels,
       verbosity: window.privacyAudit.workerVerbosity.filter(level => level !== 0) }))).toEqual({ writes: [], channels: [], verbosity: [] })
-    expect(page.url()).toBe(`http://127.0.0.1:4178/pdf-tools/${route}/`)
+    expect(page.url()).toBe(`${origin}/pdf-tools/${route}/`)
     expect(await page.evaluate(() => history.state)).toBeNull()
     await expect(page).toHaveTitle(/PDF Tools/)
     expect(await page.title()).not.toContain('PRIVATE_')
