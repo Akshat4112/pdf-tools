@@ -34,6 +34,28 @@ describe('PDF.js bootstrap recovery', () => {
     expect(mocks.getDocument).toHaveBeenCalledTimes(2)
     expect(mocks.destroy).toHaveBeenCalledTimes(2)
   })
+  it('recovers from explicit font asset initialization failure using fresh bytes', async () => {
+    const input = new Uint8Array([1, 2, 3])
+    mocks.getDocument.mockImplementationOnce(({ data }: { data: Uint8Array }) => {
+      data.fill(0)
+      return failed('Failed to load standard font data')
+    }).mockImplementationOnce(({ data }: { data: Uint8Array }) => {
+      expect(Array.from(data)).toEqual([1, 2, 3])
+      return { promise: Promise.resolve({ numPages: 1 }), destroy: mocks.destroy }
+    })
+    const doc = await openDocument(input)
+    expect(mocks.getDocument).toHaveBeenCalledTimes(2)
+    expect(mocks.destroy).toHaveBeenCalledTimes(1)
+    expect(Array.from(input)).toEqual([1, 2, 3])
+    await doc.destroy()
+    expect(mocks.destroy).toHaveBeenCalledTimes(2)
+  })
+  it('bounds persistent font asset initialization failure', async () => {
+    mocks.getDocument.mockImplementation(() => failed('Font asset initialization failed'))
+    await expect(openDocument(new Uint8Array([1]))).rejects.toMatchObject({ code: 'E-PROC-01' })
+    expect(mocks.getDocument).toHaveBeenCalledTimes(2)
+    expect(mocks.destroy).toHaveBeenCalledTimes(2)
+  })
   it('does not retry malformed PDF errors', async () => {
     mocks.getDocument.mockImplementation(() => failed('Invalid PDF structure'))
     await expect(openDocument(new Uint8Array([1]))).rejects.toMatchObject({ code: 'E-INPUT-03' })
