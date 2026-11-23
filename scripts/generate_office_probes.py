@@ -34,13 +34,15 @@ def archive(path: Path, parts: dict[str, bytes]) -> None:
             info.external_attr = 0o644 << 16
             z.writestr(info, payload)
 
-def common(kind: str, main: str, content_type: str) -> dict[str, bytes]:
+def common(kind: str, main: str, content_type: str, extra_overrides: tuple[tuple[str, str], ...] = ()) -> dict[str, bytes]:
     return {
         "[Content_Types].xml": xml(
             '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
             '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
             '<Default Extension="xml" ContentType="application/xml"/>'
-            f'<Override PartName="/{main}" ContentType="{content_type}"/></Types>'
+            f'<Override PartName="/{main}" ContentType="{content_type}"/>'
+            + "".join(f'<Override PartName="/{part}" ContentType="{type_name}"/>' for part, type_name in extra_overrides)
+            + '</Types>'
         ),
         "_rels/.rels": xml(
             '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
@@ -59,7 +61,7 @@ def generate() -> list[dict]:
     archive(doc, parts)
 
     book = OUT / "O-04-basic.xlsx"
-    parts = common("officeDocument", "xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")
+    parts = common("officeDocument", "xl/workbook.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml", (("xl/worksheets/sheet1.xml", "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"),))
     parts["xl/workbook.xml"] = xml(
         '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
         'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
@@ -78,7 +80,7 @@ def generate() -> list[dict]:
     archive(book, parts)
 
     deck = OUT / "O-06-basic.pptx"
-    parts = common("officeDocument", "ppt/presentation.xml", "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml")
+    parts = common("officeDocument", "ppt/presentation.xml", "application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml", (("ppt/slides/slide1.xml", "application/vnd.openxmlformats-officedocument.presentationml.slide+xml"),))
     parts["ppt/presentation.xml"] = xml(
         '<p:presentation xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" '
         'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'
@@ -117,6 +119,12 @@ def verify(path: Path, fixture_id: str) -> None:
         for name in names:
             if name.endswith((".xml", ".rels")) or name == "[Content_Types].xml":
                 ET.fromstring(z.read(name))
+        content_types = ET.fromstring(z.read("[Content_Types].xml"))
+        overrides = {node.attrib["PartName"]: node.attrib["ContentType"] for node in content_types.findall("{http://schemas.openxmlformats.org/package/2006/content-types}Override")}
+        if fixture_id == "O-04":
+            assert overrides.get("/xl/worksheets/sheet1.xml") == "application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"
+        elif fixture_id == "O-06":
+            assert overrides.get("/ppt/slides/slide1.xml") == "application/vnd.openxmlformats-officedocument.presentationml.slide+xml"
         if fixture_id == "O-01":
             root = ET.fromstring(z.read("word/document.xml"))
             assert "".join(t.text or "" for t in root.findall(".//w:t", NS)) == MARKER
