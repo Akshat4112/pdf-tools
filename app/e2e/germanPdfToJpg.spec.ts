@@ -89,9 +89,19 @@ test('PT-IMP-003: standard font request failure preserves a usable JPG conversio
     expect(requests).toBeLessThanOrEqual(4)
     expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
     const receiving = page.waitForEvent('download')
-    await page.getByRole('region', { name: 'Ergebnisse' }).getByRole('button', { name: /^Herunterladen / }).click()
+    await page.getByRole('button', { name: 'Alle als ZIP herunterladen' }).click()
     const download = await receiving
-    const bytes = await readFile((await download.path())!)
+    const zip = new Uint8Array(await readFile((await download.path())!))
+    const archive = new ZipReader(new Uint8ArrayReader(zip))
+    const bytes = await (async () => {
+      try {
+        const entries = await archive.getEntries()
+        expect(entries.map(entry => entry.filename)).toEqual(['font-fault-page-1.jpg'])
+        const entry = entries[0]
+        if (!('getData' in entry) || !entry.getData) throw new Error('Expected JPG entry')
+        return await entry.getData(new Uint8ArrayWriter(), { checkSignature: true })
+      } finally { await archive.close() }
+    })()
     const metadata = readImageMetadata(bytes)
     expect(metadata.kind).toBe('jpeg')
     expect([metadata.width, metadata.height]).toEqual([288, 96])
@@ -111,7 +121,7 @@ test('PT-IMP-003: standard font request failure preserves a usable JPG conversio
         if (pixels[i] < 100 && pixels[i + 1] < 100 && pixels[i + 2] < 100) count++
       }
       return count
-    }, bytes.toString('base64'))
+    }, Buffer.from(bytes).toString('base64'))
     expect(ink).toBeGreaterThan(20)
   } finally {
     await page.unrouteAll({ behavior: 'wait' })
