@@ -1,0 +1,35 @@
+name: Office synthetic structure probes
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/generate_office_probes.py'
+      - '.github/workflows/office-probes.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/generate_office_probes.py'
+      - '.github/workflows/office-probes.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-office-probes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Generate and structurally verify synthetic Office documents
+        run: python3 scripts/generate_office_probes.py
+      - name: Verify reproducibility and manifest
+        run: python3 scripts/generate_office_probes.py --check
+      - name: Upload synthetic corpus and manifest for independent inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: office-synthetic-structure-probes
+          path: fixtures/office/
+          retention-days: 7
