@@ -1,14 +1,16 @@
-name: Office synthetic structure probes
+name: Office synthetic structure and renderer probes
 
 on:
   pull_request:
     paths:
       - 'scripts/generate_office_probes.py'
+      - 'scripts/benchmark_office_rendering.py'
       - '.github/workflows/office-probes.yml'
   push:
     branches: [main]
     paths:
       - 'scripts/generate_office_probes.py'
+      - 'scripts/benchmark_office_rendering.py'
       - '.github/workflows/office-probes.yml'
 
 permissions:
@@ -17,7 +19,7 @@ permissions:
 jobs:
   verify-office-probes:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,9 +29,16 @@ jobs:
         run: python3 scripts/generate_office_probes.py
       - name: Verify reproducibility and manifest
         run: python3 scripts/generate_office_probes.py --check
-      - name: Upload synthetic corpus and manifest for independent inspection
+      - name: Install independent Office renderer and PDF readback utilities
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils
+      - name: Benchmark LibreOffice import and PDF text readback
+        run: python3 scripts/benchmark_office_rendering.py
+      - name: Upload synthetic corpus and measured results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: office-synthetic-structure-probes
+          name: office-synthetic-renderer-probes
           path: fixtures/office/
           retention-days: 7
