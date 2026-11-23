@@ -65,7 +65,7 @@ test('PT-IMP-003: standard font request failure preserves a usable JPG conversio
   test.setTimeout(120_000)
   const pdf = await PDFDocument.create()
   const font = await pdf.embedFont(StandardFonts.Symbol)
-  pdf.addPage([216, 72]).drawText('ABC', { font, size: 24, x: 12, y: 24 })
+  pdf.addPage([216, 72]).drawText('\u0391\u0392\u0393', { font, size: 24, x: 12, y: 24 })
   const buffer = Buffer.from(await pdf.save())
   let failed = 0
   let requests = 0
