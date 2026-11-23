@@ -98,7 +98,9 @@ def generate() -> list[dict]:
         'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
         '<p:cSld><p:spTree><p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>'
         '<p:grpSpPr/><p:sp><p:nvSpPr><p:cNvPr id="2" name="Title"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>'
-        '<p:spPr/><p:txBody><a:bodyPr/><a:lstStyle><a:lvl1pPr/></a:lstStyle>'
+        '<p:spPr><a:xfrm><a:off x="914400" y="914400"/><a:ext cx="7315200" cy="1828800"/></a:xfrm>'
+        '<a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr>'
+        '<p:txBody><a:bodyPr wrap="square"/><a:lstStyle><a:lvl1pPr/></a:lstStyle>'
         '<a:p><a:r><a:rPr lang="en-US"/><a:t>Office slide probe</a:t></a:r></a:p>'
         '</p:txBody></p:sp></p:spTree></p:cSld></p:sld>'
     )
@@ -139,6 +141,9 @@ def verify(path: Path, fixture_id: str) -> None:
             assert len(root.findall(".//{http://schemas.openxmlformats.org/presentationml/2006/main}sldId")) == 1
             root = ET.fromstring(z.read("ppt/slides/slide1.xml"))
             assert "Office slide probe" in [t.text for t in root.findall(".//a:t", NS)]
+            shape = root.find(".//{http://schemas.openxmlformats.org/presentationml/2006/main}sp/{http://schemas.openxmlformats.org/presentationml/2006/main}spPr", NS)
+            assert shape is not None and shape.find("{http://schemas.openxmlformats.org/drawingml/2006/main}xfrm") is not None, "slide shape needs explicit geometry"
+            assert shape.find("{http://schemas.openxmlformats.org/drawingml/2006/main}prstGeom") is not None, "slide shape needs preset geometry"
 
 def main() -> None:
     parser = argparse.ArgumentParser()
