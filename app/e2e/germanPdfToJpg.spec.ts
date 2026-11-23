@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { PDFDocument } from 'pdf-lib'
+import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { readFile } from 'node:fs/promises'
 import { ZipReader, Uint8ArrayReader, Uint8ArrayWriter } from '@zip.js/zip.js'
 import { readImageMetadata } from '../src/engines/imageMetadata'
@@ -59,4 +59,61 @@ test('PT-SEO-010: German JPG conversion preserves selected page order, local-onl
   await page.getByRole('button', { name: 'Neu beginnen' }).click()
   await expect(page.locator('.file-row')).toHaveCount(0)
   expect(await page.evaluate(() => [Object.keys(localStorage), Object.keys(sessionStorage)])).toEqual([[], []])
+})
+
+test('PT-IMP-003: standard font request failure preserves a usable JPG conversion', async ({ page }) => {
+  test.setTimeout(120_000)
+  const pdf = await PDFDocument.create()
+  const font = await pdf.embedFont(StandardFonts.Symbol)
+  pdf.addPage([216, 72]).drawText('ABC', { font, size: 24, x: 12, y: 24 })
+  const buffer = Buffer.from(await pdf.save())
+  let failed = 0
+  let requests = 0
+  await page.route('**/assets/standard_fonts/**', async route => {
+    requests++
+    if (failed === 0) {
+      failed++
+      await route.abort('failed')
+    } else await route.continue()
+  })
+  try {
+    await page.goto('de/pdf-to-jpg/')
+    const timeOrigin = await page.evaluate(() => performance.timeOrigin)
+    await page.locator('input[type=file]').setInputFiles({ name: 'font-fault.pdf', mimeType: 'application/pdf', buffer })
+    await page.getByRole('textbox', { name: 'Umzuwandelnde Seiten' }).fill('1')
+    await page.getByRole('combobox', { name: 'Auflösung' }).selectOption('96')
+    await page.getByLabel('JPG-Qualität (%)').fill('90')
+    await page.getByRole('button', { name: 'JPG-Bilder erstellen' }).click()
+    await expect(page.getByRole('region', { name: 'Ergebnisse' })).toBeVisible()
+    expect(failed).toBe(1)
+    expect(requests).toBeLessThanOrEqual(4)
+    expect(await page.evaluate(() => performance.timeOrigin)).toBe(timeOrigin)
+    const receiving = page.waitForEvent('download')
+    await page.getByRole('region', { name: 'Ergebnisse' }).getByRole('button', { name: /^Herunterladen / }).click()
+    const download = await receiving
+    const bytes = await readFile((await download.path())!)
+    const metadata = readImageMetadata(bytes)
+    expect(metadata.kind).toBe('jpeg')
+    expect([metadata.width, metadata.height]).toEqual([288, 96])
+    // Decode the actual output, not just its metadata: a blank page is not recovery.
+    const ink = await page.evaluate(async encoded => {
+      const image = new Image()
+      image.src = 'data:image/jpeg;base64,' + encoded
+      await image.decode()
+      const canvas = document.createElement('canvas')
+      canvas.width = image.width
+      canvas.height = image.height
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(image, 0, 0)
+      const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+      let count = 0
+      for (let i = 0; i < pixels.length; i += 4) {
+        if (pixels[i] < 100 && pixels[i + 1] < 100 && pixels[i + 2] < 100) count++
+      }
+      return count
+    }, bytes.toString('base64'))
+    expect(ink).toBeGreaterThan(20)
+  } finally {
+    await page.unrouteAll({ behavior: 'wait' })
+  }
 })
