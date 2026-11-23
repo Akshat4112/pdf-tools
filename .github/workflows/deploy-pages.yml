@@ -126,3 +126,7 @@ jobs:
         env:
           PDF_TOOLS_PRODUCTION_SMOKE: '1'
         run: npm run test:pages-ui -- privacy.spec.ts --project=desktop-chromium --max-failures=1
+      - name: Verify deployed English/German PDF-to-JPG conversion
+        env:
+          PDF_TOOLS_PRODUCTION_SMOKE: '1'
+        run: npm run test:pages-ui -- productionPdfToJpg.spec.ts --project=desktop-chromium --max-failures=1
