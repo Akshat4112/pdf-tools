@@ -11,6 +11,8 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
+from measure_office_layout import measure
+from xml.etree.ElementTree import ParseError
 
 ROOT = Path(__file__).resolve().parents[1]
 CORPUS = ROOT / "fixtures" / "office"
@@ -58,6 +60,15 @@ def benchmark() -> dict:
                                         extracted.returncode == 0 and record["page_count"] and
                                         all(record["expected_text_checks"].values())
                                         else "text_readback_failed")
+                    try:
+                        bbox = command(["pdftotext", "-bbox", str(pdf), "-"])
+                        if bbox.returncode != 0:
+                            raise ValueError("Poppler bbox extraction failed")
+                        record["text_geometry"] = measure(bbox.stdout)
+                        record["geometry_status"] = "measured"
+                    except (ValueError, ParseError, OSError, subprocess.TimeoutExpired) as exc:
+                        record["geometry_status"] = "measurement_failed"
+                        record["geometry_diagnostic"] = str(exc)[:500]
             except (OSError, subprocess.TimeoutExpired) as exc:
                 record["status"] = "renderer_unavailable_or_timeout"
                 record["diagnostic"] = str(exc)[:500]
