@@ -5,12 +5,16 @@ on:
     paths:
       - 'scripts/generate_office_probes.py'
       - 'scripts/benchmark_office_rendering.py'
+      - 'scripts/measure_office_layout.py'
+      - 'scripts/test_measure_office_layout.py'
       - '.github/workflows/office-probes.yml'
   push:
     branches: [main]
     paths:
       - 'scripts/generate_office_probes.py'
       - 'scripts/benchmark_office_rendering.py'
+      - 'scripts/measure_office_layout.py'
+      - 'scripts/test_measure_office_layout.py'
       - '.github/workflows/office-probes.yml'
 
 permissions:
@@ -33,6 +37,8 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libreoffice-writer libreoffice-calc libreoffice-impress poppler-utils
+      - name: Verify text geometry unit tests
+        run: python3 -m unittest discover -s scripts -p test_measure_office_layout.py
       - name: Benchmark LibreOffice import and PDF text readback
         run: python3 scripts/benchmark_office_rendering.py
       - name: Upload synthetic corpus and measured results
